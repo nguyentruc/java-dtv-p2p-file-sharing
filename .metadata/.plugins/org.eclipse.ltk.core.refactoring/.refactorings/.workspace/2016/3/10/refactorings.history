@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;dtv-file-sharing&apos;" deleteContents="false" description="Delete resource &apos;dtv-file-sharing&apos;" element1="/dtv-file-sharing" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1457073140490"/>&#x0A;<refactoring comment="Delete resource &apos;dtv-file-sharing&apos;" deleteContents="true" description="Delete resource &apos;dtv-file-sharing&apos;" element1="/dtv-file-sharing" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1457073571507"/>
-</session>
