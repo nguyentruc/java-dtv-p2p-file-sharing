@@ -1,35 +1,37 @@
 package dtv;
 
-import java.awt.EventQueue;
+import java.io.*;
+import java.util.concurrent.*;
 
 import javax.swing.JFrame;
 
-
-public class UI{
+/**
+ * 
+ * Handle UI thread
+ *
+ */
+public class UI implements Runnable{
 
 	private JFrame frame;
-
+	
 	/**
-	 * Launch the application.
+	 * Share data between thread
+	 * Usage: 	use mainQueue.put(o) to put object "o" into queue
+	 * 			use mainQueue.take() to take out object from queue
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					UI window = new UI();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
+	protected BlockingQueue<BufferedReader> mainQueue = null;
+	
 	/**
 	 * Create the application.
 	 */
-	public UI() {
+	public UI(BlockingQueue<BufferedReader> q) {
+		mainQueue = q;
 		initialize();
+	}
+	
+	@Override
+	public void run() {
+		frame.setVisible(true);	
 	}
 
 	/**
@@ -41,5 +43,4 @@ public class UI{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 	}
-
 }

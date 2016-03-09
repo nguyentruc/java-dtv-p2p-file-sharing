@@ -1,12 +1,28 @@
 package dtv;
 
+import java.io.*;
+import java.util.concurrent.*;
+
 public class DTV {
 
 	public static void main(String[] args) {
-		UI.main(null);
+		/**
+		 * Queue to share data between threads
+		 * Note: should have different queues for different purposes
+		 */
+		BlockingQueue<BufferedReader> mainQueue = new LinkedBlockingQueue<BufferedReader>();
 		
-		new Thread(new Peer()).start();
-
+		/**
+		 * create UI thread
+		 */
+		Thread uiHandle = new Thread(new UI(mainQueue));
+		uiHandle.start();
+		
+		/**
+		 * Create peer thread
+		 */
+		Thread peerHandle = new Thread(new Peer(mainQueue));
+		peerHandle.start();			
 	}
 
 }
