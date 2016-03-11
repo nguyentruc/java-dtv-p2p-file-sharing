@@ -1,6 +1,6 @@
 package dtv;
 
-import java.io.BufferedReader;
+import java.io.*;
 import java.util.concurrent.*;
 
 /**
@@ -11,23 +11,44 @@ import java.util.concurrent.*;
  */
 public class Peer implements Runnable{
 
-	protected BlockingQueue<BufferedReader> mainQueue = null;
+	protected BlockingQueue<TorFileMess> torFileQ = null;
+	protected Thread serverListener = null;
 	
-	public Peer(BlockingQueue<BufferedReader> q) {
-		mainQueue = q;
+	public Peer(BlockingQueue<TorFileMess> q) {
+		torFileQ = q;
+		
+		/* Create new server listener thread */
+		serverListener = new Thread(new ServerListener(6789));
+		serverListener.start();
 	}
 	
-	public void run(){
-		try{
-			while (true){
+	public void run()
+	{
+		try
+		{
+			while (true)
+			{
 				/* Sleep until a message appear */
-				BufferedReader message = mainQueue.take();
-				System.out.println(message);
+				
 			}
 		}
 		catch (Exception e){
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Get file extension
+	 * @param 	f: File to check
+	 * @return	extension of the file
+	 */
+	public String getExt(File f)
+	{
+		String name = f.getAbsolutePath();
+		int dot = name.lastIndexOf('.');
+		String ext = name.substring(dot+1);
+		
+		return ext;
 	}
 
 }
