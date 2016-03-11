@@ -14,8 +14,7 @@ public class DTV {
 		/**
 		 * create UI thread
 		 */
-//		Thread uiHandle = new Thread(new UI(mainQueue));
-//		uiHandle.start();
+
 		
 		/**
 		 * Create peer thread

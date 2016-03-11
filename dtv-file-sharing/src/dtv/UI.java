@@ -1,37 +1,33 @@
 package dtv;
 
-import java.io.*;
-import java.util.concurrent.*;
+import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import java.awt.BorderLayout;
+import javax.swing.SpringLayout;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
-/**
- * 
- * Handle UI thread
- *
- */
-public class UI implements Runnable{
+public class UI {
 
 	private JFrame frame;
-	
+	private JTextField txtTrackerAddress;
+	private JTextField txtTrackerPort;
+
 	/**
-	 * Share data between thread
-	 * Usage: 	use mainQueue.put(o) to put object "o" into queue
-	 * 			use mainQueue.take() to take out object from queue
+	 * Launch the application.
 	 */
-	protected BlockingQueue<BufferedReader> mainQueue = null;
-	
+
+
 	/**
 	 * Create the application.
 	 */
-	public UI(BlockingQueue<BufferedReader> q) {
-		mainQueue = q;
+	public UI() {
 		initialize();
-	}
-	
-	@Override
-	public void run() {
-		frame.setVisible(true);	
+		frame.setVisible(true);
 	}
 
 	/**
@@ -41,6 +37,44 @@ public class UI implements Runnable{
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		SpringLayout springLayout = new SpringLayout();
+		frame.getContentPane().setLayout(springLayout);
+		
+		JButton btnConnectTracker = new JButton("Connect");
+		springLayout.putConstraint(SpringLayout.NORTH, btnConnectTracker, 35, SpringLayout.NORTH, frame.getContentPane());
+		frame.getContentPane().add(btnConnectTracker);
+		
+		JLabel lblNewLabel = new JLabel("Tracker Address");
+		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel, 4, SpringLayout.NORTH, btnConnectTracker);
+		springLayout.putConstraint(SpringLayout.WEST, lblNewLabel, 32, SpringLayout.WEST, frame.getContentPane());
+		frame.getContentPane().add(lblNewLabel);
+		
+		txtTrackerAddress = new JTextField();
+		springLayout.putConstraint(SpringLayout.WEST, txtTrackerAddress, 39, SpringLayout.EAST, lblNewLabel);
+		springLayout.putConstraint(SpringLayout.WEST, btnConnectTracker, 23, SpringLayout.EAST, txtTrackerAddress);
+		frame.getContentPane().add(txtTrackerAddress);
+		txtTrackerAddress.setColumns(10);
+		
+		JLabel lblNewLabel_1 = new JLabel("Port");
+		springLayout.putConstraint(SpringLayout.NORTH, lblNewLabel_1, 6, SpringLayout.SOUTH, lblNewLabel);
+		frame.getContentPane().add(lblNewLabel_1);
+		
+		txtTrackerPort = new JTextField();
+		springLayout.putConstraint(SpringLayout.NORTH, txtTrackerPort, 64, SpringLayout.NORTH, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.EAST, lblNewLabel_1, -46, SpringLayout.WEST, txtTrackerPort);
+		springLayout.putConstraint(SpringLayout.SOUTH, txtTrackerAddress, -8, SpringLayout.NORTH, txtTrackerPort);
+		springLayout.putConstraint(SpringLayout.WEST, txtTrackerPort, 0, SpringLayout.WEST, txtTrackerAddress);
+		frame.getContentPane().add(txtTrackerPort);
+		txtTrackerPort.setColumns(10);
+		
+		JButton btnFileShare = new JButton("File Share");
+		btnFileShare.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new FrameFileShare();
+			}
+		});
+		springLayout.putConstraint(SpringLayout.NORTH, btnFileShare, 6, SpringLayout.SOUTH, btnConnectTracker);
+		springLayout.putConstraint(SpringLayout.WEST, btnFileShare, 0, SpringLayout.WEST, btnConnectTracker);
+		frame.getContentPane().add(btnFileShare);
 	}
 }
