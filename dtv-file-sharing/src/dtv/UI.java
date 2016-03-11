@@ -18,7 +18,7 @@ public class UI  implements Runnable{
 	private JFrame frame;
 	private JTextField txtTrackerAddress;
 	private JTextField txtTrackerPort;
-	protected BlockingQueue<BufferedReader> torMessQ = null;
+	protected BlockingQueue<TorFileMess> torMessQ = null;
 
 	/**
 	 * Launch the application.
@@ -28,7 +28,7 @@ public class UI  implements Runnable{
 	/**
 	 * Create the application.
 	 */
-	public UI(BlockingQueue<BufferedReader> q) {
+	public UI(BlockingQueue<TorFileMess> q) {
 		initialize();
 		torMessQ = q;
 	}
