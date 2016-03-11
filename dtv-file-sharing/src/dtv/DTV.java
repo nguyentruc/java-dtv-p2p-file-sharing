@@ -14,15 +14,10 @@ public class DTV {
 		/**
 		 * create UI thread
 		 */
-<<<<<<< HEAD
-		Thread uiHandle = new Thread(new UI(mainQueue));
+		Thread uiHandle = new Thread(new UI(torFileQ));
 		uiHandle.start();
 		
-		
-=======
-
->>>>>>> 6880507841fb84180b78fe3be585da62f4d0c9bf
-		
+			
 		/**
 		 * Create peer thread
 		 */
