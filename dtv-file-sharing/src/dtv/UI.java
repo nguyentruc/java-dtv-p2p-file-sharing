@@ -9,13 +9,16 @@ import javax.swing.SpringLayout;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.util.concurrent.BlockingQueue;
 import java.awt.event.ActionEvent;
 
-public class UI {
+public class UI  implements Runnable{
 
 	private JFrame frame;
 	private JTextField txtTrackerAddress;
 	private JTextField txtTrackerPort;
+	protected BlockingQueue<BufferedReader> torMessQ = null;
 
 	/**
 	 * Launch the application.
@@ -25,9 +28,9 @@ public class UI {
 	/**
 	 * Create the application.
 	 */
-	public UI() {
+	public UI(BlockingQueue<BufferedReader> q) {
 		initialize();
-		frame.setVisible(true);
+		torMessQ = q;
 	}
 
 	/**
@@ -76,5 +79,11 @@ public class UI {
 		springLayout.putConstraint(SpringLayout.NORTH, btnFileShare, 6, SpringLayout.SOUTH, btnConnectTracker);
 		springLayout.putConstraint(SpringLayout.WEST, btnFileShare, 0, SpringLayout.WEST, btnConnectTracker);
 		frame.getContentPane().add(btnFileShare);
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		frame.setVisible(true);
 	}
 }
