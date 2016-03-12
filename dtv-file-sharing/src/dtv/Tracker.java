@@ -23,7 +23,9 @@ public class Tracker {
     public static void main(String[] args) throws IOException{
         ServerSocket ss = new ServerSocket(1234);
         while(true){
+                System.out.println("Tracker ready.");
                 Socket sock = ss.accept();
+                System.out.println("Client Accepted.");
                 new Thread(new TrackerThread(sock)).start();
         }
     }

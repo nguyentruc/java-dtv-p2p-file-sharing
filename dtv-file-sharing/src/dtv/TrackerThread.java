@@ -21,6 +21,8 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class TrackerThread implements Runnable {
@@ -36,64 +38,100 @@ public class TrackerThread implements Runnable {
     @Override
     public void run() {
         try {
-            // Write received file (in bytest) to buffer
+            /*
+            * Start of "What to do with the received dtv file from peer
+            * socket->dtv file(in bytes)->buffer ---> key exist: add (ip, port) to keyList if non-exist, 
+            *                                   |        send back keyList(list of (ip, port)
+            *                                   |
+            *                                   |---> key non-exist: make new key[dir](dtv file, keyList(with first (ip, port)))
+            *                                            send back keyList(list of (ip, port)
+            */
+            // Write received file (in bytes) to buffer
+            // BufferedReader deals with characters, lines
+            // InputStreamReader deals with raw bytes
             BufferedReader br = new BufferedReader(new InputStreamReader(cs.getInputStream()));
+            System.out.println("Got all the bytes in buffer.");
             br.mark(1000);
+            // Get fileName of the received
             String fileName = br.readLine();
+            // Get the key of .dtv file (received file)
             String key = br.readLine();
             br.reset();
+            // get ipaddr (ip address) = "/xxx.xxx.xxx.xxx
+            String ipaddr = cs.getInetAddress().toString();
+            // get nPair (new (ip, port)) = "xxx.xxx.xxx.xxx:PORT_NUMBER"
+            String nPair = ipaddr.substring(1) + ":" + String.valueOf(cs.getLocalPort()) + "\n";
+            // keyList is the name of the file that contains all (ip, port) pairs of a .dtv 
+            String keyList = DirPATH + key + "\\" + key + ".txt";
+            System.out.println("Info preparation finished.");
             //                            - key.txt contains ip-port pairs
             //                           |   
             //  "...\\Storage\\key[dir] - 
             //                           |
             //                            - fileName.dtv received from peer
+            // key[dir] ~ DirPATH + key
             File f = new File(DirPATH + key);
-            if(f.exists() && f.isDirectory()){ // if key[dir] exist
-                // Add new ip-port pair to key.txt
-                String ipaddr = cs.getInetAddress().toString();
-                String newIP_PORT = ipaddr.substring(1) + ":" + 
-                        String.valueOf(cs.getLocalPort()) + "\n";
-                // Check if ip-port exist (unfinished)**************************
-                Scanner s = new Scanner(DirPATH + key + "\\" + key + ".txt");
-                boolean exist = false;
+            if(f.exists() && f.isDirectory()){ 
+                System.out.println("key exist, check if (ip, port) exist...");
+                // Unfinished
+                // If key[dir] exists (this dtv registered before)
+                // Check if ip-port exist
+                Scanner s = new Scanner(keyList);
+                List<String> list= new ArrayList<>();
                 while(s.hasNextLine()){
-                    if(newIP_PORT.equals(s.nextLine())) exist = true;
+                    list.add(s.nextLine()); 
                 }
-                if(!exist){
+                if(!list.contains(nPair)){
                     // Append ip-port if non-exist
-                    Files.write(Paths.get(DirPATH + key + "\\" + key + ".txt"), 
-                            newIP_PORT.getBytes(), StandardOpenOption.APPEND);
+                    System.out.println("(ip, port) non-exist, adding...");
+                    Files.write(Paths.get(keyList), nPair.getBytes(), StandardOpenOption.APPEND);
+                    System.out.println("Added.");
                 }
-                //*************************************************************
+                else{
+                    System.out.println("(ip, port) exist");
+                }
             }
-            else{ // if key[dir] non-exist
-                //Make key[dir]
+            else{ 
+                System.out.println("key non-exist, creating new dir...");
+                // If key[dir] doesn't exist (First time register)
+                // Make key[dir]
                 f.mkdir();
-                // Make key.txt in key[dir]
-                File newList = new File(DirPATH + key + "\\" + key + ".txt");
+                // Make keyList in key[dir]
+                File newList = new File(keyList);
                 newList.createNewFile();
-                // Write first IP-Port Pair to key.txt
-                String ipaddr = cs.getInetAddress().toString();
-                String newIP_PORT = ipaddr.substring(1) + ":" 
-                        + String.valueOf(cs.getLocalPort()) + "\n";
-                Files.write(Paths.get(DirPATH + key + "\\" + key + ".txt"),
-                        newIP_PORT.getBytes(), StandardOpenOption.WRITE);
+                // Write first (ip, port) pair to keyList
+                Files.write(Paths.get(keyList), nPair.getBytes(), StandardOpenOption.WRITE);
                 
-                // Create fileName.dtv in key[dir] from BufferedReader
+                // Store .dtv file in key[dir] (this file's created from buffer
                 String line;
-                File newFile = new File(DirPATH + key + "\\" + fileName + ".dtv");
+                String dtvFilePATH = DirPATH + key + "\\" + fileName + ".dtv";
+                // Create dtv file from buffer
+                File newFile = new File(dtvFilePATH);
                 newFile.createNewFile();
-                PrintWriter out = new PrintWriter(new BufferedWriter
-            (new FileWriter(DirPATH + key + "\\" + fileName + ".dtv", true)));
+                PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dtvFilePATH, true)));
                 while((line = br.readLine()) != null){
-                    System.out.println(line);
+                    // For debug
+                    System.out.println(out.checkError()?"Success to ":"Failed to " + "write: " + line);
+                    // Print line to file
                     out.println(line);
                 }
+                System.out.println("Store files successfully.");
                 // Close Printwriter
                 out.close();
                 // Close BufferedReader
                 br.close();
             }
+            /*
+            * End 
+            */
+            /*
+            * Send keyList back to peer
+            */
+            //FileThroughSocket f_send = new FileThroughSocket(keyList, cs);
+            //f_send.send();
+            /*
+            * End
+            */
         } catch (IOException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
