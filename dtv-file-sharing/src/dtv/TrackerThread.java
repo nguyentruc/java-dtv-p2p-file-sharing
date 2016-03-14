@@ -12,7 +12,10 @@ package dtv;
  */
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -72,23 +75,40 @@ public class TrackerThread implements Runnable {
             //                           |
             //                            - fileName.dtv received from peer
             // key[dir] ~ DirPATH + key
+            
             File f = new File(DirPATH + key);
             if(f.exists() && f.isDirectory()){ 
                 System.out.println("key exist, check if ip exist...");
                 // Unfinished
                 // If key[dir] exists (this dtv registered before)
-                // Check if ip exist
-                Scanner s = new Scanner(keyList);
-                while(s.hasNextLine()){
-                    if(nIP.equals(s.nextLine().trim())){
-                        System.out.println("ip exist");
-                    }
-                    else{
-                    // Append ip if non-exist
-                        System.out.println("ip non-exist, adding...");
-                        Files.write(Paths.get(keyList), nIP.getBytes(), StandardOpenOption.APPEND);
-                        System.out.println("Added.");
-                    }
+                // Check if ip exist                                
+             
+                File FilekeyList = new File(keyList);
+                byte[] tmp = new byte[(int)FilekeyList.length()];
+                DataInputStream readFile = new DataInputStream(new FileInputStream(FilekeyList));
+                readFile.readFully(tmp);
+                readFile.close();
+                String check = new String(tmp);
+                if (check.indexOf(nIP) != -1) {
+                    System.out.println("ip exist");
+                }
+                else{
+                // Append ip if non-exist
+                    System.out.println("ip non-exist, adding...");
+                    String fstLine = check.substring(0, check.indexOf('\n'));
+                    System.out.print(fstLine);
+                    fstLine = fstLine.trim();
+                    int nn = Integer.parseInt(fstLine);
+                    nn++;
+                    String ns = String.valueOf(nn);//
+                    check = check.replaceFirst(fstLine, ns);//
+                    System.out.println(check);
+                    PrintWriter newFile = new PrintWriter(FilekeyList);
+                    check += nIP;
+                    newFile.println(check);
+                    newFile.flush();
+                    newFile.close();
+                    System.out.println("Added.");
                 }
                 
             }
