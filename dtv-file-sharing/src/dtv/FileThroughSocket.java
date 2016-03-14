@@ -2,12 +2,16 @@ package dtv;
 
 
 import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -43,9 +47,14 @@ public class FileThroughSocket {
         // Read bytes from buffer into bytes array with offset 0
         bis.read(mybytearray,0,mybytearray.length);
         // Create an output stream to send bytes through socket
-        OutputStream os = csocket.getOutputStream();
+        DataOutputStream os = new DataOutputStream(csocket.getOutputStream());
+        //PrintWriter pw = new PrintWriter(new OutputStreamWriter(csocket.getOutputStream()));
+   
         // For debug
         System.out.println("Sending file" + "(" + mybytearray.length + " bytes) ...");
+        //pw.println(Arrays.toString(mybytearray));
+        //pw.flush();
+        //pw.close();
         // send an bytes array through socket
         os.write(mybytearray,0,mybytearray.length);
         os.flush();

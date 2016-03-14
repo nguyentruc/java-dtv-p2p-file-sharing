@@ -27,15 +27,18 @@ public class Client_ForTestTrackerOnly {
             f_send.send();
             
             // get response from tracker (keyList)
-            //BufferedReader br = new BufferedReader(new InputStreamReader(csocket.getInputStream()));
-            //String line;
-            //System.out.println("List of (ip, port) received");
-            //while((line = br.readLine()) != null){
-            //    System.out.println(line);
-            //}
+            BufferedReader br = new BufferedReader(new InputStreamReader(csocket.getInputStream()));
+            String line;
+            System.out.println("List of ip received");
+            
+            line = br.readLine();
+            System.out.println(line);
+          
+            
             csocket.close();
         } catch(Exception e){
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }  
 }
