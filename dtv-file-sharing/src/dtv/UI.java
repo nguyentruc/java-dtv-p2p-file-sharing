@@ -74,6 +74,13 @@ public class UI  implements Runnable{
 		btnFileShare.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new FrameFileShare();
+			//	TorFileMess temp = new TorFileMess();
+			//	try {
+			//		torMessQ.put(temp);
+			//	} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+			//		e1.printStackTrace();
+			//	}
 			}
 		});
 		springLayout.putConstraint(SpringLayout.NORTH, btnFileShare, 6, SpringLayout.SOUTH, btnConnectTracker);
