@@ -6,12 +6,12 @@ public class FileTorList {
 	
 	static volatile LinkedList<String> listFile = new LinkedList<String>();
 	
-	public static LinkedList<String> getFileList()
+	public static synchronized LinkedList<String> getFileList()
 	{	
 		return listFile;
 	}
 	
-	public static int posFile(String hashCode)
+	public static synchronized int posFile(String hashCode)
 	{
 		return listFile.indexOf(hashCode);
 	}
@@ -21,7 +21,7 @@ public class FileTorList {
 		listFile.add(hashCode);
 	}
 	
-	public static String getKey(int index)
+	public static synchronized String getKey(int index)
 	{
 		return listFile.get(index);
 	}

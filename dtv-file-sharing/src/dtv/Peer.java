@@ -1,8 +1,6 @@
 package dtv;
 
 import java.io.*;
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.concurrent.*;
 import java.net.*;
 
@@ -24,17 +22,6 @@ public class Peer implements Runnable{
 		serverListener.start();
 		
 		FileTorList.resetList();			
-		
-		/* For debug purpose only */
-		File torFile = new File("d:/aabcd.dtv");
-		TorFileMess testTor = new TorFileMess(0, torFile, "abcd");
-		try {
-			torFileQ.put(testTor);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 	}
 	
 	public void run()
@@ -63,7 +50,7 @@ public class Peer implements Runnable{
 		}
 	}
 	
-	public String getHash(File tor)
+	private String getHash(File tor)
 	{
 		try {
 			BufferedReader tFile = new BufferedReader(new InputStreamReader(new FileInputStream(tor)));
@@ -79,12 +66,12 @@ public class Peer implements Runnable{
 		}
 	}
 	
-	public void sendFileToTracker(File tor)
+	private void sendFileToTracker(File tor)
 	{
 		try {
 			BufferedReader tFile = new BufferedReader(new InputStreamReader(new FileInputStream(tor)));
 			
-			/* Read file to  */
+			/* Read file to buffer */
 			DataInputStream tFile_stream = new DataInputStream(new FileInputStream(tor));
 			byte[] fileToSend = new byte[(int)tor.length()];
 			tFile_stream.readFully(fileToSend);
