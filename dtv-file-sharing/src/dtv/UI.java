@@ -73,7 +73,7 @@ public class UI  implements Runnable{
 		JButton btnFileShare = new JButton("File Share");
 		btnFileShare.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new FrameFileShare();
+				new FrameFileShare(torMessQ);
 			//	TorFileMess temp = new TorFileMess();
 			//	try {
 			//		torMessQ.put(temp);

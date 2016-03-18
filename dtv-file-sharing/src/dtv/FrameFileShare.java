@@ -23,6 +23,8 @@ import java.net.UnknownHostException;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.BlockingQueue;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -36,6 +38,8 @@ public class FrameFileShare extends JFrame {
 
 	private JPanel contentPane;
 	private JFrame frameShare;
+	File fileChoose;
+	File addressChoose;
 	/**
 	 * Launch the application.
 	 */
@@ -46,7 +50,7 @@ public class FrameFileShare extends JFrame {
 	private String key;
 	private String trackerNumber;
 	private String trackerAddress;
-	public FrameFileShare() {
+	public FrameFileShare(BlockingQueue<TorFileMess> torMessQ) {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -71,7 +75,7 @@ public class FrameFileShare extends JFrame {
 				JFileChooser fileChooser = new JFileChooser();
 				int value=fileChooser.showOpenDialog(btnAddFile);
 				if(value ==JFileChooser.APPROVE_OPTION){			
-				File fileChoose = fileChooser.getSelectedFile();
+				fileChoose = fileChooser.getSelectedFile();
 				getFileName=fileChoose.getName();
 				/*getUrl=fileChoose.getAbsolutePath();
 				InetAddress myHost;
@@ -105,7 +109,7 @@ public class FrameFileShare extends JFrame {
 				//fileChooser.showOpenDialog(contentPane);
 				int value=fileChooser.showSaveDialog(btnCreateFile);
 				if(value ==JFileChooser.APPROVE_OPTION){
-					File addressChoose = fileChooser.getSelectedFile();
+					addressChoose = fileChooser.getSelectedFile();
 					String url=addressChoose.getAbsolutePath();
 					String FileName=addressChoose.getName();
 					// Write File
@@ -122,8 +126,13 @@ public class FrameFileShare extends JFrame {
 			             fileTorrent.println(trackerNumber);
 			             fileTorrent.println(trackerAddress);
 			             fileTorrent.flush();
-			             fileTorrent.close();	
-					} catch (FileNotFoundException e) {
+			             fileTorrent.close();
+			             
+			             TorFileMess torMess = new TorFileMess(0,addressChoose,fileChoose.getAbsolutePath());
+			             torMessQ.put(torMess);
+			        
+			             
+					} catch (FileNotFoundException | InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}    
