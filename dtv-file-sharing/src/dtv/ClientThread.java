@@ -6,16 +6,19 @@ import java.net.*;
 public class ClientThread implements Runnable {
 
 	private int port;
+	String peerIP;
 	Socket clientSocket = null;
+	byte[] file;
 	
-	public ClientThread(int portToConnect) {
+	public ClientThread(byte[] fileDownloaded, String ip, int portToConnect) 
+	{
 		this.port = portToConnect;
+		peerIP = ip;
+		file = fileDownloaded;
 		
 		try
-		{
-			System.out.println("Opening client socket ...");
-			InetAddress localhost = InetAddress.getLocalHost();	
-			clientSocket = new Socket(localhost, port);
+		{	
+			clientSocket = new Socket(peerIP, port);
 		} 
 		catch (IOException e)
 		{
@@ -26,30 +29,11 @@ public class ClientThread implements Runnable {
 	public void run() {
 		try
 		{
-			PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
-			BufferedReader inFromServer = 
-					new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			DataInputStream inFromServer = new DataInputStream(clientSocket.getInputStream());
 			
-			while (true)
-			{
-				if (port == 9013)
-					outToServer.println("Peer 1");
-				else outToServer.println("Peer 2");
-				
-				outToServer.flush();
-				
-				if (inFromServer.ready())
-				{
-					System.out.println(inFromServer.readLine());
-				}
-				
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					System.out.println("can't sleep");
-				}
-			}
+			//Receive File
+			
+			
 		}
 		catch (Exception e)
 		{

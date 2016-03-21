@@ -7,7 +7,8 @@ public class PeerGet implements Runnable {
 
 	TorFileMess torMess = null;
 	protected Thread serverListener = null;
-	List<String> availPeer = new LinkedList<>();
+	List<String> availPeer = new ArrayList<>();
+	byte[] fileDownloaded;
 	
 	public PeerGet(TorFileMess torMess) 
 	{
@@ -27,6 +28,11 @@ public class PeerGet implements Runnable {
 			synchronized (availPeer) {
 				while (availPeer.isEmpty()) availPeer.wait();
 			}			
+			
+			for (int i = 0; i < availPeer.size(); i++)
+			{
+				new Thread(new ClientThread(fileDownloaded, availPeer.get(i), 6789)).start();
+			}
 		}
 		catch(Exception e)
 		{

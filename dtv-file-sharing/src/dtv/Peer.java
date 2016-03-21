@@ -32,10 +32,10 @@ public class Peer implements Runnable{
 			{
 				/* Sleep until a message appear */
 				TorFileMess revTor = torFileQ.take();
+				FileTorList.addNew(getHash(revTor.tor));
 				
 				if (revTor.type == 0) //register new torrent
 				{
-					FileTorList.addNew(getHash(revTor.tor));
 					sendFileToTracker(revTor.tor);
 				}
 				else if (revTor.type == 1) //add torrent
