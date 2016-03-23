@@ -23,7 +23,8 @@ public class FileTorList {
 	
 	public static synchronized void addNew (TorFileMess torMess)
 	{
-		listFile.add(torMess);
+		TorFileMess _torMess = new TorFileMess(torMess.type, torMess.tor, torMess.path, torMess.hashCode);
+		listFile.add(_torMess);
 	}
 	
 	public static synchronized TorFileMess getKey(int index)
