@@ -34,24 +34,26 @@ import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 public class FrameFileShare extends JFrame {
 
 	private JPanel contentPane;
 	private JFrame frameShare;
 	File fileChoose;
 	File addressChoose;
+	private String getFileName;
+	private String key;
+	private int trackerNumber;
+	private String trackerAddress;
+	private long size;
 	/**
 	 * Launch the application.
 	 */
 	/**
 	 * Create the frame.
 	 */
-	private String getFileName;
-	private String key;
-	private String trackerNumber;
-	private String trackerAddress;
 	public FrameFileShare(BlockingQueue<TorFileMess> torMessQ) {
-		
+		////////////////////////////////////////////////////////////////////////////
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -59,14 +61,30 @@ public class FrameFileShare extends JFrame {
 		setContentPane(contentPane);
 		SpringLayout sl_contentPane = new SpringLayout();
 		contentPane.setLayout(sl_contentPane);
-		
 		JButton btnAddFile = new JButton("AddFile");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, btnAddFile, 10, SpringLayout.NORTH, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.WEST, btnAddFile, 83, SpringLayout.WEST, contentPane);
+		JButton btnCreateFile = new JButton("Create");
+		sl_contentPane.putConstraint(SpringLayout.NORTH, btnAddFile, 0, SpringLayout.NORTH, btnCreateFile);
+		sl_contentPane.putConstraint(SpringLayout.EAST, btnAddFile, -25, SpringLayout.WEST, btnCreateFile);
+		sl_contentPane.putConstraint(SpringLayout.NORTH, btnCreateFile, 10, SpringLayout.NORTH, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.WEST, btnCreateFile, 181, SpringLayout.WEST, contentPane);
 		JLabel lblStatus = new JLabel("");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblStatus, 57, SpringLayout.SOUTH, btnAddFile);
-		sl_contentPane.putConstraint(SpringLayout.WEST, lblStatus, 105, SpringLayout.WEST, contentPane);
-		//Select Source and create File Torrent	
+		sl_contentPane.putConstraint(SpringLayout.NORTH, lblStatus, 27, SpringLayout.SOUTH, btnCreateFile);
+		sl_contentPane.putConstraint(SpringLayout.WEST, lblStatus, 156, SpringLayout.WEST, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.EAST, lblStatus, -143, SpringLayout.EAST, contentPane);
+		JLabel lblAddressTracker = new JLabel("Address Tracker");
+		sl_contentPane.putConstraint(SpringLayout.WEST, lblAddressTracker, 25, SpringLayout.WEST, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.EAST, lblAddressTracker, -274, SpringLayout.EAST, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.NORTH, lblAddressTracker, -77, SpringLayout.SOUTH, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.SOUTH, lblAddressTracker, -45, SpringLayout.SOUTH, contentPane);
+		JTextArea textAddressTracker = new JTextArea();
+		sl_contentPane.putConstraint(SpringLayout.NORTH, textAddressTracker, 158, SpringLayout.NORTH, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.SOUTH, lblStatus, -113, SpringLayout.NORTH, textAddressTracker);
+		sl_contentPane.putConstraint(SpringLayout.WEST, textAddressTracker, 41, SpringLayout.EAST, lblAddressTracker);
+		sl_contentPane.putConstraint(SpringLayout.SOUTH, textAddressTracker, -27, SpringLayout.SOUTH, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.EAST, textAddressTracker, -63, SpringLayout.EAST, contentPane);
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////
+		//Button Add File to choose select soure include file -> button Create to create file torrent
 		btnAddFile.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -77,32 +95,22 @@ public class FrameFileShare extends JFrame {
 				if(value ==JFileChooser.APPROVE_OPTION){			
 				fileChoose = fileChooser.getSelectedFile();
 				getFileName=fileChoose.getName();
-				/*getUrl=fileChoose.getAbsolutePath();
-				InetAddress myHost;
-				try {
-					myHost = InetAddress.getLocalHost();
-					 getIP=myHost.getHostAddress();
-				} catch (UnknownHostException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}*/
-				Hashcode hashFile=new Hashcode();
+				//hash content of file torrent
+				Hashcode hashFile=new Hashcode(); 
 				key=hashFile.hashCode(fileChoose);
-				trackerNumber="1";
-				trackerAddress="VDT";
-				lblStatus.setText("File Selected : " + fileChoose.getName() +  fileChoose.getAbsolutePath());
+				size=fileChoose.length();
+				lblStatus.setText("Select Source: "+fileChoose.getAbsolutePath());
 				}
 				else{
 					lblStatus.setText("Open command cancelled by user." );           
 		        }
 				
 	         }    
-				//create torrent file
-				//create TorFileMess
-				//send to thread
-				
 		});
-		JButton btnCreateFile = new JButton("Create");
+		//Create FileTorrent
+		//JtextArea in order to edit addressTracker
+		textAddressTracker.setLineWrap(true);//Sets the line-wrapping policy of the text area.
+		textAddressTracker.append("DVT");
 		btnCreateFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fileChooser = new JFileChooser();
@@ -112,26 +120,23 @@ public class FrameFileShare extends JFrame {
 					addressChoose = fileChooser.getSelectedFile();
 					String url=addressChoose.getAbsolutePath();
 					String FileName=addressChoose.getName();
-					// Write File
+					//Get content (trackerAddress) and line (trackerNumber) of JtextArea 
+					trackerAddress=textAddressTracker.getText();
+					trackerNumber=textAddressTracker.getLineCount();
+					// Write FileTorrent
 					try {
 						FileOutputStream fos = new FileOutputStream(url,true);
 						PrintWriter fileTorrent = new PrintWriter(fos);
-						
-					//	 fileTorrent.println(getFileName);
-					//	 fileTorrent.println(getUrl);
-			        //   fileTorrent.println(getIP);
-			        //   fileTorrent.println(port);
 						 fileTorrent.println(FileName);
 			             fileTorrent.println(key);
-			             fileTorrent.println(trackerNumber);
+			             fileTorrent.print(trackerNumber);
+			             fileTorrent.println();
 			             fileTorrent.println(trackerAddress);
+			             fileTorrent.println(size);
 			             fileTorrent.flush();
-			             fileTorrent.close();
-			             
-			             TorFileMess torMess = new TorFileMess(0,addressChoose,fileChoose.getAbsolutePath());
+			             fileTorrent.close();          
+			             TorFileMess torMess = new TorFileMess(0,addressChoose,fileChoose.getAbsolutePath(),key);
 			             torMessQ.put(torMess);
-			        
-			             
 					} catch (FileNotFoundException | InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -143,14 +148,16 @@ public class FrameFileShare extends JFrame {
 				
 			}
 		});
-		sl_contentPane.putConstraint(SpringLayout.NORTH, btnCreateFile, 0, SpringLayout.NORTH, btnAddFile);
-		sl_contentPane.putConstraint(SpringLayout.WEST, btnCreateFile, 31, SpringLayout.EAST, btnAddFile);
+		///////////////////////////////////////////////////////////////////////////////////////////
 		contentPane.add(btnAddFile);
 		contentPane.add(lblStatus);
 		contentPane.add(btnCreateFile);
+		contentPane.add(lblAddressTracker);
+		contentPane.add(textAddressTracker);
 		setVisible(true);
 	}
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////
  class Hashcode {
 	public String hashCode(File file){
 		MessageDigest md;
