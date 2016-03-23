@@ -8,7 +8,6 @@ public class PeerGet implements Runnable {
 	TorFileMess torMess = null;
 	protected Thread serverListener = null;
 	List<String> availPeer = new ArrayList<>();
-	byte[] fileDownloaded;
 	
 	public PeerGet(TorFileMess torMess) 
 	{
@@ -29,10 +28,14 @@ public class PeerGet implements Runnable {
 				while (availPeer.isEmpty()) availPeer.wait();
 			}			
 			
+			RandomAccessFile file = new RandomAccessFile(torMess.path, "w");
+			
 			for (int i = 0; i < availPeer.size(); i++)
 			{
-				new Thread(new ClientThread(fileDownloaded, availPeer.get(i), 6789)).start();
+				new Thread(new ClientThread(file, torMess.hashCode, availPeer.get(i), 6789)).start();
 			}
+			
+			//close file after finish download
 		}
 		catch(Exception e)
 		{

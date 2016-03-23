@@ -32,7 +32,7 @@ public class Peer implements Runnable{
 			{
 				/* Sleep until a message appear */
 				TorFileMess revTor = torFileQ.take();
-				FileTorList.addNew(getHash(revTor.tor));
+				FileTorList.addNew(revTor);
 				
 				if (revTor.type == 0) //register new torrent
 				{
@@ -47,22 +47,6 @@ public class Peer implements Runnable{
 		}
 		catch (Exception e){
 			e.printStackTrace();
-		}
-	}
-	
-	private String getHash(File tor)
-	{
-		try {
-			BufferedReader tFile = new BufferedReader(new InputStreamReader(new FileInputStream(tor)));
-			tFile.readLine();
-			String key = tFile.readLine();
-			tFile.close();
-			return key;
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
 		}
 	}
 	

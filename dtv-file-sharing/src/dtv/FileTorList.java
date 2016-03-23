@@ -1,27 +1,32 @@
 package dtv;
 
-import java.util.LinkedList;
+import java.util.*;
 
 public class FileTorList {
 	
-	static volatile LinkedList<String> listFile = new LinkedList<String>();
+	static volatile List<TorFileMess> listFile = new ArrayList<>();
 	
-	public static synchronized LinkedList<String> getFileList()
+	public static synchronized List<TorFileMess> getFileList()
 	{	
 		return listFile;
 	}
 	
 	public static synchronized int posFile(String hashCode)
 	{
-		return listFile.indexOf(hashCode);
+		for (int i = 0; i < listFile.size(); i++)
+		{
+			if (listFile.get(i).hashCode == hashCode)
+				return i;
+		}
+		return -1;
 	}
 	
-	public static synchronized void addNew (String hashCode)
+	public static synchronized void addNew (TorFileMess torMess)
 	{
-		listFile.add(hashCode);
+		listFile.add(torMess);
 	}
 	
-	public static synchronized String getKey(int index)
+	public static synchronized TorFileMess getKey(int index)
 	{
 		return listFile.get(index);
 	}
