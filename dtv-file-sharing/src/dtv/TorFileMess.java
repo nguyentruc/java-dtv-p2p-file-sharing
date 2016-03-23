@@ -6,6 +6,7 @@ public class TorFileMess {
 	int type;
 	File tor = null;
 	String path = null;
+	String hashCode = null;
 	
 	public TorFileMess()
 	{
@@ -14,10 +15,11 @@ public class TorFileMess {
 		path = null;
 	}
 	
-	public TorFileMess(int type, File tor, String path)
+	public TorFileMess(int type, File tor, String path, String hash)
 	{
 		this.type = type;
 		this.tor = tor;
 		this.path = path;
+		this.hashCode = hash;
 	}
 }
