@@ -15,26 +15,19 @@ import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 public class TrackerThread implements Runnable {
 
     Socket cs;
     // Create a Storage Folder in your PC then change DirPATH below
-    String DirPATH = "D:\\Users\\King\\Desktop\\Study Materials\\"
-            + "Semester 2 - Year 3\\Computer network\\Assignment\\Storage\\";
+    String DirPATH = "C:\\Study Materials\\Semester 2 Year 3 - 2016"
+            + "\\Computer Networking\\AssTestFolder\\Tracker\\";
     TrackerThread(Socket cs) {
         this.cs = cs;
     }
@@ -116,7 +109,7 @@ public class TrackerThread implements Runnable {
                 System.out.println("key non-exist, creating new dir...");
                 // If key[dir] doesn't exist (First time register)
                 // Make key[dir]
-                f.mkdir();
+                try{f.mkdir();
                 // Make keyList in key[dir]
                 File newList = new File(keyList);
                 newList.createNewFile();
@@ -134,8 +127,12 @@ public class TrackerThread implements Runnable {
                 newFile.createNewFile();
                 PrintWriter toDtvFile = new PrintWriter(new BufferedWriter(new FileWriter(dtvFilePATH, true)));
                 toDtvFile.println(fileName);
+                System.out.println("pass fileName: " + fileName);
                 toDtvFile.println(key);
+                System.out.println("pass key: " + key);
                 toDtvFile.println(numberOfTracker);
+                System.out.println("pass number0fTracker: " + numberOfTracker);
+                
                 for(int i = 0; i<Integer.parseInt(numberOfTracker); i++){
                     line = br.readLine();
                     toDtvFile.println(line);
@@ -147,6 +144,9 @@ public class TrackerThread implements Runnable {
                 //System.out.flush();
                 // Close Printwriter
                 toDtvFile.close();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
                 // Close BufferedReader
                 //br.close();
             }
