@@ -14,28 +14,28 @@ import java.io.*;
 public class UpdatePeerList implements Runnable{
 
 	List<String> peerList;
-	List<String> trackerList = new ArrayList<>();
-	File tor;
-	int numOfTracker;
+	DTVParams dtv_params;
+	
 	/**
 	 * 
 	 */
-	public UpdatePeerList(List<String> list, File _tor) {
+	public UpdatePeerList(List<String> list, DTVParams dtv_params) {
 		peerList = list;
-		tor = _tor;
+		this.dtv_params = dtv_params;
 	}
 
 	@Override
 	public void run() {
 		try
 		{
-			trackerList.clear();
-			getTrackerList();
-			String fileToSend = new String(torToBuffer());
+			List<String> trackerList = new ArrayList<>(dtv_params.getTrackerList());
+			String fileName = dtv_params.getName();
+			String hashCode = dtv_params.getHashCode();
+			long size = dtv_params.getSize();
 			
 			while (true)
 			{
-				for (int i = 0; i < numOfTracker; i++)
+				for (int i = 0; i < trackerList.size(); i++)
 				{
 					String tracker = trackerList.get(i);
 					
@@ -48,7 +48,10 @@ public class UpdatePeerList implements Runnable{
 					BufferedReader inFromServer = 
 							new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 					PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());		
-					outToServer.println(fileToSend);
+					outToServer.println(fileName);
+					outToServer.println(hashCode);
+					outToServer.println(String.valueOf(size));
+					
 					outToServer.flush();
 					
 					readPeerList(inFromServer);
@@ -65,39 +68,6 @@ public class UpdatePeerList implements Runnable{
 		}
 		
 		
-	}
-	
-	private void getTrackerList()
-	{
-		try
-		{
-			BufferedReader tFile = new BufferedReader(new InputStreamReader(new FileInputStream(tor)));
-			tFile.readLine();
-			tFile.readLine();
-			
-			numOfTracker = Integer.parseInt(tFile.readLine());
-			for (int i = 0; i < numOfTracker; i++)
-			{
-				trackerList.add(tFile.readLine());
-			}
-				
-			tFile.close();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	private byte[] torToBuffer() throws IOException
-	{
-		/* Read file to buffer */
-		DataInputStream tFile_stream = new DataInputStream(new FileInputStream(tor));
-		byte[] fileToSend = new byte[(int)tor.length()];
-		tFile_stream.readFully(fileToSend);
-		tFile_stream.close();
-		
-		return fileToSend;
 	}
 	
 	/* Check for new peer, if new peer -> new connect */

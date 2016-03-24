@@ -5,16 +5,17 @@ import java.net.*;
 public class ClientThread implements Runnable {
 
 	private int port;
-	String peerIP, hash;
+	String peerIP;
+	DTVParams dtv_params;
 	Socket clientSocket = null;
 	RandomAccessFile file;
 	
-	public ClientThread(RandomAccessFile _file, String _hash, String ip, int portToConnect) 
+	public ClientThread(RandomAccessFile _file, DTVParams dtv_params, String ip, int portToConnect) 
 	{
 		this.port = portToConnect;
 		peerIP = ip;
 		file = _file;
-		hash = _hash;
+		this.dtv_params = dtv_params;
 		
 		try
 		{	
@@ -29,11 +30,11 @@ public class ClientThread implements Runnable {
 	public void run() {
 		try
 		{
-			DataInputStream inFromServer = new DataInputStream(clientSocket.getInputStream());
+			DataInputStream inFromServer = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
 			DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
 			
 			//ask for file
-			outToServer.writeUTF(hash);
+			outToServer.writeUTF(dtv_params.getHashCode());
 			outToServer.flush();
 			
 			//if not found
@@ -47,7 +48,7 @@ public class ClientThread implements Runnable {
 			byte[] buffer = new byte[8192];
 			int cnt;
 			
-			while ((cnt = inFromServer.read(buffer)) >= 0)
+			while ((cnt = inFromServer.read(buffer,0,8192)) >= 0)
 			{
 				file.write(buffer, 0, cnt);
 			}

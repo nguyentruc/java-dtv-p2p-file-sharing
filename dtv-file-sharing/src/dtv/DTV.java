@@ -9,7 +9,7 @@ public class DTV {
 		 * Queue to share data between threads
 		 * Note: should have different queues for different purposes
 		 */
-		BlockingQueue<TorFileMess> torFileQ = new LinkedBlockingQueue<TorFileMess>();
+		BlockingQueue<DTVParams> torFileQ = new LinkedBlockingQueue<>();
 				
 		/**
 		 * create UI thread
