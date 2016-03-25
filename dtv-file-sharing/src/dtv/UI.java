@@ -18,10 +18,14 @@ import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -29,18 +33,22 @@ import java.util.concurrent.BlockingQueue;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.JTree;
+import java.util.*;
 
 public class UI  implements Runnable{
 
 	private JFrame frame;
 	protected BlockingQueue<DTVParams> torMessQ = null;
+	BlockingQueue<List<DTVParams>> fileListQ = null;
 	private JTree tree;
 	private JTable table;
 	private JTable tableRequest;
@@ -62,9 +70,17 @@ public class UI  implements Runnable{
 	/**
 	 * Create the application.
 	 */
-	public UI(BlockingQueue<DTVParams> q) {
+	public UI(BlockingQueue<DTVParams> q, BlockingQueue<List<DTVParams>> fileList) {
 		initialize();
 		torMessQ = q;
+		fileListQ = fileList;
+		
+//		try {
+//			List<DTVParams> fileL = fileListQ.take();
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	/**
@@ -157,13 +173,23 @@ public class UI  implements Runnable{
 			new String[] {
 				"STT", "FILE NAME", "SIZE", "PATH"
 			}
-		));
-		//change JTable column width
-		table.getColumnModel().getColumn(0).setPreferredWidth(0);
-		table.getColumnModel().getColumn(1).setPreferredWidth(190);
-		table.getColumnModel().getColumn(2).setPreferredWidth(0);
-		table.getColumnModel().getColumn(3).setPreferredWidth(296);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		){
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                true, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        }			
+		);
 		/////////////////////////////////////////////////////////
 		tableRequest.setModel(new DefaultTableModel(
 				new Object[][] {
@@ -171,7 +197,24 @@ public class UI  implements Runnable{
 				new String[] {
 					"STT", "FILE NAME", "SIZE", "IP ADDRESS","PORT"
 				}
-			));
+			)
+		{
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+            		true, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        }		
+			);
 			//change JTable column width
 			/////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////
@@ -180,10 +223,25 @@ public class UI  implements Runnable{
 			},
 			new String[] {
 			"STT", "FILE NAME", "SIZE", "STATUS","IP ADDRESS","PORT","TIME"
-			}
-			));
-			//change JTable column width
-			/////////////////////////////////////////////////////////////////
+			})
+			{
+	            Class[] types = new Class [] {
+	                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
+	            };
+	            boolean[] canEdit = new boolean [] {
+	                true, false, false, false,false, false,true
+	            };
+
+	            public Class getColumnClass(int columnIndex) {
+	                return types [columnIndex];
+	            }
+
+	            public boolean isCellEditable(int rowIndex, int columnIndex) {
+	                return canEdit [columnIndex];
+	            }
+	        }			
+					);
+		/////////////////////////////////////////////////////////////////
 		scrollPaneTree = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.SOUTH, btnAddTorrent, -27, SpringLayout.NORTH, scrollPaneTree);
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPaneTree, 0, SpringLayout.NORTH, scrollPaneTable1);
@@ -243,6 +301,7 @@ public class UI  implements Runnable{
 				String size=Long.toString(file.length())+" bytes";
 				int numberRow=0;
 				boolean flag = false;
+				boolean flagLoad = false;
 				if(model.getRowCount()==0){
 					model.addRow(new Object[]{model.getRowCount()+1,file.getName(),size,file.getAbsoluteFile()});
 				}
@@ -251,6 +310,7 @@ public class UI  implements Runnable{
 					while(numberRow<count){
 						if(file.getName().equals((String)model.getValueAt(numberRow, 1))){
 							flag = true;
+							flagLoad=true;
 							break;
 						}
 						numberRow=numberRow+1;
@@ -259,13 +319,29 @@ public class UI  implements Runnable{
 						model.addRow(new Object[]{model.getRowCount()+1,file.getName(),size,file.getAbsoluteFile()});
 					} 
 					}
-				Hashcode hashFile=new Hashcode(); 
+				if(flagLoad==false){ 
 				DTVParams dtv_params = new DTVParams();
 				dtv_params.setName(file.getName());
-				dtv_params.setHashCode(hashFile.hashCode(file));
+				String hashCode = null;
+				try {
+					hashCode = generateMD5(new FileInputStream(file));
+				} catch (FileNotFoundException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+				System.out.println(hashCode);
+				dtv_params.setHashCode(hashCode);
 				dtv_params.setSize(file.length());
 				dtv_params.setPathToFile(file.getAbsolutePath());
-				dtv_params.setType(0);						//Share File
+				//dtv_params.addTracker();
+				dtv_params.setType(0);		//Share File
+				try {
+					torMessQ.put(dtv_params);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				}
 				}
 			}
 		}
@@ -284,10 +360,10 @@ public class UI  implements Runnable{
 		//--------------------------------------------IMAGES TREE-------------------------------------------------------------------------
 		//Change Icon for Jtree
 				tree.setCellRenderer(new DefaultTreeCellRenderer() {
-					private Icon downloadIcon = new ImageIcon(this.getClass().getResource("/download-icon.png"));
-			        private Icon searchIcon =  new ImageIcon(this.getClass().getResource("/search-icon.png"));
-			        private Icon uploadIcon =  new ImageIcon(this.getClass().getResource("/upload-icon.png"));
-			        private Icon torrentIcon =  new ImageIcon(this.getClass().getResource("/torrent.png"));
+					private Icon downloadIcon = new ImageIcon(this.getClass().getResource("download-icon.png"));
+			        private Icon searchIcon =  new ImageIcon(this.getClass().getResource("search-icon.png"));
+			        private Icon uploadIcon =  new ImageIcon(this.getClass().getResource("upload-icon.png"));
+			        private Icon torrentIcon =  new ImageIcon(this.getClass().getResource("torrent.png"));
 				        @Override
 				        public Component getTreeCellRendererComponent(JTree tree,
 				                Object value, boolean selected, boolean expanded,
@@ -318,9 +394,259 @@ public class UI  implements Runnable{
 		btnSearch.setContentAreaFilled(false);
 		btnSearch.setIcon(new ImageIcon(this.getClass().getResource("search.png")));
 		btnSearch.setText("");
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+	    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+	       
+	    /////////////////////////////Image for Table////////////////////////////////////////
+	            
+	    //////////////////UDATABLE////////////////////////////////////////////////////
+	            TableColumnModel tcmUpdate = table.getColumnModel();
+	            TableColumn tcUpdate;
+	            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	            tcUpdate= tcmUpdate.getColumn(1);
+	            tcUpdate.setPreferredWidth(301);
+	            tcUpdate.setHeaderRenderer(new TableCellRenderer(){
+
+	                @Override
+	                public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+	                    JLabel label=new JLabel();
+						label.setBorder(BorderFactory.createEmptyBorder());
+						label.setIcon(new ImageIcon(this.getClass().getResource("file-name.png")));
+						return label;
+	                }
+	                
+	            });
+	            tcUpdate= tcmUpdate.getColumn(0);
+	            tcUpdate.setPreferredWidth(74);
+	            tcUpdate.setHeaderRenderer(new TableCellRenderer(){
+
+	                @Override
+	                public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+	                    JLabel label=new JLabel();
+						label.setBorder(BorderFactory.createEmptyBorder());
+						label.setIcon(new ImageIcon(this.getClass().getResource("stt.png")));
+						return label;
+	                }
+	                
+	            });
+	            tcUpdate= tcmUpdate.getColumn(2);
+	            tcUpdate.setPreferredWidth(79);
+	            tcUpdate.setHeaderRenderer(new TableCellRenderer(){
+
+	                @Override
+	                public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+	                    JLabel label=new JLabel();
+						label.setBorder(BorderFactory.createEmptyBorder());
+						label.setIcon(new ImageIcon(this.getClass().getResource("size.png")));
+						return label;
+	                }
+	                
+	            });
+	            tcUpdate= tcmUpdate.getColumn(3);
+	            tcUpdate.setPreferredWidth(300);
+	            tcUpdate.setHeaderRenderer(new TableCellRenderer(){
+
+	                @Override
+	                public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+	                    JLabel label=new JLabel();
+						label.setBorder(BorderFactory.createEmptyBorder());
+						label.setIcon(new ImageIcon(this.getClass().getResource("path.png")));
+						return label;	              
+	                }         
+	            });
+				///////////////////////////////////////////////////Request/////////////////////
+				TableColumnModel tcmRequest = tableRequest.getColumnModel();
+				TableColumn tcRequest;
+				tableRequest.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+				tcRequest= tcmRequest.getColumn(1);
+				tcRequest.setPreferredWidth(301);
+				tcRequest.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("file-name.png")));
+				return label;
+				}
+				
+				});
+				tcRequest= tcmRequest.getColumn(0);
+				tcRequest.setPreferredWidth(74);
+				tcRequest.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("stt.png")));
+				return label;
+				}
+				
+				});
+				tcRequest= tcmRequest.getColumn(2);
+				tcRequest.setPreferredWidth(79);
+				tcRequest.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("size.png")));
+				return label;
+				}
+				
+				});
+				tcRequest= tcmRequest.getColumn(3);
+				tcRequest.setPreferredWidth(153);
+				tcRequest.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("ip-address1.png")));
+				return label;
+				
+				}
+				
+				});
+				
+				tcRequest= tcmRequest.getColumn(4);
+				tcRequest.setPreferredWidth(152);
+				tcRequest.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("port1.png")));
+				return label;
+			
+				}
+				});
+				////////////////////////////////////////////////////////////////////////////////
+				
+				////////////////////////Download/////////////////////////////////////////////////
+				TableColumnModel tcmDownload = tableDownload.getColumnModel();
+				TableColumn tcDownload;
+				tableDownload.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+				tcDownload= tcmDownload.getColumn(1);
+				tcDownload.setPreferredWidth(301);
+				tcDownload.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("file-name.png")));
+				return label;
+			
+				}
+				
+				});
+				tcDownload= tcmDownload.getColumn(0);
+				tcDownload.setPreferredWidth(74);
+				tcDownload.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("stt.png")));
+				return label;
+				
+				}
+				
+				});
+				tcDownload= tcmDownload.getColumn(2);
+				tcDownload.setPreferredWidth(79);
+				tcDownload.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("size.png")));
+				return label;
+				
+				}
+				
+				});
+				tcDownload= tcmDownload.getColumn(3);
+				tcDownload.setPreferredWidth(151);
+				tcDownload.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("status.png")));
+				return label;
+				
+				}
+				
+				});
+				tcDownload= tcmDownload.getColumn(4);
+				tcDownload.setPreferredWidth(153);
+				tcDownload.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("ip-address1.png")));
+				return label;
+				
+				}
+				
+				});
+				tcDownload= tcmDownload.getColumn(5);
+				tcDownload.setPreferredWidth(153);
+				tcDownload.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("port1.png")));
+				return label;
+				}
+				
+				});
+				
+				tcDownload= tcmDownload.getColumn(6);
+				tcDownload.setPreferredWidth(120);
+				tcDownload.setHeaderRenderer(new TableCellRenderer(){
+				
+				@Override
+				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+				JLabel label=new JLabel();
+				label.setBorder(BorderFactory.createEmptyBorder());
+				label.setIcon(new ImageIcon(this.getClass().getResource("time.png")));
+				return label;
+				}
+				
+				});
+				////////////////////////////////////////////////////////////////////////////////
+				
+
+	            
+	            
+	            
+	            
+	            
+	            
+	 
+	            
+	            
+	            
+	            
+	            
+	            
+	            
+	            
+	////////////////////////////////////////////////////////////////////////	
 	}
-	
 	//Change value for Jtree
 	private void treeValueChanged(TreeSelectionEvent evt) {//GEN-FIRST:event_treeValueChanged
         // TODO add your handling code here:
@@ -364,28 +690,51 @@ public class UI  implements Runnable{
         }
     }//GEN-LAST:event_treeValueChanged
 	// hash content of fileShare
-	 class Hashcode {
-		public String hashCode(File file){
-			MessageDigest md;
-			byte[] digest = null;
-			try {
-				md = MessageDigest.getInstance("MD5");
-				InputStream is;
-				try {
-					is = new FileInputStream(file);
-					DigestInputStream dis = new DigestInputStream(is, md);
-					digest = md.digest();
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} catch (NoSuchAlgorithmException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return convertByteArrayToHexString(digest);
+	 
+	 @Override
+		public void run() {
+			// TODO Auto-generated method stub
+			frame.setVisible(true);
 		}
-		private  String convertByteArrayToHexString(byte[] arrayBytes) {
+	 
+	 private static String generateMD5(FileInputStream inputStream){
+		    if(inputStream==null){
+
+		        return null;
+		    }
+		    MessageDigest md;
+		    try {
+		        md = MessageDigest.getInstance("MD5");
+		        FileChannel channel = inputStream.getChannel();
+		        ByteBuffer buff = ByteBuffer.allocate(2048);
+		        while(channel.read(buff) != -1)
+		        {
+		            buff.flip();
+		            md.update(buff);
+		            buff.clear();
+		        }
+		        byte[] hashValue = md.digest();
+		        return convertByteArrayToHexString(hashValue);
+		    }
+		    catch (NoSuchAlgorithmException e)
+		    {
+		        return null;
+		    } 
+		    catch (IOException e) 
+		    {
+		        return null;
+		    }
+		    finally
+		    {
+		        try {
+		            if(inputStream!=null)inputStream.close();
+		        } catch (IOException e) {
+
+		        }
+		    } 
+		}
+	 
+	 private static String convertByteArrayToHexString(byte[] arrayBytes) {
 		    StringBuffer stringBuffer = new StringBuffer();
 		    for (int i = 0; i < arrayBytes.length; i++) {
 		        stringBuffer.append(Integer.toString((arrayBytes[i] & 0xff) + 0x100, 16)
@@ -393,11 +742,4 @@ public class UI  implements Runnable{
 		    }
 		    return stringBuffer.toString();
 		}
-	}
-	 @Override
-		public void run() {
-			// TODO Auto-generated method stub
-			frame.setVisible(true);
-		}
-
 }
