@@ -86,4 +86,14 @@ public class DTVParams {
 	{
 		return type;
 	}
+	
+	public void printInfo()
+	{
+		System.out.println("Type: " + type);
+		System.out.println("Name: " + fileName);
+		System.out.println("Hash (SHA-512): " + hashCode);
+		System.out.println("Size: " + sizeOfFile);
+		System.out.println("Path: " + pathToFile);
+		System.out.println("Tracker: " + TrackerList);
+	}
 }

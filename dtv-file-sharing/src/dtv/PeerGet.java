@@ -19,8 +19,6 @@ public class PeerGet implements Runnable {
 	{
 		try
 		{
-		//create client thread to tracker
-		//create client thread to another peer
 			Thread tUpdatePeer = new Thread(new UpdatePeerList(availPeer, dtv_params));
 			tUpdatePeer.start();
 			
@@ -28,11 +26,11 @@ public class PeerGet implements Runnable {
 				while (availPeer.isEmpty()) availPeer.wait();
 			}			
 			
-			RandomAccessFile file = new RandomAccessFile(dtv_params.getPathToFile(), "w");
+			RandomAccessFile file = new RandomAccessFile(dtv_params.getPathToFile(), "rw");
 			
 			for (int i = 0; i < availPeer.size(); i++)
 			{
-				new Thread(new ClientThread(file, dtv_params, availPeer.get(i), 6789)).start();
+				new Thread(new ClientThread(file, dtv_params, availPeer.get(i))).start();
 			}
 			
 			//close file after finish download

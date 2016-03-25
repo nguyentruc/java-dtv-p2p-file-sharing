@@ -4,22 +4,18 @@ import java.io.*;
 import java.net.*;
 public class ClientThread implements Runnable {
 
-	private int port;
-	String peerIP;
-	DTVParams dtv_params;
-	Socket clientSocket = null;
-	RandomAccessFile file;
+	private DTVParams dtv_params;
+	private Socket clientSocket = null;
+	private RandomAccessFile file;
 	
-	public ClientThread(RandomAccessFile _file, DTVParams dtv_params, String ip, int portToConnect) 
+	public ClientThread(RandomAccessFile _file, DTVParams dtv_params, String address) 
 	{
-		this.port = portToConnect;
-		peerIP = ip;
 		file = _file;
 		this.dtv_params = dtv_params;
 		
 		try
 		{	
-			clientSocket = new Socket(peerIP, port);
+			clientSocket = new Socket(DTV.getIP(address), DTV.getPort(address));
 		} 
 		catch (IOException e)
 		{

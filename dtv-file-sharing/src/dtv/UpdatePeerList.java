@@ -29,9 +29,7 @@ public class UpdatePeerList implements Runnable{
 		try
 		{
 			List<String> trackerList = new ArrayList<>(dtv_params.getTrackerList());
-			String fileName = dtv_params.getName();
 			String hashCode = dtv_params.getHashCode();
-			long size = dtv_params.getSize();
 			
 			while (true)
 			{
@@ -39,18 +37,15 @@ public class UpdatePeerList implements Runnable{
 				{
 					String tracker = trackerList.get(i);
 					
-					/* Get tracker IP:port */
-					int posColon = tracker.indexOf(':');
-					String trackerIP = tracker.substring(0, posColon);
-					int trackerPort = Integer.parseInt(tracker.substring(posColon + 1));
-			
-					Socket clientSocket = new Socket(trackerIP, trackerPort);
+					/* Send params to  */
+					Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
+					
 					BufferedReader inFromServer = 
 							new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-					PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());		
-					outToServer.println(fileName);
+					PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
+					outToServer.println("1");
 					outToServer.println(hashCode);
-					outToServer.println(String.valueOf(size));
+					outToServer.println(Peer.ServerPort);
 					
 					outToServer.flush();
 					

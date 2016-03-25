@@ -40,5 +40,17 @@ public class DTV {
 //		nFile.close();
 		
 	}
+	
+	public static String getIP(String address)
+	{
+		int posColon = address.indexOf(':');
+		return address.substring(0, posColon);
+	}
+	
+	public static int getPort(String address)
+	{
+		int posColon = address.indexOf(':');
+		return Integer.parseInt(address.substring(posColon + 1));
+	}
 
 }

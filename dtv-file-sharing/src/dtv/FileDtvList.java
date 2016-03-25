@@ -48,4 +48,13 @@ public class FileDtvList {
 		
 		listFile.remove(i);
 	}
+	
+	public static void printListHash()
+	{
+		System.out.println("List:");
+		for (int i = 0; i < listFile.size(); i++)
+		{
+			System.out.println(listFile.get(i).getHashCode());
+		}
+	}
 }

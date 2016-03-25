@@ -17,12 +17,13 @@ public class Peer implements Runnable{
 	protected BlockingQueue<DTVParams> torFileQ = null;
 	protected BlockingQueue<List<DTVParams>> fileListQ = null;
 	Thread serverListener = null;
+	public static int ServerPort;
 	
 	public Peer(BlockingQueue<DTVParams> q, BlockingQueue<List<DTVParams>> fileList) {
 		torFileQ = q;
 		this.fileListQ = fileList;
 		
-		serverListener = new Thread(new ServerListener(6789));
+		serverListener = new Thread(new ServerListener());
 		serverListener.start();
 		
 		FileDtvList.resetList();			
@@ -36,11 +37,13 @@ public class Peer implements Runnable{
 			{
 				/* Sleep until a message appear */
 				DTVParams revDtv = torFileQ.take();
+				System.out.println("Receive from UI");
 				
 				if (revDtv.getType() == 0) //register new torrent
 				{
 					FileDtvList.addNew(revDtv);
 					sendParamsToTracker(revDtv);
+					FileDtvList.printListHash();
 				}
 				else if (revDtv.getType() == 1) //add torrent
 				{
@@ -75,19 +78,17 @@ public class Peer implements Runnable{
 			{
 				String tracker = trackerList.get(i);
 				
-				/* Get addr of tracker */
-				int posColon = tracker.indexOf(':');
-				String trackerIP = tracker.substring(0, posColon);
-				int trackerPort = Integer.parseInt(tracker.substring(posColon + 1));
-				
 				/* Send params to  */
-				Socket clientSocket = new Socket(trackerIP, trackerPort);
+				System.out.println("Connect to " + tracker);
+				dtv_params.printInfo();
+				Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
 				
 				PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
 				outToServer.println("0");
 				outToServer.println(fileName);
 				outToServer.println(hashCode);
 				outToServer.println(String.valueOf(size));
+				outToServer.println(String.valueOf(ServerPort));
 				outToServer.flush();
 				
 				clientSocket.close();
@@ -108,13 +109,8 @@ public class Peer implements Runnable{
 		{
 			String tracker = trackerList.get(i);
 			
-			/* Get addr of tracker */
-			int posColon = tracker.indexOf(':');
-			String trackerIP = tracker.substring(0, posColon);
-			int trackerPort = Integer.parseInt(tracker.substring(posColon + 1));
-			
 			/* Send params to  */
-			Socket clientSocket = new Socket(trackerIP, trackerPort);
+			Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
 			
 			PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
 			outToServer.println("2");

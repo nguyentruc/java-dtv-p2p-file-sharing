@@ -6,16 +6,23 @@ import java.net.*;
 public class ServerListener implements Runnable{
 
 	protected ServerSocket welcomeSocket = null;
-	protected int port;
 	
-	public ServerListener(int port) {
-		this.port = port;
+	public ServerListener() {
+		int i;
 		
-		try {
-			welcomeSocket = new ServerSocket(port);
-		} catch (IOException e) {
-			e.printStackTrace();
+		for (i = 7000; i <= 8000; i++)
+		{
+			try {
+				welcomeSocket = new ServerSocket(i);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				continue;
+			}
+			break;
 		}
+		
+		Peer.ServerPort = i;
 	}
 
 	@Override
