@@ -1,5 +1,6 @@
 package dtv;
 
+import java.util.List;
 import java.util.concurrent.*;
 
 public class DTV {
@@ -10,18 +11,19 @@ public class DTV {
 		 * Note: should have different queues for different purposes
 		 */
 		BlockingQueue<DTVParams> torFileQ = new LinkedBlockingQueue<>();
+		BlockingQueue<List<DTVParams>> fileList = new LinkedBlockingQueue<>();
 				
 		/**
 		 * create UI thread
 		 */
-		Thread uiHandle = new Thread(new UI(torFileQ));
+		Thread uiHandle = new Thread(new UI(torFileQ, fileList));
 		uiHandle.start();
 		
 			
 		/**
 		 * Create peer thread
 		 */
-		Thread peerHandle = new Thread(new Peer(torFileQ));
+		Thread peerHandle = new Thread(new Peer(torFileQ, fileList));
 		peerHandle.start();		
 	
 //		File a = new File("d:/Documents/10608.pdf");

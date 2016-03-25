@@ -35,4 +35,17 @@ public class FileDtvList {
 	{
 		listFile.clear();
 	}
+	
+	public static synchronized void remove(String hashCode)
+	{
+		int i;
+		
+		for (i = 0; i < listFile.size(); i++)
+		{
+			if (listFile.get(i).getHashCode().equals(hashCode))
+				break;
+		}
+		
+		listFile.remove(i);
+	}
 }
