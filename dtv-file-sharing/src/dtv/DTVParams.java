@@ -23,7 +23,7 @@ public class DTVParams {
 	 */
 	public DTVParams() {
 		TrackerList = new ArrayList<String>();
-		fileName = hashCode = pathToFile = null;
+		fileName = hashCode = pathToFile = "";
 		sizeOfFile = 0;
 	}
 

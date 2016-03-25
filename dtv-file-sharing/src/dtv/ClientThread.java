@@ -2,19 +2,24 @@ package dtv;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.atomic.AtomicInteger;
 public class ClientThread implements Runnable {
 
 	private DTVParams dtv_params;
 	private Socket clientSocket = null;
-	private RandomAccessFile file;
+	final private RandomAccessFile file;
+	final private AtomicInteger peerConnected;
+	private long offset;
 	
-	public ClientThread(RandomAccessFile _file, DTVParams dtv_params, String address) 
+	public ClientThread(RandomAccessFile _file, DTVParams dtv_params, String address, AtomicInteger peerConected) 
 	{
 		file = _file;
 		this.dtv_params = dtv_params;
+		this.peerConnected = peerConected;
 		
 		try
 		{	
+			offset = file.length()/PeerGet.numOfPart;
 			clientSocket = new Socket(DTV.getIP(address), DTV.getPort(address));
 		} 
 		catch (IOException e)
@@ -52,11 +57,13 @@ public class ClientThread implements Runnable {
 			System.out.println("end of file");
 			
 			clientSocket.close();
+			peerConnected.decrementAndGet();
 		}
 		catch (Exception e)
 		{
 			try {
 				clientSocket.close();
+				peerConnected.decrementAndGet();
 			} catch (IOException e1) {
 				System.out.println("Can't close client socket");
 			}
