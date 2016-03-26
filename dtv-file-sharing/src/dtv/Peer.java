@@ -26,6 +26,17 @@ public class Peer implements Runnable{
 		serverListener = new Thread(new ServerListener());
 		serverListener.start();
 		
+		/* Debug only */
+		DTVParams tempdtv = new DTVParams();
+		tempdtv.setType(2);
+		tempdtv.addTracker("192.168.1.80:1234");
+		try {
+			torFileQ.put(tempdtv);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		FileDtvList.resetList();			
 	}
 	
@@ -41,22 +52,39 @@ public class Peer implements Runnable{
 				
 				if (revDtv.getType() == 0) //register new torrent
 				{
+					System.out.println("Register new");
 					FileDtvList.addNew(revDtv);
 					sendParamsToTracker(revDtv);
 					FileDtvList.printListHash();
 				}
 				else if (revDtv.getType() == 1) //add torrent
 				{
-					new Thread(new PeerGet(revDtv)).start();
+					System.out.println("Get DTV");
+					new Thread(new PeerGet(revDtv,torFileQ)).start();
 				}
 				else if (revDtv.getType() == 2) //search
 				{
+					System.out.println("search");
 					List<DTVParams> fileList = getListFromServer(revDtv);
 					fileListQ.put(fileList);
+					
+					/* Debug only */
+					DTVParams tempdtv = new DTVParams();
+					tempdtv.setType(1);
+					tempdtv.setHashCode(fileList.get(0).getHashCode());
+					tempdtv.addTracker("192.168.1.80:1234");
+					try {
+						torFileQ.put(tempdtv);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				else if (revDtv.getType() == 3) //remove
 				{
 					FileDtvList.remove(revDtv.getHashCode());
+					System.out.println("Current list:");
+					FileDtvList.printListHash();
 				}
 				
 			}
@@ -134,6 +162,8 @@ public class Peer implements Runnable{
 			clientSocket.close();
 		}		
 		
+		for (int i = 0; i < fileList.size(); i++)
+			fileList.get(i).printInfo();
 		
 		return fileList;
 	}

@@ -13,8 +13,10 @@ import java.io.*;
  */
 public class UpdatePeerList implements Runnable{
 
-	List<String> peerList;
-	DTVParams dtv_params;
+	private final List<String> peerList;
+	private final DTVParams dtv_params;
+	private List<String> trackerList;
+	private String hashCode;
 	
 	/**
 	 * 
@@ -22,47 +24,43 @@ public class UpdatePeerList implements Runnable{
 	public UpdatePeerList(List<String> list, DTVParams dtv_params) {
 		peerList = list;
 		this.dtv_params = dtv_params;
+		trackerList = new ArrayList<>(dtv_params.getTrackerList());
+		hashCode = dtv_params.getHashCode();
 	}
 
 	@Override
 	public void run() {
 		try
-		{
-			List<String> trackerList = new ArrayList<>(dtv_params.getTrackerList());
-			String hashCode = dtv_params.getHashCode();
-			
-			while (true)
+		{	
+			for (int i = 0; i < trackerList.size(); i++)
 			{
-				for (int i = 0; i < trackerList.size(); i++)
-				{
-					String tracker = trackerList.get(i);
-					
-					/* Send params to  */
-					Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
-					
-					BufferedReader inFromServer = 
-							new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-					PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
-					outToServer.println("1");
-					outToServer.println(hashCode);
-					outToServer.println(Peer.ServerPort);
-					
-					outToServer.flush();
-					
-					readPeerList(inFromServer);
-					
-					clientSocket.close();
-					
-				}
-				Thread.sleep(5*60*1000);
+				String tracker = trackerList.get(i);
+				
+				/* Send params to  */
+				Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
+				
+				BufferedReader inFromServer = 
+						new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+				PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
+				outToServer.println("1");
+				outToServer.println(hashCode);
+				
+				outToServer.flush();
+				
+				readPeerList(inFromServer);
+				
+				clientSocket.close();			
 			}
+			synchronized (peerList) {
+				peerList.notifyAll();
+			}
+			
+			
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		
-		
 	}
 	
 	/* Check for new peer, if new peer -> new connect */
@@ -75,7 +73,6 @@ public class UpdatePeerList implements Runnable{
 				String peer = file.readLine();
 				peerList.add(peer);
 			}
-			peerList.notifyAll();
 		}
 	}
 }

@@ -2,6 +2,7 @@ package dtv;
 
 import java.io.*;
 import java.net.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 public class ClientThread implements Runnable {
 
@@ -10,12 +11,15 @@ public class ClientThread implements Runnable {
 	final private RandomAccessFile file;
 	final private AtomicInteger peerConnected;
 	private long offset;
+	final private List<Integer> file_part;
 	
-	public ClientThread(RandomAccessFile _file, DTVParams dtv_params, String address, AtomicInteger peerConected) 
+	public ClientThread(RandomAccessFile _file, DTVParams dtv_params, String address, AtomicInteger peerConnected,
+			List<Integer> file_part) 
 	{
 		file = _file;
 		this.dtv_params = dtv_params;
-		this.peerConnected = peerConected;
+		this.peerConnected = peerConnected;
+		this.file_part = file_part;
 		
 		try
 		{	
@@ -24,6 +28,7 @@ public class ClientThread implements Runnable {
 		} 
 		catch (IOException e)
 		{
+			peerConnected.decrementAndGet();
 			e.printStackTrace();
 		}
 	}
@@ -45,16 +50,32 @@ public class ClientThread implements Runnable {
 				return;
 			}
 			
-			//Receive File
-			byte[] buffer = new byte[8192];
-			int cnt;
+			int partRemain = 0;
 			
-			while ((cnt = inFromServer.read(buffer,0,8192)) >= 0)
+			while (true)
 			{
-				file.write(buffer, 0, cnt);
+				synchronized (file_part) {
+					partRemain = file_part.indexOf(Integer.valueOf(0));
+					if (partRemain == -1) break;
+					file_part.set(partRemain, Integer.valueOf(1));
+				}
+				
+				long filePtr = offset * partRemain;
+				//Receive File
+				byte[] buffer = new byte[8192];
+				int cnt;
+				
+				while ((cnt = inFromServer.read(buffer,0,8192)) >= 0)
+				{
+					synchronized (file) {
+						file.seek(filePtr);
+						file.write(buffer, 0, cnt);
+					}
+					filePtr = filePtr + cnt;
+				}
+				
+				System.out.println("end of part" + partRemain);
 			}
-			
-			System.out.println("end of file");
 			
 			clientSocket.close();
 			peerConnected.decrementAndGet();

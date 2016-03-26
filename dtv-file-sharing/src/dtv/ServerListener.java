@@ -15,14 +15,13 @@ public class ServerListener implements Runnable{
 			try {
 				welcomeSocket = new ServerSocket(i);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 				continue;
 			}
 			break;
 		}
 		
 		Peer.ServerPort = i;
+		System.out.println(String.format("Server port: %d", i));
 	}
 
 	@Override
