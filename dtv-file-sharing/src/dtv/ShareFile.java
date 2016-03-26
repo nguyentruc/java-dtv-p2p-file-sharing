@@ -9,6 +9,10 @@ package dtv;
  * 
  */
 
+/**
+ * 
+ */
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -41,30 +45,30 @@ public class ShareFile implements Serializable{
             seeder ns = new seeder(ipaddr, port);
             ipList.add(ns);
         }
-//        
-//        public String pickSome(){
-//            String ret = "";
-//            if(ipList.size() <= CONSTANT.IPLIST_SIZE){
-//                ret = ret + String.valueOf(ipList.size()) + "\n";
-//                for(int i = 0; i<ipList.size(); i++){
-//                    ret = ret + ipList.get(i).parseLine();
-//                }
-//            }else{
-//                ret = ret + String.valueOf(CONSTANT.IPLIST_SIZE) + "\n";
-//                ArrayList<Integer> tmp = new ArrayList<>();
-//                int randNum;
-//                Random rand = new Random();
-//                do{
-//                    randNum = rand.nextInt(ipList.size());
-//                    if(!tmp.contains(randNum)) tmp.add(randNum);
-//                }while(tmp.size() < CONSTANT.IPLIST_SIZE);
-//                for(int i = 0; i<tmp.size(); i++){
-//                    randNum = tmp.get(i);
-//                    ret = ret + ipList.get(randNum).parseLine();
-//                }
-//            }
-//            return ret;
-//        }
+        
+        public String pickSome(){
+            String ret = "";
+            if(ipList.size() <= CONSTANT.IPLIST_SIZE){
+                ret = ret + String.valueOf(ipList.size()) + "\n";
+                for(int i = 0; i<ipList.size(); i++){
+                    ret = ret + ipList.get(i).parseLine();
+                }
+            }else{
+                ret = ret + String.valueOf(CONSTANT.IPLIST_SIZE) + "\n";
+                ArrayList<Integer> tmp = new ArrayList<>();
+                int randNum;
+                Random rand = new Random();
+                do{
+                    randNum = rand.nextInt(ipList.size());
+                    if(!tmp.contains(randNum)) tmp.add(randNum);
+                }while(tmp.size() < CONSTANT.IPLIST_SIZE);
+                for(int i = 0; i<tmp.size(); i++){
+                    randNum = tmp.get(i);
+                    ret = ret + ipList.get(randNum).parseLine();
+                }
+            }
+            return ret;
+        }
         
         public String parseFileInfo(){
             String ret = "";
@@ -76,4 +80,3 @@ public class ShareFile implements Serializable{
             return ret;
         }
 }
-

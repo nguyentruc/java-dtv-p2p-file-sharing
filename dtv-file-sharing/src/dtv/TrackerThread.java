@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class TrackerThread implements Runnable {
 
@@ -88,9 +87,7 @@ public class TrackerThread implements Runnable {
             ArrayList<String> controlList;
             {
                 controlList = CONSTANT.READ_CONTROL_FILE(Tracker.CONTROL_FILE);
-                //System.out.println(controlList.get(0));
-                //System.out.println(controlList.get(3));
-                // Add new file into CONTROL_FILE
+               // Add new file into CONTROL_FILE
                 controlList.add(hashCode);
                 CONSTANT.WRITE_CONTROL_FILE(Tracker.CONTROL_FILE, controlList);
             }
@@ -123,7 +120,7 @@ public class TrackerThread implements Runnable {
             sf = CONSTANT.READ_SHARE_FILE(f);
             CONSTANT.WATCH_SHARE_FILE(f);
             // pick at most 5 ip, port send back to enquirer
-            //dos.write(sf.pickSome().getBytes());
+            dos.write(sf.pickSome().getBytes());
             dos.flush();
             dos.close();
         }
@@ -135,7 +132,7 @@ public class TrackerThread implements Runnable {
         controlList = CONSTANT.READ_CONTROL_FILE(Tracker.CONTROL_FILE);
         String numberOfFile = String.valueOf(controlList.size());
         dos.write((numberOfFile + "\n").getBytes());
-        for(int i = 0; i<controlList.size()/3; i++){
+        for(int i = 0; i<controlList.size(); i++){
             String tmp = controlList.get(i);
             File FILE = new File(CONSTANT.STORAGE_PATH + tmp);
             ShareFile sf = CONSTANT.READ_SHARE_FILE(FILE);

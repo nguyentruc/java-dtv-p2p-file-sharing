@@ -9,12 +9,10 @@ package dtv;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Random;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -80,16 +78,17 @@ public class CONSTANT implements Serializable{
     }    
     
     public static void WRITE_SHARE_FILE(File FILE, ShareFile nsf) throws Exception{
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE))) {
-            oos.writeObject(nsf);
-            oos.flush();
-        }
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE));
+        oos.writeObject(nsf);
+        oos.flush();
+        oos.close();
     }
+    
     public static ShareFile READ_SHARE_FILE(File FILE) throws Exception{
         ShareFile nsf;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE))) {
-            nsf = (ShareFile) ois.readObject();
-        }
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE));
+        nsf = (ShareFile) ois.readObject();
+        ois.close();
         return nsf;
     }
     
@@ -107,7 +106,7 @@ public class CONSTANT implements Serializable{
             System.out.println("File exist but empty");
         }
         ret = ret + String.valueOf(outArray.size()) + " files" + "\n";
-        for(int i = 0; i<outArray.size()/3; i++){
+        for(int i = 0; i<outArray.size(); i++){
             ret = ret + outArray.get(i) + "\n";
         }
         System.out.println(ret);
