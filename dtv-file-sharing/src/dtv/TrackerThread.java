@@ -5,176 +5,147 @@
  */
 package dtv;
 
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 /**
  *
  *
  * @author King
  */
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class TrackerThread implements Runnable {
 
     Socket cs;
-    // Create a Storage Folder in your PC then change DirPATH below
-    String DirPATH = "C:\\Study Materials\\Semester 2 Year 3 - 2016"
-            + "\\Computer Networking\\AssTestFolder\\Tracker\\";
+    String incommingIP;
+    String incommingPort;
     TrackerThread(Socket cs) {
         this.cs = cs;
+        this.incommingIP = cs.getInetAddress().toString().substring(1);
+        this.incommingPort = String.valueOf(cs.getRemoteSocketAddress());
     }
-
     @Override
     public void run() {
         try {
-            /*
-            * Start of "What to do with the received dtv file from peer
-            * socket->dtv file(in bytes)->buffer ---> key exist: add (ip, port) to keyList if non-exist, 
-            *                                   |        send back keyList(list of (ip, port)
-            *                                   |
-            *                                   |---> key non-exist: make new key[dir](dtv file, keyList(with first (ip, port)))
-            *                                            send back keyList(list of (ip, port)
-            */
-            // Write received file (in bytes) to buffer
-            // BufferedReader deals with characters, lines
-            // InputStreamReader deals with raw bytes
+            // Create a buffer to store bytes got from InputStream
             BufferedReader br = new BufferedReader(new InputStreamReader(cs.getInputStream()));
-            System.out.println("Got all the bytes in buffer.");
-            
-            // Get fileName of the received
-            String fileName = br.readLine();
-            // Get the key of .dtv file (received file)
-            String key = br.readLine();
-            String numberOfTracker = br.readLine();
-            
-            // get ipaddr (ip address) = "/xxx.xxx.xxx.xxx
-            String ipaddr = cs.getInetAddress().toString();
-            // get nIP (new ip)) = "xxx.xxx.xx.xx"
-            String nIP = ipaddr.substring(1);
-            // keyList is the name of the file that contains all (ip) of a .dtv 
-            String keyList = DirPATH + key + "\\" + key + ".txt";
-            System.out.println("Info preparation finished.");
-            //                            - key.txt contains ips
-            //                           |   
-            //  "...\\Storage\\key[dir] - 
-            //                           |
-            //                            - fileName.dtv received from peer
-            // key[dir] ~ DirPATH + key
-            
-            File f = new File(DirPATH + key);
-            if(f.exists() && f.isDirectory()){ 
-                System.out.println("key exist, check if ip exist...");
-                // Unfinished
-                // If key[dir] exists (this dtv registered before)
-                // Check if ip exist                                
-             
-                File FilekeyList = new File(keyList);
-                byte[] tmp = new byte[(int)FilekeyList.length()];
-                DataInputStream readFile = new DataInputStream(new FileInputStream(FilekeyList));
-                readFile.readFully(tmp);
-                readFile.close();
-                String check = new String(tmp);
-                if (check.indexOf(nIP) != -1) {
-                    System.out.println("ip exist");
-                }
-                else{
-                // Append ip if non-exist
-                    System.out.println("ip non-exist, adding...");
-                    String fstLine = check.substring(0, check.indexOf('\n'));
-                    System.out.print(fstLine);
-                    fstLine = fstLine.trim();
-                    int nn = Integer.parseInt(fstLine);
-                    nn++;
-                    String ns = String.valueOf(nn);//
-                    check = check.replaceFirst(fstLine, ns);//
-                    System.out.println(check);
-                    PrintWriter newFile = new PrintWriter(FilekeyList);
-                    check += nIP;
-                    newFile.println(check);
-                    newFile.flush();
-                    newFile.close();
-                    System.out.println("Added.");
-                }
-                
+            String ServiceCode = br.readLine();
+            // Code for debug
+            System.out.println("Received ServiceCode = " + ServiceCode);
+            System.out.println("Incomming port = " + incommingPort);
+            // cs.getInetAddress().toString() give us: "/ip"
+            // "/ip" -- substring(1)--> "ip"
+            switch (ServiceCode) {
+                case "0":
+                    ExecuteCommandCode0(br);
+                    break;
+                case "1":
+                    ExecuteCommandCode1(br);
+                    break;
+                case "2":
+                    ExecuteCommandCode2();
+                    break;
+                case "3":
+                    ExecuteCommandCode3(br);
+                default:
+                    break;
             }
-            else{ 
-                System.out.println("key non-exist, creating new dir...");
-                // If key[dir] doesn't exist (First time register)
-                // Make key[dir]
-                try{f.mkdir();
-                // Make keyList in key[dir]
-                File newList = new File(keyList);
-                newList.createNewFile();
-                // Write first ip to keyList
-                PrintWriter toKeyList = new PrintWriter(new BufferedWriter(new FileWriter(keyList, true)));
-                toKeyList.println("1");
-                toKeyList.println(nIP);
-                toKeyList.flush();
-                toKeyList.close();
-                // Store .dtv file in key[dir] (this file's created from buffer
-                String line;
-                String dtvFilePATH = DirPATH + key + "\\" + fileName + ".dtv";
-                // Create dtv file from buffer
-                File newFile = new File(dtvFilePATH);
-                newFile.createNewFile();
-                PrintWriter toDtvFile = new PrintWriter(new BufferedWriter(new FileWriter(dtvFilePATH, true)));
-                toDtvFile.println(fileName);
-                System.out.println("pass fileName: " + fileName);
-                toDtvFile.println(key);
-                System.out.println("pass key: " + key);
-                toDtvFile.println(numberOfTracker);
-                System.out.println("pass number0fTracker: " + numberOfTracker);
-                
-                for(int i = 0; i<Integer.parseInt(numberOfTracker); i++){
-                    line = br.readLine();
-                    toDtvFile.println(line);
-                }
-                
-                toDtvFile.flush();
-             
-                System.out.println("Store files successfully.");
-                //System.out.flush();
-                // Close Printwriter
-                toDtvFile.close();
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
-                // Close BufferedReader
-                //br.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void ExecuteCommandCode0(BufferedReader br) throws Exception {
+        String fileName = br.readLine();
+        String hashCode = br.readLine();
+        String size = br.readLine();
+        String listeningPort = br.readLine();
+        int numberOfTracker = Integer.valueOf(br.readLine());
+        System.out.println("listening port = " + listeningPort);
+        String ipFileAbsolutePath = CONSTANT.STORAGE_PATH + hashCode;
+        File f = new File(ipFileAbsolutePath);
+
+        if (f.exists()) {
+            ShareFile sf;
+            sf = CONSTANT.READ_SHARE_FILE(f);
+            // Add new (ip, port, time)
+            sf.addIp(incommingIP, listeningPort);
+            for(int i = 0; i<numberOfTracker; i++){
+                sf.addTracker(br.readLine());
             }
-            /*
-            * End 
-            */
-            /*
-            * Send keyList back to peer
-            */try{
-                FileThroughSocket f_send = new FileThroughSocket(keyList, cs);
-                f_send.send();
-            }catch(SocketException e){
-                System.out.println("Socket closed!");
+            CONSTANT.WRITE_SHARE_FILE(f, sf);
+        }else{
+            ArrayList<String> controlList;
+            {
+                controlList = CONSTANT.READ_CONTROL_FILE(Tracker.CONTROL_FILE);
+                //System.out.println(controlList.get(0));
+                //System.out.println(controlList.get(3));
+                // Add new file into CONTROL_FILE
+                controlList.add(hashCode);
+                CONSTANT.WRITE_CONTROL_FILE(Tracker.CONTROL_FILE, controlList);
             }
-            /*
-            * End
-            */
-        } catch (IOException e) {
-            //System.out.println(e.getMessage());
-            e.printStackTrace();
-        } finally {
-            try {
-                // Close socket connection
-                cs.close();
-            } catch (IOException e) {
-               // System.out.println(e.getMessage());
-               e.printStackTrace();
+            // Make hashCode[file]
+            CONSTANT.CONSTRUCT_SHARE_FILE(f, hashCode, fileName, size);
+            ShareFile sf;
+            {
+                sf = CONSTANT.READ_SHARE_FILE(f);
+                // Add new (ip, port, time) into hashCode[file]
+                sf.addIp(incommingIP, listeningPort);
+                for(int i = 0; i<numberOfTracker; i++){
+                    sf.addTracker(br.readLine());
+                }
+                CONSTANT.WRITE_SHARE_FILE(f, sf);
             }
         }
+        CONSTANT.WATCH_CONTROL_FILE(Tracker.CONTROL_FILE);
+    }
+
+    private void ExecuteCommandCode1(BufferedReader br) throws Exception {
+        String hashCode = br.readLine();
+        DataOutputStream dos = new DataOutputStream(cs.getOutputStream());
+        String ipFileAbsolutePath = CONSTANT.STORAGE_PATH + hashCode;
+        File f = new File(ipFileAbsolutePath);
+        if(!f.exists()){
+            dos.write("0\n".getBytes());
+            dos.flush();
+        }else{
+            ShareFile sf;
+            sf = CONSTANT.READ_SHARE_FILE(f);
+            CONSTANT.WATCH_SHARE_FILE(f);
+            // pick at most 5 ip, port send back to enquirer
+            //dos.write(sf.pickSome().getBytes());
+            dos.flush();
+            dos.close();
+        }
+    }
+       
+    private void ExecuteCommandCode2() throws Exception {
+        DataOutputStream dos = new DataOutputStream(cs.getOutputStream());
+        ArrayList<String> controlList;
+        controlList = CONSTANT.READ_CONTROL_FILE(Tracker.CONTROL_FILE);
+        String numberOfFile = String.valueOf(controlList.size());
+        dos.write((numberOfFile + "\n").getBytes());
+        for(int i = 0; i<controlList.size()/3; i++){
+            String tmp = controlList.get(i);
+            File FILE = new File(CONSTANT.STORAGE_PATH + tmp);
+            ShareFile sf = CONSTANT.READ_SHARE_FILE(FILE);
+            dos.write(sf.parseFileInfo().getBytes());
+        }
+        dos.flush();
+        dos.close();
+    }
+
+    private void ExecuteCommandCode3(BufferedReader br) {
+        
     }
 }

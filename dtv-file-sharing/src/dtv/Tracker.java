@@ -6,12 +6,17 @@
 
 package dtv;
 
-/**
- * 
- * Tracker implementation
- *
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-import java.io.IOException;
+
+/**
+ *
+ * @author vuong
+ */
+import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
 /**
@@ -19,14 +24,15 @@ import java.net.Socket;
  * @author King
  */
 public class Tracker {
-    
-    public static void main(String[] args) throws IOException{
-        ServerSocket ss = new ServerSocket(1234);
+    public static File CONTROL_FILE = new File(CONSTANT.STORAGE_PATH + "controlFile.dat");
+    public static void main(String[] args) throws Exception{
+        ServerSocket ss = new ServerSocket(CONSTANT.SERVER_LISTENING_PORT);
         while(true){
-                System.out.println("Tracker ready.");
+                CONSTANT.CONSTRUCT_CONTROL_FILE(CONTROL_FILE);
+                System.out.println("Tracker ready. (Main Thread)");
                 Socket sock = ss.accept();
-                System.out.println("Client Accepted.");
+                System.out.println("Client Accepted. (Go to new Thread)");
                 new Thread(new TrackerThread(sock)).start();
         }
     }
-}
+} 
