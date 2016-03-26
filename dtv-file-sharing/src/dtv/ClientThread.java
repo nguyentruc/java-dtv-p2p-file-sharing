@@ -60,7 +60,13 @@ public class ClientThread implements Runnable {
 					file_part.set(partRemain, Integer.valueOf(1));
 				}
 				
+				outToServer.writeByte(partRemain);
+				outToServer.flush();
+				
+				//calculate file pointer
 				long filePtr = offset * partRemain;
+				System.out.println(filePtr);
+				
 				//Receive File
 				byte[] buffer = new byte[8192];
 				int cnt;

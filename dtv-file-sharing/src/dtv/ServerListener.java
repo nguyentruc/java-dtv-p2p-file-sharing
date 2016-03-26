@@ -33,7 +33,7 @@ public class ServerListener implements Runnable{
 			{
 				Socket connectionSocket = welcomeSocket.accept();
 				
-				Thread serverThread = new Thread(new ServerThread(connectionSocket, clientID));
+				Thread serverThread = new Thread(new PeerSeed(connectionSocket, clientID));
 				serverThread.start();
 				clientID++;
 			}

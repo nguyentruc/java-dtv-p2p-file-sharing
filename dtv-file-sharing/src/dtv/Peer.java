@@ -27,15 +27,15 @@ public class Peer implements Runnable{
 		serverListener.start();
 		
 		/* Debug only */
-		DTVParams tempdtv = new DTVParams();
-		tempdtv.setType(2);
-		tempdtv.addTracker("192.168.1.80:1234");
-		try {
-			torFileQ.put(tempdtv);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		DTVParams tempdtv = new DTVParams();
+//		tempdtv.setType(2);
+//		tempdtv.addTracker("192.168.1.80:1234");
+//		try {
+//			torFileQ.put(tempdtv);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		FileDtvList.resetList();			
 	}
@@ -69,16 +69,16 @@ public class Peer implements Runnable{
 					fileListQ.put(fileList);
 					
 					/* Debug only */
-					DTVParams tempdtv = new DTVParams();
-					tempdtv.setType(1);
-					tempdtv.setHashCode(fileList.get(0).getHashCode());
-					tempdtv.addTracker("192.168.1.80:1234");
-					try {
-						torFileQ.put(tempdtv);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+//					DTVParams tempdtv = new DTVParams();
+//					tempdtv.setType(1);
+//					tempdtv.setHashCode(fileList.get(0).getHashCode());
+//					tempdtv.addTracker("192.168.1.80:1234");
+//					try {
+//						torFileQ.put(tempdtv);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
 				}
 				else if (revDtv.getType() == 3) //remove
 				{
@@ -117,6 +117,12 @@ public class Peer implements Runnable{
 				outToServer.println(hashCode);
 				outToServer.println(String.valueOf(size));
 				outToServer.println(String.valueOf(ServerPort));
+				outToServer.println(trackerList.size());
+				
+				for (int j = 0; j < trackerList.size(); j++)
+				{
+					outToServer.println(trackerList.get(j));
+				}
 				outToServer.flush();
 				
 				clientSocket.close();
@@ -155,6 +161,12 @@ public class Peer implements Runnable{
 				retDtv.setName(inFromServer.readLine());
 				retDtv.setHashCode(inFromServer.readLine());
 				retDtv.setSize(Integer.parseInt(inFromServer.readLine()));
+				int numOfTracker = Integer.parseInt(inFromServer.readLine());
+				for (int k = 0; k < numOfTracker; k++)
+				{
+					String newTracker = inFromServer.readLine();
+					retDtv.addTracker(newTracker);
+				}
 				
 				fileList.add(retDtv);
 			}
