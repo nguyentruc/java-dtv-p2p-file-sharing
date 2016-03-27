@@ -27,15 +27,15 @@ public class Peer implements Runnable{
 		serverListener.start();
 		
 		/* Debug only */
-//		DTVParams tempdtv = new DTVParams();
-//		tempdtv.setType(2);
-//		tempdtv.addTracker("192.168.1.80:1234");
-//		try {
-//			torFileQ.put(tempdtv);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		DTVParams tempdtv = new DTVParams();
+		tempdtv.setType(2);
+		tempdtv.addTracker("192.168.1.80:1234");
+		try {
+			torFileQ.put(tempdtv);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		FileDtvList.resetList();			
 	}
@@ -69,16 +69,16 @@ public class Peer implements Runnable{
 					fileListQ.put(fileList);
 					
 					/* Debug only */
-//					DTVParams tempdtv = new DTVParams();
-//					tempdtv.setType(1);
-//					tempdtv.setHashCode(fileList.get(0).getHashCode());
-//					tempdtv.addTracker("192.168.1.80:1234");
-//					try {
-//						torFileQ.put(tempdtv);
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					DTVParams tempdtv = new DTVParams();
+					tempdtv.setType(1);
+					tempdtv.setHashCode(fileList.get(0).getHashCode());
+					tempdtv.addTracker("192.168.1.80:1234");
+					try {
+						torFileQ.put(tempdtv);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				else if (revDtv.getType() == 3) //remove
 				{

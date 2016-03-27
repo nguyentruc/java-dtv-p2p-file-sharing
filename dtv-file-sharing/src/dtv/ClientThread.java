@@ -56,9 +56,16 @@ public class ClientThread implements Runnable {
 			{
 				synchronized (file_part) {
 					partRemain = file_part.indexOf(Integer.valueOf(0));
-					if (partRemain == -1) break;
+					if (partRemain == -1) 
+					{
+						outToServer.writeByte(-1);
+						outToServer.flush();
+						break;
+					}
 					file_part.set(partRemain, Integer.valueOf(1));
 				}
+				
+				System.out.println("Get: getting part " + partRemain);
 				
 				outToServer.writeByte(partRemain);
 				outToServer.flush();
@@ -68,16 +75,23 @@ public class ClientThread implements Runnable {
 				System.out.println(filePtr);
 				
 				//Receive File
-				byte[] buffer = new byte[8192];
+				byte[] buffer = new byte[DTV.chunkSize];
 				int cnt;
+				int amount = 0;
 				
-				while ((cnt = inFromServer.read(buffer,0,8192)) >= 0)
+				while ((cnt = inFromServer.read(buffer, 0, DTV.chunkSize)) >= 0)
 				{
 					synchronized (file) {
 						file.seek(filePtr);
 						file.write(buffer, 0, cnt);
 					}
+					
 					filePtr = filePtr + cnt;
+					amount = amount + cnt;
+					if (amount >= offset)
+					{
+						break;
+					}
 				}
 				
 				System.out.println("end of part" + partRemain);

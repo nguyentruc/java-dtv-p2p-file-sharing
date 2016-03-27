@@ -12,7 +12,7 @@ public class PeerGet implements Runnable {
 	private List<String> availPeer = new ArrayList<>();
 	private List<Integer> file_part;
 	static final int numOfPart = 16;
-	static final int maxPeer = 5;
+	static final int maxPeer = 16;
 	private AtomicInteger peerConnected;
 	final private BlockingQueue<DTVParams> DTVFileQ;
 	
@@ -43,8 +43,10 @@ public class PeerGet implements Runnable {
 				}
 			}			
 			
+			System.out.println(availPeer);
+			
 			/* Get access to file */
-			RandomAccessFile file = new RandomAccessFile(dtv_params.getPathToFile(), "rw");
+			RandomAccessFile file = new RandomAccessFile("d:/abcd/a.pdf", "rw");
 			int partRemain = 0;
 			
 			synchronized (availPeer) {

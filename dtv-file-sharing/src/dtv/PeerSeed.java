@@ -7,6 +7,8 @@ public class PeerSeed implements Runnable {
 
 	final protected Socket connectionSocket;
 	final protected int clientID;
+	private long offset;
+	private RandomAccessFile file;
 
 	public PeerSeed(Socket clientSocket, int id) {
 		this.connectionSocket = clientSocket;
@@ -19,7 +21,7 @@ public class PeerSeed implements Runnable {
 			DataInputStream inFromPeer = 
 					new DataInputStream(new BufferedInputStream(connectionSocket.getInputStream()));
 			DataOutputStream outToPeer = new DataOutputStream(connectionSocket.getOutputStream());
-			
+				
 			String hashCode = inFromPeer.readUTF();
 			
 			int fileIndex = FileDtvList.posFile(hashCode);
@@ -28,23 +30,61 @@ public class PeerSeed implements Runnable {
 			{
 				outToPeer.writeByte(0);
 				connectionSocket.close();
+				System.out.println("Seed: File not found");
 				return;
 			}
 			
 			outToPeer.writeByte(1);
 			outToPeer.flush();
 			
-			long filePtr = inFromPeer.readByte();
+			System.out.println("Seed: Start to seed");
 			
 			DTVParams dtv_params = FileDtvList.getDtv(fileIndex);
-			filePtr = filePtr * (dtv_params.getSize() / PeerGet.numOfPart);
+			offset = dtv_params.getSize() / PeerGet.numOfPart;
+			file = new RandomAccessFile(dtv_params.getPathToFile(), "r");
 			
-			RandomAccessFile file = new RandomAccessFile(dtv_params.getPathToFile(), "r");
-			
-			
+			while (true)
+			{	
+				long filePtr = inFromPeer.readByte();
+				if (filePtr == -1)
+				{
+					System.out.println("ID:" + clientID + "close");
+					break;
+				}
+				
+				System.out.println("Seed: seeding part " + filePtr);
+					
+				filePtr = filePtr * offset;				
+				
+				byte[] buffer = new byte[DTV.chunkSize];
+				int cnt;
+				int amount = 0;
+				file.seek(filePtr);
+				
+				while ((cnt = file.read(buffer, 0, (int) Long.min(offset - amount, DTV.chunkSize))) >= 0)
+				{
+					outToPeer.write(buffer, 0, cnt);
+					outToPeer.flush();
+					amount = amount + cnt;
+					
+					if (amount >= offset)
+					{
+						break;
+					}
+				}		
+				
+			}
 			connectionSocket.close();
+			file.close();
+			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			try {
+				connectionSocket.close();
+				file.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		}
 	}

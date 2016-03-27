@@ -5,6 +5,8 @@ import java.util.concurrent.*;
 
 public class DTV {
 
+	public static final int chunkSize = 8192;
+	
 	public static void main(String[] args) {
 		/**
 		 * Queue to share data between threads
