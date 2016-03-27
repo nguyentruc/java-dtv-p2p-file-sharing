@@ -12,7 +12,7 @@ public class PeerGet implements Runnable {
 	private List<String> availPeer = new ArrayList<>();
 	private List<Integer> file_part;
 	static final int numOfPart = 16;
-	static final int maxPeer = 16;
+	static final int maxPeer = 5;
 	private AtomicInteger peerConnected;
 	final private BlockingQueue<DTVParams> DTVFileQ;
 	
@@ -47,7 +47,6 @@ public class PeerGet implements Runnable {
 			
 			/* Get access to file */
 			RandomAccessFile file = new RandomAccessFile("d:/abcd/a.pdf", "rw");
-			int partRemain = 0;
 			
 			synchronized (availPeer) {
 				for (int i = 0; i < availPeer.size(); i++)
@@ -62,13 +61,18 @@ public class PeerGet implements Runnable {
 			while (true)
 			{
 				synchronized (file_part) {
-					partRemain = file_part.indexOf(Integer.valueOf(0));
-					if (partRemain == -1) break;
+					if (file_part.indexOf(Integer.valueOf(0)) == -1 && 
+							file_part.indexOf(Integer.valueOf(1)) == -1)
+						break;						
 				}
 	
 				if (peerConnected.intValue() >= maxPeer) continue;
 				
-				if (tUpdatePeer.isAlive() != true) tUpdatePeer.start();
+				if (tUpdatePeer.isAlive() != true) 
+				{
+					tUpdatePeer = new Thread(new UpdatePeerList(availPeer, dtv_params));
+					tUpdatePeer.start();
+				}
 				
 				synchronized (availPeer) {
 					for (int i = 0; i < availPeer.size(); i++)
