@@ -38,12 +38,14 @@ public class UpdatePeerList implements Runnable{
 				
 				/* Send params to  */
 				Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
+				clientSocket.setSoTimeout(2000);
 				
 				BufferedReader inFromServer = 
 						new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-				PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
-				outToServer.println("1");
-				outToServer.println(hashCode);
+				DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+				outToServer.writeBytes("1\n");
+				outToServer.flush();
+				outToServer.writeBytes(new String(hashCode + '\n'));
 				
 				outToServer.flush();
 				
@@ -59,6 +61,9 @@ public class UpdatePeerList implements Runnable{
 		}
 		catch (Exception e)
 		{
+			synchronized (peerList) {
+				peerList.notifyAll();
+			}
 			e.printStackTrace();
 		}
 	}
@@ -67,10 +72,11 @@ public class UpdatePeerList implements Runnable{
 	private void readPeerList(BufferedReader file) throws IOException
 	{
 		int numOfPeer = Integer.parseInt(file.readLine());
-		synchronized (peerList) {
-			for (int i = 0; i < numOfPeer; i++)
-			{
-				String peer = file.readLine();
+		System.out.println("reading peer list..." + numOfPeer);
+		for (int i = 0; i < numOfPeer; i++)
+		{
+			String peer = file.readLine();	
+			synchronized (peerList) {
 				peerList.add(peer);
 			}
 		}

@@ -11,6 +11,7 @@ public class ClientThread implements Runnable {
 	final private RandomAccessFile file;
 	final private AtomicInteger peerConnected;
 	private long offset;
+	private long lastOffset;
 	final private List<Integer> file_part;
 	
 	public ClientThread(RandomAccessFile _file, DTVParams dtv_params, String address, AtomicInteger peerConnected,
@@ -23,7 +24,9 @@ public class ClientThread implements Runnable {
 		
 		try
 		{	
-			offset = file.length()/PeerGet.numOfPart;
+			System.out.println(dtv_params.getSize());
+			offset = dtv_params.getSize() / PeerGet.numOfPart;
+			lastOffset = dtv_params.getSize() - (offset*(PeerGet.numOfPart-1));
 			clientSocket = new Socket(DTV.getIP(address), DTV.getPort(address));
 		} 
 		catch (IOException e)
@@ -34,8 +37,10 @@ public class ClientThread implements Runnable {
 	}
 
 	public void run() {
+		int partRemain = 0;
 		try
 		{
+			
 			DataInputStream inFromServer = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
 			DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
 			
@@ -50,7 +55,9 @@ public class ClientThread implements Runnable {
 				return;
 			}
 			
-			int partRemain = 0;
+			clientSocket.setSoTimeout(2000);
+			
+			System.out.println(offset);
 			
 			while (true)
 			{
@@ -70,6 +77,8 @@ public class ClientThread implements Runnable {
 				outToServer.writeByte(partRemain);
 				outToServer.flush();
 				
+				long curOffset = (partRemain == PeerGet.numOfPart-1)? lastOffset : offset;
+				System.out.println("CurOffset: " + curOffset);
 				//calculate file pointer
 				long filePtr = offset * partRemain;
 				System.out.println(filePtr);
@@ -88,13 +97,17 @@ public class ClientThread implements Runnable {
 					
 					filePtr = filePtr + cnt;
 					amount = amount + cnt;
-					if (amount >= offset)
+					if (amount >= curOffset)
 					{
 						break;
 					}
 				}
 				
 				System.out.println("end of part" + partRemain);
+				
+				synchronized (file_part) {
+					file_part.set(partRemain, Integer.valueOf(2));
+				}
 			}
 			
 			clientSocket.close();
@@ -103,8 +116,15 @@ public class ClientThread implements Runnable {
 		catch (Exception e)
 		{
 			try {
+				synchronized (file_part) {
+					if (file_part.get(partRemain) == Integer.valueOf(1))
+					{
+						file_part.set(partRemain, Integer.valueOf(0));
+					}
+				}
 				clientSocket.close();
 				peerConnected.decrementAndGet();
+				e.printStackTrace();
 			} catch (IOException e1) {
 				System.out.println("Can't close client socket");
 			}
