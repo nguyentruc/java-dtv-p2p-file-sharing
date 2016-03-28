@@ -44,7 +44,7 @@ public class PeerSeed implements Runnable {
 			
 			DTVParams dtv_params = FileDtvList.getDtv(fileIndex);
 			offset = dtv_params.getSize() / PeerGet.numOfPart;
-			long lastOffset = dtv_params.getSize() - (offset*PeerGet.numOfPart);
+			long lastOffset = dtv_params.getSize() - (offset*(PeerGet.numOfPart - 1));
 			file = new RandomAccessFile(dtv_params.getPathToFile(), "r");
 			
 			while (true)
@@ -71,6 +71,7 @@ public class PeerSeed implements Runnable {
 				
 				while ((cnt = file.read(buffer, 0, (int) Long.min(curOffset - amount, DTV.chunkSize))) >= 0)
 				{
+                                        //System.out.println("cnt = " + cnt + "fileptr = " +  filePtr/offset                                        );
 					outToPeer.write(buffer, 0, cnt);
 					outToPeer.flush();
 					amount = amount + cnt;
