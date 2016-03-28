@@ -6,24 +6,6 @@
 package dtv;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author vuong
- */
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,13 +14,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
  * @author vuong
@@ -54,10 +29,11 @@ public class CONSTANT implements Serializable{
             + "\\";
     public static String CONTROL_FILE = 
             "controlFile.dat";
-    public static int KEEP_ALIVE_TIME = 8;
+    public static int KEEP_ALIVE_TIME = 6;
     public static int SERVER_LISTENING_PORT = 1234; 
     public static int IPLIST_SIZE = 16;
-    public static int CHECK_TIME = 1;
+    public static int CHECK_TIME_IN_SECS = 1*1000*60; // ms * 1000 * 60 ->1 mins
+    public static String CONTROL_FILE_NAME = "controlFile.dat";
     public static void CONSTRUCT_CONTROL_FILE(File FILE) throws Exception {
         if(!FILE.exists()){
             FILE.createNewFile();

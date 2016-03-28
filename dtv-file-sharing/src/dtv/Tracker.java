@@ -6,25 +6,15 @@
 
 package dtv;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author vuong
- */
 import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
 /**
  *
- * @author King
+ * @author vuong
  */
 public class Tracker {
-    public static File CONTROL_FILE = new File(CONSTANT.STORAGE_PATH + "controlFile.dat");
+    public static File CONTROL_FILE = new File(CONSTANT.STORAGE_PATH + CONSTANT.CONTROL_FILE_NAME);
     public static void main(String[] args) throws Exception{
         ServerSocket ss = new ServerSocket(CONSTANT.SERVER_LISTENING_PORT);
         CONSTANT.CONSTRUCT_CONTROL_FILE(CONTROL_FILE);

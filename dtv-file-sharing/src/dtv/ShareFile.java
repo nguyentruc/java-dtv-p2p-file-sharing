@@ -5,19 +5,11 @@
  */
 package dtv;
 
-/**
- * 
- */
-
-/**
- * 
- */
-
 import java.io.Serializable;
 import java.util.*;
 
 /**
- * @author Trung Truc
+ * @author vuong
  *
  */
 public class ShareFile implements Serializable{
@@ -87,7 +79,6 @@ public class ShareFile implements Serializable{
                 retSeeder.decTime();
                 if(!retSeeder.isAlive()) ipList.remove(i);
                 else ipList.set(i, retSeeder);
-                //ipList.re
             }
         }
         
