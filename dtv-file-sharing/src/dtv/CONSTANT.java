@@ -24,6 +24,25 @@ import java.util.ArrayList;
  *
  * @author vuong
  */
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author vuong
+ */
 public class CONSTANT implements Serializable{
 
     public static String STORAGE_PATH = 
@@ -37,7 +56,8 @@ public class CONSTANT implements Serializable{
             "controlFile.dat";
     public static int KEEP_ALIVE_TIME = 8;
     public static int SERVER_LISTENING_PORT = 1234; 
-    public static int IPLIST_SIZE = 5;
+    public static int IPLIST_SIZE = 16;
+    public static int CHECK_TIME = 1;
     public static void CONSTRUCT_CONTROL_FILE(File FILE) throws Exception {
         if(!FILE.exists()){
             FILE.createNewFile();
@@ -83,7 +103,6 @@ public class CONSTANT implements Serializable{
         oos.flush();
         oos.close();
     }
-    
     public static ShareFile READ_SHARE_FILE(File FILE) throws Exception{
         ShareFile nsf;
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE));

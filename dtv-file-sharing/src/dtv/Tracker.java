@@ -27,12 +27,13 @@ public class Tracker {
     public static File CONTROL_FILE = new File(CONSTANT.STORAGE_PATH + "controlFile.dat");
     public static void main(String[] args) throws Exception{
         ServerSocket ss = new ServerSocket(CONSTANT.SERVER_LISTENING_PORT);
+        CONSTANT.CONSTRUCT_CONTROL_FILE(CONTROL_FILE);
+        new Thread(new PeriodicallyResetThread()).start();
         while(true){
-                CONSTANT.CONSTRUCT_CONTROL_FILE(CONTROL_FILE);
-                System.out.println("Tracker ready. (Main Thread)");
-                Socket sock = ss.accept();
-                System.out.println("Client Accepted. (Go to new Thread)");
-                new Thread(new TrackerThread(sock)).start();
+            System.out.println("Tracker ready. (Main Thread)");
+            Socket sock = ss.accept();
+            System.out.println("Client Accepted. (Go to new Thread)");
+            new Thread(new TrackerThread(sock)).start();
         }
     }
 } 

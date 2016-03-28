@@ -23,7 +23,7 @@ import java.util.*;
 public class ShareFile implements Serializable{
 
 	private final ArrayList<String> TrackerList;
-	private final ArrayList<seeder> ipList;
+	private final ArrayList<Seeder> ipList;
         private final String sizeOfFile;
         private final String fileName;
         private final String hashCode;
@@ -42,7 +42,7 @@ public class ShareFile implements Serializable{
 	}
 
         public void addIp(String ipaddr, String port){
-            seeder ns = new seeder(ipaddr, port);
+            Seeder ns = new Seeder(ipaddr, port);
             ipList.add(ns);
         }
         
@@ -79,4 +79,16 @@ public class ShareFile implements Serializable{
             }
             return ret;
         }
+        
+        public void checkSeederAliveTime(){
+            int loopTimes = ipList.size();
+            for(int i = loopTimes - 1; i >= 0; i--){
+                Seeder retSeeder = ipList.get(i);
+                retSeeder.decTime();
+                if(!retSeeder.isAlive()) ipList.remove(i);
+                else ipList.set(i, retSeeder);
+                //ipList.re
+            }
+        }
+        
 }

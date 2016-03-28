@@ -142,7 +142,17 @@ public class TrackerThread implements Runnable {
         dos.close();
     }
 
-    private void ExecuteCommandCode3(BufferedReader br) {
-        
+    private void ExecuteCommandCode3(BufferedReader br) throws Exception {
+        String listeningPort = br.readLine();
+        int numOfhashCode = Integer.valueOf(br.readLine());
+        for(int i = 0; i<numOfhashCode; i++){
+            String hashCode = br.readLine();
+            File f = new File(CONSTANT.STORAGE_PATH + hashCode);
+            if(f.exists()){
+                ShareFile sf = CONSTANT.READ_SHARE_FILE(f);
+                sf.addIp(incommingIP, listeningPort);
+                CONSTANT.WRITE_SHARE_FILE(f, sf);
+            }
+        }
     }
 }
