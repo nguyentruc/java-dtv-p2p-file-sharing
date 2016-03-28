@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.SpringLayout;
@@ -43,6 +44,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.JTree;
 import java.util.*;
+import javax.swing.JComboBox;
+import javax.swing.JTextArea;
+import javax.swing.DefaultComboBoxModel;
 
 public class UI  implements Runnable{
 
@@ -61,8 +65,10 @@ public class UI  implements Runnable{
 	private JButton btnDelete;
 	private JButton btnDownload;
 	private JButton btnSearch;
+	private JTextArea txtAddressTracker;
+	private JComboBox selectTracker;
 	File fileSave; 
-	
+	private List<DTVParams> fileL;
 	/**
 	 * Launch the application.
 	 */
@@ -94,13 +100,12 @@ public class UI  implements Runnable{
 		frame.getContentPane().setLayout(springLayout);
 		
 		btnAddTorrent = new JButton("ADD FILE");
-		springLayout.putConstraint(SpringLayout.NORTH, btnAddTorrent, 14, SpringLayout.NORTH, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.WEST, btnAddTorrent, 28, SpringLayout.WEST, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.EAST, btnAddTorrent, -726, SpringLayout.EAST, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.WEST, btnAddTorrent, 260, SpringLayout.WEST, frame.getContentPane());
 		frame.getContentPane().add(btnAddTorrent);
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Jtable FileShare ----------------------------
 		scrollPaneTable1 = new JScrollPane();
+		springLayout.putConstraint(SpringLayout.SOUTH, btnAddTorrent, -27, SpringLayout.NORTH, scrollPaneTable1);
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPaneTable1, 70, SpringLayout.NORTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, scrollPaneTable1, 159, SpringLayout.WEST, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollPaneTable1, -10, SpringLayout.SOUTH, frame.getContentPane());
@@ -117,7 +122,6 @@ public class UI  implements Runnable{
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Jtable FileShare ----------------------------
 		scrollTableRequest = new JScrollPane();
-		springLayout.putConstraint(SpringLayout.SOUTH, btnAddTorrent, -29, SpringLayout.NORTH, scrollTableRequest);
 		springLayout.putConstraint(SpringLayout.NORTH, scrollTableRequest, 70, SpringLayout.NORTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, scrollTableRequest, 159, SpringLayout.WEST, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollTableRequest, -10, SpringLayout.SOUTH, frame.getContentPane());
@@ -135,7 +139,6 @@ public class UI  implements Runnable{
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Jtable FileShare ----------------------------
 		scrollTableDownload = new JScrollPane();
-		springLayout.putConstraint(SpringLayout.SOUTH, btnAddTorrent, -29, SpringLayout.NORTH, scrollTableDownload);
 		springLayout.putConstraint(SpringLayout.NORTH, scrollTableDownload, 70, SpringLayout.NORTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, scrollTableDownload, 159, SpringLayout.WEST, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollTableDownload, -10, SpringLayout.SOUTH, frame.getContentPane());
@@ -150,21 +153,26 @@ public class UI  implements Runnable{
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		btnDelete = new JButton("REMOVE");
-		springLayout.putConstraint(SpringLayout.NORTH, btnDelete, -2, SpringLayout.NORTH, btnAddTorrent);
-		springLayout.putConstraint(SpringLayout.WEST, btnDelete, 113, SpringLayout.EAST, btnAddTorrent);
-		springLayout.putConstraint(SpringLayout.SOUTH, btnDelete, 0, SpringLayout.SOUTH, btnAddTorrent);
-		springLayout.putConstraint(SpringLayout.EAST, btnDelete, -525, SpringLayout.EAST, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.NORTH, btnAddTorrent, 0, SpringLayout.NORTH, btnDelete);
+		springLayout.putConstraint(SpringLayout.EAST, btnAddTorrent, -6, SpringLayout.WEST, btnDelete);
+		springLayout.putConstraint(SpringLayout.NORTH, btnDelete, 12, SpringLayout.NORTH, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.WEST, btnDelete, 354, SpringLayout.WEST, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.SOUTH, btnDelete, -27, SpringLayout.NORTH, scrollPaneTable1);
 		frame.getContentPane().add(btnDelete);
 		
 		btnDownload = new JButton("DOWNLOAD");
-		springLayout.putConstraint(SpringLayout.NORTH, btnDownload, 0, SpringLayout.NORTH, btnAddTorrent);
-		springLayout.putConstraint(SpringLayout.WEST, btnDownload, 17, SpringLayout.EAST, btnDelete);
+		
+		springLayout.putConstraint(SpringLayout.NORTH, btnDownload, 12, SpringLayout.NORTH, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.WEST, btnDownload, 456, SpringLayout.WEST, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.SOUTH, btnDownload, -27, SpringLayout.NORTH, scrollPaneTable1);
+		springLayout.putConstraint(SpringLayout.EAST, btnDelete, -6, SpringLayout.WEST, btnDownload);
 		frame.getContentPane().add(btnDownload);
 		
 		btnSearch = new JButton("SEARCH");
-		springLayout.putConstraint(SpringLayout.NORTH, btnSearch, 0, SpringLayout.NORTH, btnDelete);
-		springLayout.putConstraint(SpringLayout.WEST, btnSearch, 27, SpringLayout.EAST, btnDownload);
-		springLayout.putConstraint(SpringLayout.SOUTH, btnSearch, 0, SpringLayout.SOUTH, btnAddTorrent);
+		
+		springLayout.putConstraint(SpringLayout.NORTH, btnSearch, 14, SpringLayout.NORTH, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.SOUTH, btnSearch, -25, SpringLayout.NORTH, scrollPaneTable1);
+		springLayout.putConstraint(SpringLayout.EAST, btnSearch, -10, SpringLayout.EAST, frame.getContentPane());
 		frame.getContentPane().add(btnSearch);
 		//Create TableModel of Table File Share 
 		table.setModel(new DefaultTableModel(
@@ -291,9 +299,11 @@ public class UI  implements Runnable{
 		springLayout.putConstraint(SpringLayout.EAST, tree, -6, SpringLayout.WEST, scrollTableDownload);
 		
 		//Add data for Table FileShare
-		DefaultTableModel model=(DefaultTableModel)table.getModel();
+	
+		DefaultComboBoxModel modelCombo=new DefaultComboBoxModel();	
 		btnAddTorrent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				DefaultTableModel model=(DefaultTableModel)table.getModel();
 				JFileChooser fileAddTorrent = new JFileChooser();
 				int value=fileAddTorrent.showSaveDialog(btnAddTorrent);
 				if(value ==JFileChooser.APPROVE_OPTION){
@@ -319,21 +329,48 @@ public class UI  implements Runnable{
 						model.addRow(new Object[]{model.getRowCount()+1,file.getName(),size,file.getAbsoluteFile()});
 					} 
 					}
-				if(flagLoad==false){ 
+				if(flagLoad==false){
 				DTVParams dtv_params = new DTVParams();
 				dtv_params.setName(file.getName());
-				String hashCode = null;
+				String hashCode = "";
+				
 				try {
-					hashCode = generateMD5(new FileInputStream(file));
+					hashCode = generateSHA512(new FileInputStream(file));
 				} catch (FileNotFoundException e2) {
 					// TODO Auto-generated catch block
 					e2.printStackTrace();
 				}
-				System.out.println(hashCode);
+				
 				dtv_params.setHashCode(hashCode);
 				dtv_params.setSize(file.length());
 				dtv_params.setPathToFile(file.getAbsolutePath());
-				//dtv_params.addTracker();
+				//add tracker at dtv_params
+				boolean flagAdd=false;
+				String[] lines = txtAddressTracker.getText().split("\n");//read line by line of a text area
+				int row=txtAddressTracker.getLineCount();
+				int rowCombo=selectTracker.getItemCount();
+				if(rowCombo==0){
+					for(int i=0;i<row;i++){
+						modelCombo.addElement(lines[i]);//add data in row for combobox
+						dtv_params.addTracker(lines[i]);
+					}
+				}
+				else {
+					for(int i=0;i<row;i++){
+						for(int j=0;j<rowCombo;j++){
+							if(lines[i].equals((String)(selectTracker.getItemAt(j)))){
+								flagAdd=true;
+							}
+						}
+						if(!flagAdd) {
+							modelCombo.addElement(lines[i]);//add data in row for combobox
+							dtv_params.addTracker(lines[i]);
+						}	
+						flagAdd=false;
+					}
+				}
+				selectTracker.setModel(modelCombo);
+				/////////////////////////////////////////
 				dtv_params.setType(0);		//Share File
 				try {
 					torMessQ.put(dtv_params);
@@ -343,17 +380,113 @@ public class UI  implements Runnable{
 				}
 				}
 				}
+				tree.setSelectionRow(1);
 			}
 		}
 		);
+		//Search 
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				DefaultTableModel modelRequest=(DefaultTableModel)tableRequest.getModel();
+				//delete data for tableSearch
+				while(modelRequest.getRowCount()!=0)
+			       {
+					modelRequest.removeRow(0);
+			       }
+				 tree.setSelectionRow(2);
+				///////////////////////////////////
+				DTVParams dtvParams1= new DTVParams();
+				dtvParams1.addTracker((String)selectTracker.getSelectedItem());
+				dtvParams1.setType(2);
+				try {
+					torMessQ.put(dtvParams1);
+					//List<DTVParams>
+					fileL = fileListQ.take();
+					
+					for (int i = 0; i < fileL.size(); i++)
+					{
+						DTVParams tParams = fileL.get(i);
+						modelRequest.addRow(new Object[]{modelRequest.getRowCount()+1,tParams.getName(),tParams.getSize()});
+					}
+					
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				btnDownload.setEnabled(true);
+			}
+		});
+		//Download a File
+		btnDownload.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				DefaultTableModel tableDowloadModel=(DefaultTableModel)tableDownload.getModel();
+				DefaultTableModel tableRequestModel = (DefaultTableModel) tableRequest.getModel();
+				 JFileChooser fileChooseSave=new JFileChooser();
+			     int value=fileChooseSave.showSaveDialog(btnDownload);
+			     if(value==JFileChooser.APPROVE_OPTION){
+			    	
+			    	 fileChooseSave.setSelectedFile(new File((String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1)));//save file 
+			     } 
+				tree.setSelectionPath(tree.getPathForRow(2));//chon duong dan o Table Searh (JTree 2)
+				for (int i = 0; i < fileL.size(); i++){
+					if(fileL.get(i).getName().equals((String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1))){
+						DTVParams dtvParamsDownload=fileL.get(i);
+						dtvParamsDownload.setType(1);
+						dtvParamsDownload.setPathToFile(fileChooseSave.getSelectedFile().getAbsolutePath());
+						try {
+							torMessQ.put(dtvParamsDownload);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+				//Gui len peer
+				//DTVParams dtvParamsDownload= new DTVParams();
+				//dtvParamsDownload.setName((String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1));
+				//dtvParamsDownload.setSize((int) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 2));
+				///-------------------------gui duong dan luu file hay duong dan cua  file kia
+				//	dtvParamsDownload.setHashCode(hashCode); 
+				
+				
+			    
+			     ////
+			     Date time = new Date();
+		         int index = tableRequest.getSelectedRow();
+		         Object[] d = new Object[tableDownload.getColumnCount()];
+		         String path = fileChooseSave.getSelectedFile().getAbsolutePath();
+		         d[0] = tableDowloadModel.getRowCount();            
+		         d[1] = tableRequestModel.getValueAt(index, 1);
+		         d[2] = tableRequestModel.getValueAt(index, 2);
+		         d[3] = 0;
+		         d[4] = tableRequestModel.getValueAt(index, 3);
+		         d[5] = tableRequestModel.getValueAt(index, 4);
+		         d[6] = time;        
+		         int count = tableDownload.getRowCount();
+		         tableDowloadModel.insertRow(count,d);
+		         tree.setSelectionRow(3);
+			}
+		});
 		//Remove a DataRow on Table
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-		        int del = table.getSelectedRows().length;
-		        for(int i= 0; i<del;i++)
-		        	model.removeRow(table.getSelectedRows()[0]);
-		        for(int i=0;i<table.getRowCount();i++)
-		        	model.setValueAt(i+1, i, 0);
+				 DefaultTableModel model = (DefaultTableModel) table.getModel();
+				 DefaultTableModel modelDownload = (DefaultTableModel) tableDownload.getModel();
+				if(tree.getSelectionPath().equals(tree.getPathForRow(1))){
+					int del = table.getSelectedRows().length;
+			        for(int i= 0; i<del;i++)
+			        	model.removeRow(table.getSelectedRows()[0]);
+			        for(int i=0;i<table.getRowCount();i++)
+			        	model.setValueAt(i+1, i, 0);
+				}
+				else if(tree.getSelectionPath().equals(tree.getPathForRow(3))){
+					int del = tableDownload.getSelectedRows().length;
+			        for(int i= 0; i<del;i++)
+			        	modelDownload.removeRow(tableDownload.getSelectedRows()[0]);
+			        for(int i=0;i<tableDownload.getRowCount();i++)
+			        	modelDownload.setValueAt(i+1, i, 0);
+				}
+		        
 			}
 		});
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -394,6 +527,10 @@ public class UI  implements Runnable{
 		btnSearch.setContentAreaFilled(false);
 		btnSearch.setIcon(new ImageIcon(this.getClass().getResource("search.png")));
 		btnSearch.setText("");
+		btnAddTorrent.setBorder(BorderFactory.createEmptyBorder());
+		btnAddTorrent.setContentAreaFilled(false);
+		btnAddTorrent.setIcon(new ImageIcon(this.getClass().getResource("up-file-share.png")));
+		btnAddTorrent.setText("");
 	    ///////////////////////////////////////////////////////////////////////////////////////////////////////
 	       
 	    /////////////////////////////Image for Table////////////////////////////////////////
@@ -411,6 +548,8 @@ public class UI  implements Runnable{
 	                    JLabel label=new JLabel();
 						label.setBorder(BorderFactory.createEmptyBorder());
 						label.setIcon(new ImageIcon(this.getClass().getResource("file-name.png")));
+						//label.setText("avc");
+						//label.setBackground(Color.red);
 						return label;
 	                }
 	                
@@ -530,6 +669,24 @@ public class UI  implements Runnable{
 				TableColumnModel tcmDownload = tableDownload.getColumnModel();
 				TableColumn tcDownload;
 				tableDownload.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+				
+				selectTracker = new JComboBox();
+				springLayout.putConstraint(SpringLayout.WEST, btnSearch, 6, SpringLayout.EAST, selectTracker);
+				springLayout.putConstraint(SpringLayout.EAST, btnDownload, -25, SpringLayout.WEST, selectTracker);
+				springLayout.putConstraint(SpringLayout.WEST, selectTracker, 569, SpringLayout.WEST, frame.getContentPane());
+				springLayout.putConstraint(SpringLayout.SOUTH, selectTracker, 45, SpringLayout.NORTH, frame.getContentPane());
+				springLayout.putConstraint(SpringLayout.EAST, selectTracker, -89, SpringLayout.EAST, frame.getContentPane());
+				springLayout.putConstraint(SpringLayout.NORTH, selectTracker, 14, SpringLayout.NORTH, frame.getContentPane());
+				frame.getContentPane().add(selectTracker);
+				
+				
+				
+				txtAddressTracker = new JTextArea();
+				springLayout.putConstraint(SpringLayout.NORTH, txtAddressTracker, 0, SpringLayout.NORTH, btnAddTorrent);
+				springLayout.putConstraint(SpringLayout.WEST, txtAddressTracker, 0, SpringLayout.WEST, scrollPaneTree);
+				springLayout.putConstraint(SpringLayout.SOUTH, txtAddressTracker, -6, SpringLayout.NORTH, scrollPaneTable1);
+				springLayout.putConstraint(SpringLayout.EAST, txtAddressTracker, -6, SpringLayout.WEST, btnAddTorrent);
+				frame.getContentPane().add(txtAddressTracker);
 				tcDownload= tcmDownload.getColumn(1);
 				tcDownload.setPreferredWidth(301);
 				tcDownload.setHeaderRenderer(new TableCellRenderer(){
@@ -628,7 +785,9 @@ public class UI  implements Runnable{
 				
 				});
 				////////////////////////////////////////////////////////////////////////////////
-				
+				//textArea txtAddressTracker
+				txtAddressTracker.setLineWrap(true);//Sets the line-wrapping policy of the text area.
+				txtAddressTracker.append("192.168.10.1:1234");
 
 	            
 	            
@@ -660,12 +819,6 @@ public class UI  implements Runnable{
             btnAddTorrent.setEnabled(true);
             btnDownload.setEnabled(false);
             btnSearch.setEnabled(false);
-          
-        	/*
-            if(status == 1)
-                bttShare.setEnabled(true);
-            else bttShare.setEnabled(false);
-         */
                
         }
         else if(tree.getSelectionPath().getLastPathComponent().toString().equals("Search"))
@@ -675,7 +828,7 @@ public class UI  implements Runnable{
             scrollTableDownload.setVisible(false);
             btnDelete.setEnabled(false);
             btnAddTorrent.setEnabled(false);
-            btnDownload.setEnabled(true);
+            btnDownload.setEnabled(false);
             btnSearch.setEnabled(true);                   
         }
         else  if(tree.getSelectionPath().getLastPathComponent().toString().equals("Download"))
@@ -697,16 +850,16 @@ public class UI  implements Runnable{
 			frame.setVisible(true);
 		}
 	 
-	 private static String generateMD5(FileInputStream inputStream){
+	 private static String generateSHA512(FileInputStream inputStream){
 		    if(inputStream==null){
 
 		        return null;
 		    }
 		    MessageDigest md;
 		    try {
-		        md = MessageDigest.getInstance("MD5");
+		        md = MessageDigest.getInstance("SHA-512");
 		        FileChannel channel = inputStream.getChannel();
-		        ByteBuffer buff = ByteBuffer.allocate(2048);
+		        ByteBuffer buff = ByteBuffer.allocate(64*1024);
 		        while(channel.read(buff) != -1)
 		        {
 		            buff.flip();
