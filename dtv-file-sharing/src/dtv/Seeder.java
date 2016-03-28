@@ -28,6 +28,9 @@ public class Seeder implements Serializable{
         return (ip + ":" + port + "\n");
     }
     
+    public String getSeederFullInfo(){
+        return ("IP = " + ip + " Port = " + port + " Remain Alive Time = " + aliveTime + "\n");
+    }
     public void decTime(){
         aliveTime -=1;
     }

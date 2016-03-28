@@ -46,14 +46,14 @@ public class CONSTANT implements Serializable{
         }
         System.out.println(FILE.getName() + " ready!");
     }
-    public static void WRITE_CONTROL_FILE(File FILE, ArrayList<String> inArray) throws Exception{
+    public static synchronized void WRITE_CONTROL_FILE(File FILE, ArrayList<String> inArray) throws Exception{
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE));
         oos.writeObject(inArray);
         oos.flush();
         oos.close();
     }
     
-    public static ArrayList<String> READ_CONTROL_FILE(File FILE) throws Exception{
+    public static synchronized ArrayList<String> READ_CONTROL_FILE(File FILE) throws Exception{
         ArrayList<String> outArray;
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE));
         outArray = (ArrayList<String>) ois.readObject();
@@ -73,13 +73,13 @@ public class CONSTANT implements Serializable{
         System.out.println(FILE.getName() + " ready!");
     }    
     
-    public static void WRITE_SHARE_FILE(File FILE, ShareFile nsf) throws Exception{
+    public static synchronized void WRITE_SHARE_FILE(File FILE, ShareFile nsf) throws Exception{
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE));
         oos.writeObject(nsf);
         oos.flush();
         oos.close();
     }
-    public static ShareFile READ_SHARE_FILE(File FILE) throws Exception{
+    public static synchronized ShareFile READ_SHARE_FILE(File FILE) throws Exception{
         ShareFile nsf;
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE));
         nsf = (ShareFile) ois.readObject();
@@ -87,7 +87,7 @@ public class CONSTANT implements Serializable{
         return nsf;
     }
     
-    public static void WATCH_CONTROL_FILE(File FILE) throws Exception{
+    public static synchronized void WATCH_CONTROL_FILE(File FILE) throws Exception{
         if(!FILE.exists()){
             System.out.println(FILE.getName() + "non-exist!");
             System.out.println("Enquire File non-exist!");
@@ -107,7 +107,7 @@ public class CONSTANT implements Serializable{
         System.out.println(ret);
     }
     
-    public static void WATCH_SHARE_FILE(File FILE) throws Exception{
+    public static synchronized void WATCH_SHARE_FILE(File FILE) throws Exception{
         if(!FILE.exists()){
             System.out.println(FILE.getName() + "non-exist!");
             return;

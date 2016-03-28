@@ -82,4 +82,11 @@ public class ShareFile implements Serializable{
             }
         }
         
+        public String getFileName(){
+            return fileName;
+        }
+        
+        public ArrayList<Seeder> getIPList(){
+            return ipList;
+        }
 }
