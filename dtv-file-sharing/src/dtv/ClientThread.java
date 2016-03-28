@@ -55,7 +55,7 @@ public class ClientThread implements Runnable {
 				return;
 			}
 			
-			clientSocket.setSoTimeout(2000);
+			clientSocket.setSoTimeout(60000);
 			
 			System.out.println(offset);
 			

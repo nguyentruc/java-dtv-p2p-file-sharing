@@ -38,7 +38,7 @@ public class UpdatePeerList implements Runnable{
 				
 				/* Send params to  */
 				Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
-				clientSocket.setSoTimeout(2000);
+				clientSocket.setSoTimeout(60000);
 				
 				BufferedReader inFromServer = 
 						new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
