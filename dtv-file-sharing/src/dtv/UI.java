@@ -422,11 +422,13 @@ public class UI  implements Runnable{
 				DefaultTableModel tableDowloadModel=(DefaultTableModel)tableDownload.getModel();
 				DefaultTableModel tableRequestModel = (DefaultTableModel) tableRequest.getModel();
 				 JFileChooser fileChooseSave=new JFileChooser();
-			     int value=fileChooseSave.showSaveDialog(btnDownload);
-			     if(value==JFileChooser.APPROVE_OPTION){
-			    	
-			    	 fileChooseSave.setSelectedFile(new File((String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1)));//save file 
-			     } 
+			     
+			     fileChooseSave.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			     
+			     //if(value==JFileChooser.APPROVE_OPTION){
+			    	 File temp = new File("c:/Users/" + (String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1));
+			    	 fileChooseSave.setSelectedFile(temp);//save file 
+			    	fileChooseSave.showSaveDialog(btnDownload);
 				tree.setSelectionPath(tree.getPathForRow(2));//chon duong dan o Table Searh (JTree 2)
 				for (int i = 0; i < fileL.size(); i++){
 					if(fileL.get(i).getName().equals((String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1))){
@@ -455,7 +457,7 @@ public class UI  implements Runnable{
 		         int index = tableRequest.getSelectedRow();
 		         Object[] d = new Object[tableDownload.getColumnCount()];
 		         String path = fileChooseSave.getSelectedFile().getAbsolutePath();
-		         d[0] = tableDowloadModel.getRowCount();            
+		         d[0] = tableDowloadModel.getRowCount()+1;            
 		         d[1] = tableRequestModel.getValueAt(index, 1);
 		         d[2] = tableRequestModel.getValueAt(index, 2);
 		         d[3] = 0;
@@ -818,7 +820,7 @@ public class UI  implements Runnable{
             btnDelete.setEnabled(true);
             btnAddTorrent.setEnabled(true);
             btnDownload.setEnabled(false);
-            btnSearch.setEnabled(false);
+            btnSearch.setEnabled(true);
                
         }
         else if(tree.getSelectionPath().getLastPathComponent().toString().equals("Search"))
