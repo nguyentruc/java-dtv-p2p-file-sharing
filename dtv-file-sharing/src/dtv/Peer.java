@@ -44,6 +44,7 @@ public class Peer implements Runnable{
 	{
 		try
 		{
+			new Thread(new KeepAliveThread()).start();
 			while (true)
 			{
 				/* Sleep until a message appear */

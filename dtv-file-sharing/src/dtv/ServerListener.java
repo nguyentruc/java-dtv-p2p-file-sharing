@@ -2,10 +2,12 @@ package dtv;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerListener implements Runnable{
 
 	protected ServerSocket welcomeSocket = null;
+	protected AtomicInteger peerConnected;
 	
 	public ServerListener() {
 		int i;
@@ -29,13 +31,17 @@ public class ServerListener implements Runnable{
 		try 
 		{
 			int clientID = 0;
+			peerConnected = new AtomicInteger(0);
 			while (true)
 			{
-				Socket connectionSocket = welcomeSocket.accept();
-				
-				Thread serverThread = new Thread(new PeerSeed(connectionSocket, clientID));
-				serverThread.start();
-				clientID++;
+				if (peerConnected.get() < PeerGet.maxPeer)
+				{
+					Socket connectionSocket = welcomeSocket.accept();
+					peerConnected.incrementAndGet();
+					Thread serverThread = new Thread(new PeerSeed(connectionSocket, clientID, peerConnected));
+					serverThread.start();
+					clientID++;
+				}
 			}
 		} 
 		catch (IOException e) 

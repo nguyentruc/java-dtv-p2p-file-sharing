@@ -2,6 +2,7 @@ package dtv;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PeerSeed implements Runnable {
 
@@ -9,10 +10,12 @@ public class PeerSeed implements Runnable {
 	final protected int clientID;
 	private long offset;
 	private RandomAccessFile file;
+	final protected AtomicInteger peerConnected;
 
-	public PeerSeed(Socket clientSocket, int id) {
+	public PeerSeed(Socket clientSocket, int id, AtomicInteger peerConnected) {
 		this.connectionSocket = clientSocket;
 		clientID = id;
+		this.peerConnected = peerConnected;
 		System.out.println("Peer " + id + " connected");
 	}
 
@@ -79,6 +82,7 @@ public class PeerSeed implements Runnable {
 				}		
 				
 			}
+			peerConnected.decrementAndGet();
 			connectionSocket.close();
 			file.close();
 			
@@ -86,6 +90,7 @@ public class PeerSeed implements Runnable {
 			try {
 				connectionSocket.close();
 				file.close();
+				peerConnected.decrementAndGet();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

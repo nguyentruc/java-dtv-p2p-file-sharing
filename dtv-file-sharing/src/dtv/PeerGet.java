@@ -58,7 +58,6 @@ public class PeerGet implements Runnable {
 				availPeer.clear();
 			}
 		
-			int t =0;
 			/* Start to get File */
 			while (true)
 			{
@@ -76,11 +75,10 @@ public class PeerGet implements Runnable {
 					}
 				}
 	
-				if (peerConnected.intValue() >= maxPeer) continue;
+				if (peerConnected.get() >= maxPeer) continue;
 				
 				if (tUpdatePeer.isAlive() != true) 
 				{
-					System.out.println("Request new peer " + t++);
 					tUpdatePeer = new Thread(new UpdatePeerList(availPeer, dtv_params));
 					tUpdatePeer.start();
 				}

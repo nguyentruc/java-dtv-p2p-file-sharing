@@ -57,4 +57,9 @@ public class FileDtvList {
 			System.out.println(listFile.get(i).getHashCode());
 		}
 	}
+	
+	public static synchronized int getSize()
+	{
+		return listFile.size();
+	}
 }
