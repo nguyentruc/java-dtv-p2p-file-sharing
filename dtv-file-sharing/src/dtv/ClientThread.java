@@ -25,8 +25,8 @@ public class ClientThread implements Runnable {
 		try
 		{	
 			System.out.println(dtv_params.getSize());
-			offset = dtv_params.getSize() / PeerGet.numOfPart;
-			lastOffset = dtv_params.getSize() - (offset*(PeerGet.numOfPart-1));
+			offset = dtv_params.getSize() / DTV.numOfPart;
+			lastOffset = dtv_params.getSize() - (offset*(DTV.numOfPart-1));
 			clientSocket = new Socket(DTV.getIP(address), DTV.getPort(address));
 		} 
 		catch (IOException e)
@@ -55,7 +55,7 @@ public class ClientThread implements Runnable {
 				return;
 			}
 			
-			clientSocket.setSoTimeout(60000);
+			clientSocket.setSoTimeout(DTV.SocketTimeout);
 			
 			System.out.println(offset);
 			
@@ -77,7 +77,7 @@ public class ClientThread implements Runnable {
 				outToServer.writeByte(partRemain);
 				outToServer.flush();
 				
-				long curOffset = (partRemain == PeerGet.numOfPart-1)? lastOffset : offset;
+				long curOffset = (partRemain == DTV.numOfPart-1)? lastOffset : offset;
 				System.out.println("CurOffset: " + curOffset);
 				//calculate file pointer
 				long filePtr = offset * partRemain;

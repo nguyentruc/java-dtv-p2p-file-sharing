@@ -51,20 +51,21 @@ public class Peer implements Runnable{
 				DTVParams revDtv = torFileQ.take();
 				System.out.println("Receive from UI");
 				
-				if (revDtv.getType() == 0) //register new torrent
+				switch (revDtv.getType()) //register new torrent
 				{
+				case 0:
 					System.out.println("Register new");
 					FileDtvList.addNew(revDtv);
 					sendParamsToTracker(revDtv);
 					FileDtvList.printListHash();
-				}
-				else if (revDtv.getType() == 1) //add torrent
-				{
+					break;
+					
+				case 1: //add torrent
 					System.out.println("Get DTV");
 					new Thread(new PeerGet(revDtv,torFileQ)).start();
-				}
-				else if (revDtv.getType() == 2) //search
-				{
+					break;
+					
+				case 2: //search
 					System.out.println("search");
 					List<DTVParams> fileList = getListFromServer(revDtv);
 					fileListQ.put(fileList);
@@ -78,12 +79,15 @@ public class Peer implements Runnable{
 //						// TODO Auto-generated catch block
 //						e.printStackTrace();
 //					}
-				}
-				else if (revDtv.getType() == 3) //remove
-				{
+					break;
+					
+				case 3: //remove
 					FileDtvList.remove(revDtv.getHashCode());
 					System.out.println("Current list:");
 					FileDtvList.printListHash();
+					break;
+					
+				default: break;
 				}
 				
 			}
@@ -100,7 +104,7 @@ public class Peer implements Runnable{
 			String fileName = dtv_params.getName();
 			String hashCode = dtv_params.getHashCode();
 			long size = dtv_params.getSize();
-			
+			System.out.println("tracker size: " + trackerList.size());
 			for (int i = 0; i < trackerList.size(); i++)
 			{
 				String tracker = trackerList.get(i);

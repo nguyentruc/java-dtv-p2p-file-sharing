@@ -34,7 +34,7 @@ public class ServerListener implements Runnable{
 			peerConnected = new AtomicInteger(0);
 			while (true)
 			{
-				if (peerConnected.get() < PeerGet.maxPeer)
+				if (peerConnected.get() < DTV.maxPeer)
 				{
 					Socket connectionSocket = welcomeSocket.accept();
 					peerConnected.incrementAndGet();

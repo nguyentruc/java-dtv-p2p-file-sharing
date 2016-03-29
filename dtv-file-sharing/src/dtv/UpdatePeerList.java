@@ -5,6 +5,7 @@ package dtv;
 
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.io.*;
 
 /**
@@ -14,57 +15,70 @@ import java.io.*;
 public class UpdatePeerList implements Runnable{
 
 	private final List<String> peerList;
-	private final DTVParams dtv_params;
-	private List<String> trackerList;
-	private String hashCode;
+	private final List<String> trackerList;
+	private final String hashCode;
+	private final AtomicInteger tUpdatePeer_control;
 	
 	/**
 	 * 
 	 */
-	public UpdatePeerList(List<String> list, DTVParams dtv_params) {
+	public UpdatePeerList(List<String> list, DTVParams dtv_params, AtomicInteger tUpdatePeer_control) {
 		peerList = list;
-		this.dtv_params = dtv_params;
 		trackerList = new ArrayList<>(dtv_params.getTrackerList());
 		hashCode = dtv_params.getHashCode();
+		this.tUpdatePeer_control = tUpdatePeer_control;
 	}
 
 	@Override
 	public void run() {
-		try
-		{	
-			for (int i = 0; i < trackerList.size(); i++)
-			{
-				String tracker = trackerList.get(i);
-				
-				/* Send params to  */
-				Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
-				clientSocket.setSoTimeout(60000);
-				
-				BufferedReader inFromServer = 
-						new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-				DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-				outToServer.writeBytes("1\n");
-				outToServer.flush();
-				outToServer.writeBytes(new String(hashCode + '\n'));
-				
-				outToServer.flush();
-				
-				readPeerList(inFromServer);
-				
-				clientSocket.close();			
-			}
-			synchronized (peerList) {
-				peerList.notifyAll();
-			}
-			
-			
-		}
-		catch (Exception e)
+		while (true)
 		{
-			synchronized (peerList) {
-				peerList.notifyAll();
+			try {
+				Thread.sleep(DTV.UpdatePeerTimeout);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-			e.printStackTrace();
+			
+			if (tUpdatePeer_control.get() == 0) //do nothing
+			{
+				continue;
+			}
+			
+			if (tUpdatePeer_control.get() == 2) // stop the thread
+			{
+				return;
+			}
+			
+			try
+			{	
+				for (int i = 0; i < trackerList.size(); i++)
+				{
+					String tracker = trackerList.get(i);
+					
+					/* Send params to  */
+					Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
+					clientSocket.setSoTimeout(DTV.SocketTimeout);
+					
+					BufferedReader inFromServer = 
+							new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+					DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+					outToServer.writeBytes("1\n");
+					outToServer.flush();
+					outToServer.writeBytes(new String(hashCode + '\n'));
+					
+					outToServer.flush();
+					
+					readPeerList(inFromServer);
+					
+					clientSocket.close();			
+				}
+				
+				tUpdatePeer_control.set(0);		
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 	

@@ -43,8 +43,8 @@ public class PeerSeed implements Runnable {
 			System.out.println("Seed: Start to seed");
 			
 			DTVParams dtv_params = FileDtvList.getDtv(fileIndex);
-			offset = dtv_params.getSize() / PeerGet.numOfPart;
-			long lastOffset = dtv_params.getSize() - (offset*(PeerGet.numOfPart - 1));
+			offset = dtv_params.getSize() / DTV.numOfPart;
+			long lastOffset = dtv_params.getSize() - (offset*(DTV.numOfPart - 1));
 			file = new RandomAccessFile(dtv_params.getPathToFile(), "r");
 			
 			while (true)
@@ -58,7 +58,7 @@ public class PeerSeed implements Runnable {
 					break;
 				}
 				
-				long curOffset = (filePtr == PeerGet.numOfPart-1)? lastOffset : offset;
+				long curOffset = (filePtr == DTV.numOfPart-1)? lastOffset : offset;
 				
 				System.out.println("Seed: seeding part " + filePtr);
 					

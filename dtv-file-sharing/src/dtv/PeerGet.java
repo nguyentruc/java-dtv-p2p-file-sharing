@@ -11,18 +11,17 @@ public class PeerGet implements Runnable {
 	protected Thread serverListener = null;
 	private List<String> availPeer = new ArrayList<>();
 	private List<Integer> file_part;
-	static final int numOfPart = 16;
-	static final int maxPeer = 16;
 	private AtomicInteger peerConnected;
+	private AtomicInteger tUpdatePeer_control;
 	final private BlockingQueue<DTVParams> DTVFileQ;
 	
 	public PeerGet(DTVParams dtv_params, BlockingQueue<DTVParams> DTVFileQ) 
 	{
 		this.dtv_params = dtv_params;
-		file_part = new ArrayList<>(numOfPart);
+		file_part = new ArrayList<>(DTV.numOfPart);
 		this.DTVFileQ = DTVFileQ;
 		
-		for (int i = 0; i < numOfPart; i++)
+		for (int i = 0; i < DTV.numOfPart; i++)
 			file_part.add(Integer.valueOf(0));
 	}
 	
@@ -31,33 +30,16 @@ public class PeerGet implements Runnable {
 	{
 		try
 		{
-			Thread tUpdatePeer = new Thread(new UpdatePeerList(availPeer, dtv_params));
+			peerConnected = new AtomicInteger(0);
+			tUpdatePeer_control = new AtomicInteger(1);
 			
-			/* Wait for available peer */
-			synchronized (availPeer) {
-				while (availPeer.isEmpty()) 
-				{
-					tUpdatePeer.start();
-					availPeer.wait();
-					tUpdatePeer.join();
-				}
-			}			
-			
-			System.out.println(availPeer);
-			peerConnected = new AtomicInteger(availPeer.size());
+			/* Thread update peer list each 2 seconds */
+			Thread tUpdatePeer = new Thread(new UpdatePeerList(availPeer, dtv_params, tUpdatePeer_control));
+			tUpdatePeer.start();
 			
 			/* Get access to file */
 			RandomAccessFile file = new RandomAccessFile(dtv_params.getPathToFile(), "rw");
-			//RandomAccessFile file = new RandomAccessFile("d:/abcd/a.pdf", "rw");
-			
-			synchronized (availPeer) {
-				for (int i = 0; i < availPeer.size(); i++)
-				{
-					new Thread(new ClientThread(file, dtv_params, availPeer.get(i), peerConnected, file_part)).start();
-				}	
-				availPeer.clear();
-			}
-		
+
 			/* Start to get File */
 			while (true)
 			{
@@ -74,14 +56,10 @@ public class PeerGet implements Runnable {
 						continue;
 					}
 				}
-	
-				if (peerConnected.get() >= maxPeer) continue;
 				
-				if (tUpdatePeer.isAlive() != true) 
-				{
-					tUpdatePeer = new Thread(new UpdatePeerList(availPeer, dtv_params));
-					tUpdatePeer.start();
-				}
+				if (peerConnected.get() >= DTV.maxPeer) continue;
+				
+				tUpdatePeer_control.set(1); //want new peer
 				
 				synchronized (availPeer) {
 					for (int i = 0; i < availPeer.size(); i++)
@@ -93,8 +71,13 @@ public class PeerGet implements Runnable {
 				}
 			}
 			
+			tUpdatePeer_control.set(2); //stop update peer list
+			tUpdatePeer.interrupt();
+			
 			//close file after finish download
 			file.close();
+			
+			/* Register to tracker */
 			dtv_params.setType(0);
 			DTVFileQ.put(dtv_params);
 		}
