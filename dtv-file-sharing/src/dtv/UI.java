@@ -47,6 +47,8 @@ import java.util.*;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
 
 public class UI  implements Runnable{
 
@@ -68,7 +70,9 @@ public class UI  implements Runnable{
 	private JTextArea txtAddressTracker;
 	private JComboBox selectTracker;
 	File fileSave; 
+	private String codeHash;
 	private List<DTVParams> fileL;
+	private JButton btnNewButton;
 	/**
 	 * Launch the application.
 	 */
@@ -98,7 +102,7 @@ public class UI  implements Runnable{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SpringLayout springLayout = new SpringLayout();
 		frame.getContentPane().setLayout(springLayout);
-		
+		frame.setTitle("Torrent");
 		btnAddTorrent = new JButton("ADD FILE");
 		springLayout.putConstraint(SpringLayout.WEST, btnAddTorrent, 260, SpringLayout.WEST, frame.getContentPane());
 		frame.getContentPane().add(btnAddTorrent);
@@ -179,7 +183,7 @@ public class UI  implements Runnable{
 			new Object[][] {
 			},
 			new String[] {
-				"STT", "FILE NAME", "SIZE", "PATH"
+				"STT", "FILE NAME", "SIZE", "PATH","HASHCODE"
 			}
 		){
             Class[] types = new Class [] {
@@ -304,16 +308,26 @@ public class UI  implements Runnable{
 		btnAddTorrent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				DefaultTableModel model=(DefaultTableModel)table.getModel();
+				//hash code
+				
+				//////////
 				JFileChooser fileAddTorrent = new JFileChooser();
 				int value=fileAddTorrent.showSaveDialog(btnAddTorrent);
 				if(value ==JFileChooser.APPROVE_OPTION){
 				File file = fileAddTorrent.getSelectedFile();
 				String size=Long.toString(file.length())+" bytes";
+				String hashCode = "";
+				try {
+					hashCode = generateSHA512(new FileInputStream(file));
+				} catch (FileNotFoundException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
 				int numberRow=0;
 				boolean flag = false;
 				boolean flagLoad = false;
 				if(model.getRowCount()==0){
-					model.addRow(new Object[]{model.getRowCount()+1,file.getName(),size,file.getAbsoluteFile()});
+					model.addRow(new Object[]{model.getRowCount()+1,file.getName(),size,file.getAbsoluteFile(),hashCode});
 				}
 				else{
 					int count = model.getRowCount();
@@ -332,14 +346,6 @@ public class UI  implements Runnable{
 				if(flagLoad==false){
 				DTVParams dtv_params = new DTVParams();
 				dtv_params.setName(file.getName());
-				String hashCode = "";
-				
-				try {
-					hashCode = generateSHA512(new FileInputStream(file));
-				} catch (FileNotFoundException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				}
 				
 				dtv_params.setHashCode(hashCode);
 				dtv_params.setSize(file.length());
@@ -360,11 +366,11 @@ public class UI  implements Runnable{
 						for(int j=0;j<rowCombo;j++){
 							if(lines[i].equals((String)(selectTracker.getItemAt(j)))){
 								flagAdd=true;
+								dtv_params.addTracker(lines[i]);
 							}
 						}
 						if(!flagAdd) {
 							modelCombo.addElement(lines[i]);//add data in row for combobox
-							dtv_params.addTracker(lines[i]);
 						}	
 						flagAdd=false;
 					}
@@ -421,6 +427,7 @@ public class UI  implements Runnable{
 			public void actionPerformed(ActionEvent arg0) {
 				DefaultTableModel tableDowloadModel=(DefaultTableModel)tableDownload.getModel();
 				DefaultTableModel tableRequestModel = (DefaultTableModel) tableRequest.getModel();
+				DefaultTableModel model=(DefaultTableModel) table.getModel();
 				 JFileChooser fileChooseSave=new JFileChooser();
 			     
 			     fileChooseSave.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -434,6 +441,7 @@ public class UI  implements Runnable{
 					if(fileL.get(i).getName().equals((String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1))){
 						DTVParams dtvParamsDownload=fileL.get(i);
 						dtvParamsDownload.setType(1);
+						 codeHash=dtvParamsDownload.getHashCode();
 						dtvParamsDownload.setPathToFile(fileChooseSave.getSelectedFile().getAbsolutePath());
 						try {
 							torMessQ.put(dtvParamsDownload);
@@ -443,18 +451,14 @@ public class UI  implements Runnable{
 						}
 					}
 				}
-				//Gui len peer
-				//DTVParams dtvParamsDownload= new DTVParams();
-				//dtvParamsDownload.setName((String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1));
-				//dtvParamsDownload.setSize((int) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 2));
-				///-------------------------gui duong dan luu file hay duong dan cua  file kia
-				//	dtvParamsDownload.setHashCode(hashCode); 
-				
-				
-			    
-			     ////
-			     Date time = new Date();
+				////////////////////////////////////////////
+				 Date time = new Date();
 		         int index = tableRequest.getSelectedRow();
+		         ///////////////////////////////////////////
+		         model.addRow(new Object[]{model.getRowCount()+1,tableRequestModel.getValueAt(index, 1),tableRequestModel.getValueAt(index, 2),fileChooseSave.getSelectedFile().getAbsolutePath(),codeHash});
+				
+			     //////////////////////////////////////////
+			    
 		         Object[] d = new Object[tableDownload.getColumnCount()];
 		         String path = fileChooseSave.getSelectedFile().getAbsolutePath();
 		         d[0] = tableDowloadModel.getRowCount()+1;            
@@ -474,20 +478,29 @@ public class UI  implements Runnable{
 			public void actionPerformed(ActionEvent arg0) {
 				 DefaultTableModel model = (DefaultTableModel) table.getModel();
 				 DefaultTableModel modelDownload = (DefaultTableModel) tableDownload.getModel();
-				if(tree.getSelectionPath().equals(tree.getPathForRow(1))){
+				//if(tree.getSelectionPath().equals(tree.getPathForRow(1))){
 					int del = table.getSelectedRows().length;
 			        for(int i= 0; i<del;i++)
 			        	model.removeRow(table.getSelectedRows()[0]);
 			        for(int i=0;i<table.getRowCount();i++)
 			        	model.setValueAt(i+1, i, 0);
-				}
+			        DTVParams params=new DTVParams();
+			        params.setType(3);
+			        params.setHashCode((String)model.getValueAt(table.getSelectedRow(), 4));
+			        try {
+						torMessQ.put(params);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				/*}
 				else if(tree.getSelectionPath().equals(tree.getPathForRow(3))){
 					int del = tableDownload.getSelectedRows().length;
 			        for(int i= 0; i<del;i++)
 			        	modelDownload.removeRow(tableDownload.getSelectedRows()[0]);
 			        for(int i=0;i<tableDownload.getRowCount();i++)
 			        	modelDownload.setValueAt(i+1, i, 0);
-				}
+				}*/
 		        
 			}
 		});
@@ -685,9 +698,8 @@ public class UI  implements Runnable{
 				
 				txtAddressTracker = new JTextArea();
 				springLayout.putConstraint(SpringLayout.NORTH, txtAddressTracker, 0, SpringLayout.NORTH, btnAddTorrent);
-				springLayout.putConstraint(SpringLayout.WEST, txtAddressTracker, 0, SpringLayout.WEST, scrollPaneTree);
+				springLayout.putConstraint(SpringLayout.WEST, txtAddressTracker, 14, SpringLayout.WEST, frame.getContentPane());
 				springLayout.putConstraint(SpringLayout.SOUTH, txtAddressTracker, -6, SpringLayout.NORTH, scrollPaneTable1);
-				springLayout.putConstraint(SpringLayout.EAST, txtAddressTracker, -6, SpringLayout.WEST, btnAddTorrent);
 				frame.getContentPane().add(txtAddressTracker);
 				tcDownload= tcmDownload.getColumn(1);
 				tcDownload.setPreferredWidth(301);
@@ -789,6 +801,53 @@ public class UI  implements Runnable{
 				////////////////////////////////////////////////////////////////////////////////
 				//textArea txtAddressTracker
 				txtAddressTracker.setLineWrap(true);//Sets the line-wrapping policy of the text area.
+				
+				btnNewButton = new JButton("OK");
+				btnNewButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						String[] lines = txtAddressTracker.getText().split("\n");//read line by line of a text area
+						int row=txtAddressTracker.getLineCount();
+						int rowCombo=selectTracker.getItemCount();
+						boolean flagAdd=false;
+						if(rowCombo==0){
+							for(int i=0;i<row;i++){
+								modelCombo.addElement(lines[i]);//add data in row for combobox
+							}
+						}
+						else {
+							for(int i=0;i<row;i++){
+								for(int j=0;j<rowCombo;j++){
+									if(lines[i].equals((String)(selectTracker.getItemAt(j)))){
+										flagAdd=true;
+									}
+								}
+								if(!flagAdd) {
+									modelCombo.addElement(lines[i]);//add data in row for combobox
+								}	
+								flagAdd=false;
+							}
+						}
+						selectTracker.setModel(modelCombo);
+						}
+					}
+				);
+				springLayout.putConstraint(SpringLayout.EAST, txtAddressTracker, -17, SpringLayout.WEST, btnNewButton);
+				springLayout.putConstraint(SpringLayout.NORTH, btnNewButton, 0, SpringLayout.NORTH, btnAddTorrent);
+				springLayout.putConstraint(SpringLayout.WEST, btnNewButton, 184, SpringLayout.WEST, frame.getContentPane());
+				springLayout.putConstraint(SpringLayout.EAST, btnNewButton, -6, SpringLayout.WEST, btnAddTorrent);
+				frame.getContentPane().add(btnNewButton);
+				
+				JMenuBar menuBar = new JMenuBar();
+				frame.setJMenuBar(menuBar);
+				
+				JMenu mnFile = new JMenu("File");
+				menuBar.add(mnFile);
+				
+				JMenu mnEdit = new JMenu("Edit");
+				menuBar.add(mnEdit);
+				
+				JMenu mnOption = new JMenu("Option");
+				menuBar.add(mnOption);
 				txtAddressTracker.append("192.168.10.1:1234");
 
 	            
