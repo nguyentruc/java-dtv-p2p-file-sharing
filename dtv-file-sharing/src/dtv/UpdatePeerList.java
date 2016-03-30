@@ -33,51 +33,49 @@ public class UpdatePeerList implements Runnable{
 	public void run() {
 		while (true)
 		{
-			try {
-				Thread.sleep(DTV.UpdatePeerTimeout);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-			if (tUpdatePeer_control.get() == 0) //do nothing
+			if (tUpdatePeer_control.get() == 1)
 			{
-				continue;
+				try
+				{	
+					for (int i = 0; i < trackerList.size(); i++)
+					{
+						String tracker = trackerList.get(i);
+						
+						/* Send params to  */
+						Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
+						clientSocket.setSoTimeout(DTV.SocketTimeout);
+						
+						BufferedReader inFromServer = 
+								new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+						DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+						outToServer.writeBytes("1\n");
+						outToServer.flush();
+						outToServer.writeBytes(new String(hashCode + '\n'));
+						
+						outToServer.flush();
+						
+						readPeerList(inFromServer);
+						
+						clientSocket.close();			
+					}	
+					tUpdatePeer_control.set(0);	
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 			
-			if (tUpdatePeer_control.get() == 2) // stop the thread
+			if (Thread.currentThread().isInterrupted())
 			{
 				return;
 			}
 			
-			try
-			{	
-				for (int i = 0; i < trackerList.size(); i++)
-				{
-					String tracker = trackerList.get(i);
-					
-					/* Send params to  */
-					Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
-					clientSocket.setSoTimeout(DTV.SocketTimeout);
-					
-					BufferedReader inFromServer = 
-							new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-					DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-					outToServer.writeBytes("1\n");
-					outToServer.flush();
-					outToServer.writeBytes(new String(hashCode + '\n'));
-					
-					outToServer.flush();
-					
-					readPeerList(inFromServer);
-					
-					clientSocket.close();			
-				}
-				
-				tUpdatePeer_control.set(0);		
-			}
-			catch (Exception e)
+			try 
 			{
-				e.printStackTrace();
+				Thread.sleep(DTV.UpdatePeerTimeout);
+			} catch (InterruptedException e) {
+				return;
 			}
 		}
 	}

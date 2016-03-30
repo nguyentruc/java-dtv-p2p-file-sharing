@@ -8,6 +8,7 @@ public class ServerListener implements Runnable{
 
 	protected ServerSocket welcomeSocket = null;
 	protected AtomicInteger peerConnected;
+	final private int maxConnection;
 	
 	public ServerListener() {
 		int i;
@@ -24,6 +25,7 @@ public class ServerListener implements Runnable{
 		
 		Peer.ServerPort = i;
 		System.out.println(String.format("Server port: %d", i));
+		maxConnection = (DTV.maxPeer + DTV.maxPeer/2);
 	}
 
 	@Override
@@ -34,7 +36,7 @@ public class ServerListener implements Runnable{
 			peerConnected = new AtomicInteger(0);
 			while (true)
 			{
-				if (peerConnected.get() < DTV.maxPeer)
+				if (peerConnected.get() < maxConnection)
 				{
 					Socket connectionSocket = welcomeSocket.accept();
 					peerConnected.incrementAndGet();

@@ -6,11 +6,11 @@ import java.util.concurrent.*;
 public class DTV {
 
 	public static final int chunkSize = 256 * 1024;
-	public static final int SocketTimeout = 10*60*1000;
-	public static final int UpdatePeerTimeout = 2*1000;
+	public static final int SocketTimeout = 60*1000;
+	public static final int UpdatePeerTimeout = 5*1000;
 	public static final int numOfPart = 16;
 	public static final int maxPeer = 16;
-	public static final int keepAliveTimeout = 9*60*1000;
+	public static final int keepAliveTimeout = 4*60*1000;
 	
 	public static void main(String[] args) {
 		/**
