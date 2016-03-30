@@ -138,19 +138,20 @@ public class UI  implements Runnable{
 		frame = new JFrame();
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("E:\\Hoc tap\\MMT1\\Assignment\\Assignment\\test\\src\\client\\images\\icons\\torrent.png"));
 		frame.setBackground(Color.WHITE);
-		frame.setBounds(100, 100, 858, 455);
+		frame.setBounds(100, 100, 884, 482);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SpringLayout springLayout = new SpringLayout();
 		frame.getContentPane().setLayout(springLayout);
 		frame.setTitle("Torrent");
 		
 		btnAddTorrent = new JButton("ADD FILE");
-		springLayout.putConstraint(SpringLayout.WEST, btnAddTorrent, 260, SpringLayout.WEST, frame.getContentPane());
+		btnAddTorrent.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		springLayout.putConstraint(SpringLayout.NORTH, btnAddTorrent, 12, SpringLayout.NORTH, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.EAST, btnAddTorrent, -505, SpringLayout.EAST, frame.getContentPane());
 		frame.getContentPane().add(btnAddTorrent);
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Jtable FileShare ----------------------------
 		scrollPaneTable1 = new JScrollPane();
-		springLayout.putConstraint(SpringLayout.SOUTH, btnAddTorrent, -27, SpringLayout.NORTH, scrollPaneTable1);
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPaneTable1, 70, SpringLayout.NORTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, scrollPaneTable1, 159, SpringLayout.WEST, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollPaneTable1, -10, SpringLayout.SOUTH, frame.getContentPane());
@@ -198,25 +199,26 @@ public class UI  implements Runnable{
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		btnDelete = new JButton("REMOVE");
-		springLayout.putConstraint(SpringLayout.NORTH, btnAddTorrent, 0, SpringLayout.NORTH, btnDelete);
-		springLayout.putConstraint(SpringLayout.EAST, btnAddTorrent, -6, SpringLayout.WEST, btnDelete);
-		springLayout.putConstraint(SpringLayout.NORTH, btnDelete, 12, SpringLayout.NORTH, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.WEST, btnDelete, 354, SpringLayout.WEST, frame.getContentPane());
+		btnDelete.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		springLayout.putConstraint(SpringLayout.NORTH, btnDelete, 0, SpringLayout.NORTH, btnAddTorrent);
+		springLayout.putConstraint(SpringLayout.WEST, btnDelete, 6, SpringLayout.EAST, btnAddTorrent);
 		springLayout.putConstraint(SpringLayout.SOUTH, btnDelete, -27, SpringLayout.NORTH, scrollPaneTable1);
+		springLayout.putConstraint(SpringLayout.EAST, btnDelete, -403, SpringLayout.EAST, frame.getContentPane());
 		frame.getContentPane().add(btnDelete);
 		
 		btnDownload = new JButton("DOWNLOAD");
+		btnDownload.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		
 		springLayout.putConstraint(SpringLayout.NORTH, btnDownload, 12, SpringLayout.NORTH, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.WEST, btnDownload, 456, SpringLayout.WEST, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.WEST, btnDownload, 6, SpringLayout.EAST, btnDelete);
 		springLayout.putConstraint(SpringLayout.SOUTH, btnDownload, -27, SpringLayout.NORTH, scrollPaneTable1);
-		springLayout.putConstraint(SpringLayout.EAST, btnDelete, -6, SpringLayout.WEST, btnDownload);
+		springLayout.putConstraint(SpringLayout.EAST, btnDownload, -298, SpringLayout.EAST, frame.getContentPane());
 		frame.getContentPane().add(btnDownload);
 		
 		btnSearch = new JButton("SEARCH");
-		
-		springLayout.putConstraint(SpringLayout.NORTH, btnSearch, 14, SpringLayout.NORTH, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.SOUTH, btnSearch, -25, SpringLayout.NORTH, scrollPaneTable1);
+		btnSearch.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		springLayout.putConstraint(SpringLayout.NORTH, btnSearch, 0, SpringLayout.NORTH, btnAddTorrent);
+		springLayout.putConstraint(SpringLayout.SOUTH, btnSearch, -27, SpringLayout.NORTH, scrollPaneTable1);
 		springLayout.putConstraint(SpringLayout.EAST, btnSearch, -10, SpringLayout.EAST, frame.getContentPane());
 		frame.getContentPane().add(btnSearch);
 		//Create TableModel of Table File Share 
@@ -598,7 +600,7 @@ public class UI  implements Runnable{
 				        }
 				    });
 	//////--------------------------------------------IMAGES BUTTON--------------------------------------------------
-		btnDelete.setBorder(BorderFactory.createEmptyBorder());
+	/*	btnDelete.setBorder(BorderFactory.createEmptyBorder());
 		btnDelete.setContentAreaFilled(false);
 		btnDelete.setIcon(new ImageIcon(this.getClass().getResource("remove.png")));
 		btnDelete.setText("");
@@ -613,7 +615,7 @@ public class UI  implements Runnable{
 		btnAddTorrent.setBorder(BorderFactory.createEmptyBorder());
 		btnAddTorrent.setContentAreaFilled(false);
 		btnAddTorrent.setIcon(new ImageIcon(this.getClass().getResource("up-file-share.png")));
-		btnAddTorrent.setText("");
+		btnAddTorrent.setText("");*/
 	    ///////////////////////////////////////////////////////////////////////////////////////////////////////
 	       
 	    /////////////////////////////Image for Table////////////////////////////////////////
@@ -755,19 +757,19 @@ public class UI  implements Runnable{
 				
 				selectTracker = new JComboBox();
 				springLayout.putConstraint(SpringLayout.WEST, btnSearch, 6, SpringLayout.EAST, selectTracker);
-				springLayout.putConstraint(SpringLayout.EAST, btnDownload, -25, SpringLayout.WEST, selectTracker);
-				springLayout.putConstraint(SpringLayout.WEST, selectTracker, 569, SpringLayout.WEST, frame.getContentPane());
-				springLayout.putConstraint(SpringLayout.SOUTH, selectTracker, 45, SpringLayout.NORTH, frame.getContentPane());
-				springLayout.putConstraint(SpringLayout.EAST, selectTracker, -89, SpringLayout.EAST, frame.getContentPane());
-				springLayout.putConstraint(SpringLayout.NORTH, selectTracker, 14, SpringLayout.NORTH, frame.getContentPane());
+				springLayout.putConstraint(SpringLayout.NORTH, selectTracker, 0, SpringLayout.NORTH, btnAddTorrent);
+				springLayout.putConstraint(SpringLayout.WEST, selectTracker, 6, SpringLayout.EAST, btnDownload);
+				springLayout.putConstraint(SpringLayout.SOUTH, selectTracker, 43, SpringLayout.NORTH, frame.getContentPane());
+				springLayout.putConstraint(SpringLayout.EAST, selectTracker, -108, SpringLayout.EAST, frame.getContentPane());
 				frame.getContentPane().add(selectTracker);
 				
 				
 				
 				txtAddressTracker = new JTextArea();
-				springLayout.putConstraint(SpringLayout.NORTH, txtAddressTracker, 0, SpringLayout.NORTH, btnAddTorrent);
+				springLayout.putConstraint(SpringLayout.NORTH, txtAddressTracker, 12, SpringLayout.NORTH, frame.getContentPane());
 				springLayout.putConstraint(SpringLayout.WEST, txtAddressTracker, 14, SpringLayout.WEST, frame.getContentPane());
 				springLayout.putConstraint(SpringLayout.SOUTH, txtAddressTracker, -6, SpringLayout.NORTH, scrollPaneTable1);
+				springLayout.putConstraint(SpringLayout.EAST, txtAddressTracker, -675, SpringLayout.EAST, frame.getContentPane());
 				frame.getContentPane().add(txtAddressTracker);
 				tcDownload= tcmDownload.getColumn(1);
 				tcDownload.setPreferredWidth(301);
@@ -871,6 +873,12 @@ public class UI  implements Runnable{
 				txtAddressTracker.setLineWrap(true);//Sets the line-wrapping policy of the text area.
 				
 				btnNewButton = new JButton("OK");
+				btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 10));
+				springLayout.putConstraint(SpringLayout.WEST, btnAddTorrent, 6, SpringLayout.EAST, btnNewButton);
+				springLayout.putConstraint(SpringLayout.NORTH, btnNewButton, 12, SpringLayout.NORTH, frame.getContentPane());
+				springLayout.putConstraint(SpringLayout.WEST, btnNewButton, 6, SpringLayout.EAST, txtAddressTracker);
+				springLayout.putConstraint(SpringLayout.SOUTH, btnNewButton, -27, SpringLayout.NORTH, scrollPaneTable1);
+				springLayout.putConstraint(SpringLayout.EAST, btnNewButton, -599, SpringLayout.EAST, frame.getContentPane());
 				btnNewButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						String[] lines = txtAddressTracker.getText().split("\n");//read line by line of a text area
@@ -899,10 +907,6 @@ public class UI  implements Runnable{
 						}
 					}
 				);
-				springLayout.putConstraint(SpringLayout.EAST, txtAddressTracker, -17, SpringLayout.WEST, btnNewButton);
-				springLayout.putConstraint(SpringLayout.NORTH, btnNewButton, 0, SpringLayout.NORTH, btnAddTorrent);
-				springLayout.putConstraint(SpringLayout.WEST, btnNewButton, 184, SpringLayout.WEST, frame.getContentPane());
-				springLayout.putConstraint(SpringLayout.EAST, btnNewButton, -6, SpringLayout.WEST, btnAddTorrent);
 				frame.getContentPane().add(btnNewButton);
 				
 				JMenuBar menuBar = new JMenuBar();
@@ -919,7 +923,7 @@ public class UI  implements Runnable{
 				JMenu mnOption = new JMenu("Option");
 				menuBar.add(mnOption);
 			
-				txtAddressTracker.append("192.168.10.1:1234");
+				txtAddressTracker.append("192.168.43.53:1234");
 
 				
 	            
@@ -968,7 +972,7 @@ public class UI  implements Runnable{
         	scrollPaneTable1.setVisible(false);
         	scrollTableRequest.setVisible(false);
             scrollTableDownload.setVisible(true);
-            btnDelete.setEnabled(true);
+            btnDelete.setEnabled(false);
             btnAddTorrent.setEnabled(false);
             btnDownload.setEnabled(false);
             btnSearch.setEnabled(false);
