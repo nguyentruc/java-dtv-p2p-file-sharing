@@ -8,10 +8,9 @@ public class KeepAliveThread implements Runnable{
 
 	private List<String> trackerList;
 	
-	public KeepAliveThread() {
-		
+	public KeepAliveThread() 
+	{		
 		trackerList = new ArrayList<String>();
-		
 	}
 
 	@Override
@@ -20,6 +19,7 @@ public class KeepAliveThread implements Runnable{
 		{
 			while (true)
 			{
+				Thread.sleep(DTV.keepAliveTimeout);
 				createTrackerList();
 				int size = FileDtvList.getSize();
 				for (int i = 0; i < trackerList.size(); i++)
@@ -43,11 +43,8 @@ public class KeepAliveThread implements Runnable{
 					outToServer.flush();
 					outToServer.close();
 					
-					clientSocket.close();
-					
-					
+					clientSocket.close();					
 				}
-				Thread.sleep(5*60*1000);
 			}
 		}
 		catch (Exception e)

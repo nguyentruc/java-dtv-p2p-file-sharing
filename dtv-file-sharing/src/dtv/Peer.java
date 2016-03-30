@@ -26,17 +26,6 @@ public class Peer implements Runnable{
 		serverListener = new Thread(new ServerListener());
 		serverListener.start();
 		
-		/* Debug only */
-//		DTVParams tempdtv = new DTVParams();
-//		tempdtv.setType(2);
-//		tempdtv.addTracker("192.168.1.80:1234");
-//		try {
-//			torFileQ.put(tempdtv);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
 		FileDtvList.resetList();			
 	}
 	
@@ -45,6 +34,7 @@ public class Peer implements Runnable{
 		try
 		{
 			new Thread(new KeepAliveThread()).start();
+			
 			while (true)
 			{
 				/* Sleep until a message appear */
@@ -69,16 +59,7 @@ public class Peer implements Runnable{
 					System.out.println("search");
 					List<DTVParams> fileList = getListFromServer(revDtv);
 					fileListQ.put(fileList);
-					
-					/* Debug only */
-//					DTVParams tempdtv = fileList.get(0);
-//					tempdtv.setType(1);
-//					try {
-//						torFileQ.put(tempdtv);
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+
 					break;
 					
 				case 3: //remove
@@ -110,34 +91,40 @@ public class Peer implements Runnable{
 				String tracker = trackerList.get(i);
 				
 				/* Send params to  */
-				System.out.println("Connect to " + tracker);
-				dtv_params.printInfo();
-				Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
-				
-				PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
-				outToServer.println("0");
-				outToServer.println(fileName);
-				outToServer.println(hashCode);
-				outToServer.println(String.valueOf(size));
-				outToServer.println(String.valueOf(ServerPort));
-				outToServer.println(trackerList.size());
-				
-				for (int j = 0; j < trackerList.size(); j++)
+				try
 				{
-					outToServer.println(trackerList.get(j));
+					System.out.println("Connect to " + tracker);
+					dtv_params.printInfo();
+					Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
+					
+					PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
+					outToServer.println("0");
+					outToServer.println(fileName);
+					outToServer.println(hashCode);
+					outToServer.println(String.valueOf(size));
+					outToServer.println(String.valueOf(ServerPort));
+					outToServer.println(trackerList.size());
+					
+					for (int j = 0; j < trackerList.size(); j++)
+					{
+						outToServer.println(trackerList.get(j));
+					}
+					outToServer.flush();
+					
+					clientSocket.close();
 				}
-				outToServer.flush();
-				
-				clientSocket.close();
+				catch(UnknownHostException e)
+				{
+					//print textbox cannot find tracker ...
+				}
 			}
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	private List<DTVParams> getListFromServer(DTVParams dtv_params) throws UnknownHostException, IOException
+	private List<DTVParams> getListFromServer(DTVParams dtv_params) throws IOException
 	{
 		List<DTVParams> fileList = new ArrayList<>();
 		List<String> trackerList = new ArrayList<>(dtv_params.getTrackerList());
@@ -147,38 +134,42 @@ public class Peer implements Runnable{
 			String tracker = trackerList.get(i);
 			
 			/* Send params to  */
-			Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
-			
-			PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
-			outToServer.println("2");
-			outToServer.flush();
-			
-			BufferedReader inFromServer= 
-					new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			
-			int numOfFile = Integer.parseInt(inFromServer.readLine());
-			for (int j = 0; j < numOfFile; j++)
+			try
 			{
-				DTVParams retDtv = new DTVParams();
+				Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
+			
+				PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
+				outToServer.println("2");
+				outToServer.flush();
 				
-				retDtv.setName(inFromServer.readLine());
-				retDtv.setHashCode(inFromServer.readLine());
-				retDtv.setSize(Long.parseLong(inFromServer.readLine()));
-				int numOfTracker = Integer.parseInt(inFromServer.readLine());
-				for (int k = 0; k < numOfTracker; k++)
+				BufferedReader inFromServer= 
+						new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+				
+				int numOfFile = Integer.parseInt(inFromServer.readLine());
+				for (int j = 0; j < numOfFile; j++)
 				{
-					String newTracker = inFromServer.readLine();
-					retDtv.addTracker(newTracker);
+					DTVParams retDtv = new DTVParams();
+					
+					retDtv.setName(inFromServer.readLine());
+					retDtv.setHashCode(inFromServer.readLine());
+					retDtv.setSize(Long.parseLong(inFromServer.readLine()));
+					int numOfTracker = Integer.parseInt(inFromServer.readLine());
+					for (int k = 0; k < numOfTracker; k++)
+					{
+						String newTracker = inFromServer.readLine();
+						retDtv.addTracker(newTracker);
+					}
+					
+					fileList.add(retDtv);
 				}
 				
-				fileList.add(retDtv);
+				clientSocket.close();
 			}
-			
-			clientSocket.close();
+			catch(UnknownHostException e)
+			{
+				//print textbox cannot find tracker ...
+			}
 		}		
-		
-		for (int i = 0; i < fileList.size(); i++)
-			fileList.get(i).printInfo();
 		
 		return fileList;
 	}

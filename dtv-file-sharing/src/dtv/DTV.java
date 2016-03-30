@@ -10,6 +10,7 @@ public class DTV {
 	public static final int UpdatePeerTimeout = 2*1000;
 	public static final int numOfPart = 16;
 	public static final int maxPeer = 16;
+	public static final int keepAliveTimeout = 16;
 	
 	public static void main(String[] args) {
 		/**
@@ -30,21 +31,7 @@ public class DTV {
 		 * Create peer thread
 		 */
 		Thread peerHandle = new Thread(new Peer(torFileQ, fileList));
-		peerHandle.start();		
-	
-//		File a = new File("d:/Documents/10608.pdf");
-//		
-//		
-//		DataInputStream file = new DataInputStream(new FileInputStream(a));
-//		byte[] data = new byte[(int) a.length()];
-//		file.readFully(data);
-//		file.close();
-//		
-//		File newFile = new File("d:/Documents/10609.pdf");
-//		DataOutputStream nFile = new DataOutputStream(new FileOutputStream(newFile));
-//		nFile.write(data);
-//		nFile.close();
-		
+		peerHandle.start();				
 	}
 	
 	public static String getIP(String address)

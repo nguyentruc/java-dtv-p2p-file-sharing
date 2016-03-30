@@ -21,15 +21,10 @@ import java.util.ArrayList;
 public class CONSTANT implements Serializable{
 
     public static String STORAGE_PATH = 
-            "C:\\Study Materials"
-            + "\\Semester 2 Year 3 - 2016"
-            + "\\Computer Networking"
-            + "\\AssTestFolder"
-            + "\\Tracker"
-            + "\\";
+            "d:/abcd/";
     public static String CONTROL_FILE = 
             "controlFile.dat";
-    public static int KEEP_ALIVE_TIME = 6;
+    public static int KEEP_ALIVE_TIME = 10;
     public static int SERVER_LISTENING_PORT = 1234; 
     public static int IPLIST_SIZE = 16;
     public static int CHECK_TIME_IN_SECS = 1*1000*60; // ms * 1000 * 60 ->1 mins
