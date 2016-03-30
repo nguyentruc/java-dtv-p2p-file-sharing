@@ -48,8 +48,13 @@ import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JMenu;
-
+import java.awt.SystemColor;
+import javax.swing.UIManager;
+import java.awt.Toolkit;
+import java.awt.Font;
 public class UI  implements Runnable{
 
 	private JFrame frame;
@@ -96,13 +101,49 @@ public class UI  implements Runnable{
 	/**
 	 * Initialize the contents of the frame.
 	 */
+	public String sizeToString(double size){
+        String str_size;
+        if(size > Math.pow(2,30))
+                {
+                    size = size/(Math.pow(2, 30));
+                    long temp=Math.round(size*100);                    
+                    size=(double)temp/100;
+                    str_size = Double.toString(size);
+                    str_size = str_size+" GB";
+                }
+                else if(size > Math.pow(2,20))
+                {
+                    size = size/(Math.pow(2, 20));
+                    long temp=Math.round(size*100);                    
+                    size=(double)temp/100;
+                    str_size = Double.toString(size);
+                    str_size = str_size+" MB";
+                }
+                else if(size > Math.pow(2,10))
+                {
+                    size = size/(Math.pow(2, 10));
+                    long temp=Math.round(size*100);                    
+                    size=(double)temp/100;
+                    str_size = Double.toString(size);
+                    str_size = str_size+" KB";
+                }
+                else 
+                {
+                    str_size = Double.toString(size);
+                    str_size = str_size+" Byte";
+                }
+        return str_size; 
+    }
 	private void initialize() {
 		frame = new JFrame();
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("E:\\Hoc tap\\MMT1\\Assignment\\Assignment\\test\\src\\client\\images\\icons\\torrent.png"));
+		frame.setBackground(Color.WHITE);
 		frame.setBounds(100, 100, 858, 455);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SpringLayout springLayout = new SpringLayout();
 		frame.getContentPane().setLayout(springLayout);
 		frame.setTitle("Torrent");
+		
 		btnAddTorrent = new JButton("ADD FILE");
 		springLayout.putConstraint(SpringLayout.WEST, btnAddTorrent, 260, SpringLayout.WEST, frame.getContentPane());
 		frame.getContentPane().add(btnAddTorrent);
@@ -269,6 +310,8 @@ public class UI  implements Runnable{
 		frame.getContentPane().add(scrollPaneTree);
 			/////////////////////////////////////////////////////////
 		tree = new JTree();
+		tree.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		tree.setShowsRootHandles(true);
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent evt) {
 				treeValueChanged(evt);
@@ -305,17 +348,38 @@ public class UI  implements Runnable{
 		//Add data for Table FileShare
 	
 		DefaultComboBoxModel modelCombo=new DefaultComboBoxModel();	
+		JFileChooser fileAddTorrent = new JFileChooser();
+		fileAddTorrent.setFileFilter(new Filedoc());
+		fileAddTorrent.setFileFilter(new Fileppt());
+		fileAddTorrent.setFileFilter(new Filexls());
+		fileAddTorrent.setFileFilter(new Filemp3());
+		fileAddTorrent.setFileFilter(new Filemp4());
+		fileAddTorrent.setFileFilter(new Filejpeg());
+		fileAddTorrent.setFileFilter(new Filegif());
+		fileAddTorrent.setFileFilter(new Fileflv());
+		fileAddTorrent.setFileFilter(new Filehtml());
+		fileAddTorrent.setFileFilter(new Filepsd());
+		fileAddTorrent.setFileFilter(new Filejpg());
+		fileAddTorrent.setFileFilter(new Filepdf());
+		fileAddTorrent.setFileFilter(new Filetxt());
+		fileAddTorrent.setFileFilter(new Fileavi());
+		fileAddTorrent.setFileFilter(new Fileflv());
+		fileAddTorrent.setFileFilter(new Filepng());
+		fileAddTorrent.setFileFilter(new Filezip());
+		fileAddTorrent.setFileFilter(new Filewinrar());
+		fileAddTorrent.setFileFilter(fileAddTorrent.getAcceptAllFileFilter());
+		fileAddTorrent.setFileView(new ImageFileView());
+		//////////////////////////////////////////////////
 		btnAddTorrent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				DefaultTableModel model=(DefaultTableModel)table.getModel();
 				//hash code
 				
 				//////////
-				JFileChooser fileAddTorrent = new JFileChooser();
 				int value=fileAddTorrent.showSaveDialog(btnAddTorrent);
 				if(value ==JFileChooser.APPROVE_OPTION){
 				File file = fileAddTorrent.getSelectedFile();
-				String size=Long.toString(file.length())+" bytes";
+				String size=sizeToString(file.length());
 				String hashCode = "";
 				try {
 					hashCode = generateSHA512(new FileInputStream(file));
@@ -412,7 +476,7 @@ public class UI  implements Runnable{
 					for (int i = 0; i < fileL.size(); i++)
 					{
 						DTVParams tParams = fileL.get(i);
-						modelRequest.addRow(new Object[]{modelRequest.getRowCount()+1,tParams.getName(),tParams.getSize()});
+						modelRequest.addRow(new Object[]{modelRequest.getRowCount()+1,tParams.getName(),sizeToString(tParams.getSize())});
 					}
 					
 				} catch (InterruptedException e) {
@@ -449,6 +513,7 @@ public class UI  implements Runnable{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						break;
 					}
 				}
 				////////////////////////////////////////////
@@ -480,19 +545,21 @@ public class UI  implements Runnable{
 				 DefaultTableModel modelDownload = (DefaultTableModel) tableDownload.getModel();
 				//if(tree.getSelectionPath().equals(tree.getPathForRow(1))){
 					int del = table.getSelectedRows().length;
-			        for(int i= 0; i<del;i++)
+			        for(int i= 0; i<del;i++){
+			        	DTVParams params=new DTVParams();
+				        params.setType(3);
+				        params.setHashCode((String)model.getValueAt(table.getSelectedRow(), 4));
+				        try {
+							torMessQ.put(params);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 			        	model.removeRow(table.getSelectedRows()[0]);
+			        }
 			        for(int i=0;i<table.getRowCount();i++)
 			        	model.setValueAt(i+1, i, 0);
-			        DTVParams params=new DTVParams();
-			        params.setType(3);
-			        params.setHashCode((String)model.getValueAt(table.getSelectedRow(), 4));
-			        try {
-						torMessQ.put(params);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+			        
 				/*}
 				else if(tree.getSelectionPath().equals(tree.getPathForRow(3))){
 					int del = tableDownload.getSelectedRows().length;
@@ -505,6 +572,7 @@ public class UI  implements Runnable{
 			}
 		});
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
 		//--------------------------------------------IMAGES TREE-------------------------------------------------------------------------
 		//Change Icon for Jtree
 				tree.setCellRenderer(new DefaultTreeCellRenderer() {
@@ -838,6 +906,8 @@ public class UI  implements Runnable{
 				frame.getContentPane().add(btnNewButton);
 				
 				JMenuBar menuBar = new JMenuBar();
+				menuBar.setForeground(Color.WHITE);
+				menuBar.setBackground(UIManager.getColor("PasswordField.inactiveBackground"));
 				frame.setJMenuBar(menuBar);
 				
 				JMenu mnFile = new JMenu("File");
@@ -848,9 +918,10 @@ public class UI  implements Runnable{
 				
 				JMenu mnOption = new JMenu("Option");
 				menuBar.add(mnOption);
+			
 				txtAddressTracker.append("192.168.10.1:1234");
 
-	            
+				
 	            
 	            
 	            
@@ -957,3 +1028,4 @@ public class UI  implements Runnable{
 		    return stringBuffer.toString();
 		}
 }
+
