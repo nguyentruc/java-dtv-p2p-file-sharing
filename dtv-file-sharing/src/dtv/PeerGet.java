@@ -5,6 +5,8 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.JProgressBar;
+
 public class PeerGet implements Runnable {
 
 	private DTVParams dtv_params = null;
@@ -36,6 +38,13 @@ public class PeerGet implements Runnable {
 			/* Thread update peer list each 2 seconds */
 			Thread tUpdatePeer = new Thread(new UpdatePeerList(availPeer, dtv_params, tUpdatePeer_control));
 			tUpdatePeer.start();
+			
+			Object[] table = dtv_params.getTable();
+			
+			JProgressBar progressBar = new JProgressBar();
+			progressBar.setValue(40);
+			
+			table[3] = progressBar;
 			
 			/* Get access to file */
 			RandomAccessFile file = new RandomAccessFile(dtv_params.getPathToFile(), "rw");
