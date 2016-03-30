@@ -48,6 +48,7 @@ import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JMenu;
@@ -376,7 +377,6 @@ public class UI  implements Runnable{
 			public void actionPerformed(ActionEvent e) {
 				DefaultTableModel model=(DefaultTableModel)table.getModel();
 				//hash code
-				
 				//////////
 				int value=fileAddTorrent.showSaveDialog(btnAddTorrent);
 				if(value ==JFileChooser.APPROVE_OPTION){
@@ -406,7 +406,7 @@ public class UI  implements Runnable{
 						numberRow=numberRow+1;
 					}
 					if(flag==false){
-						model.addRow(new Object[]{model.getRowCount()+1,file.getName(),size,file.getAbsoluteFile()});
+						model.addRow(new Object[]{model.getRowCount()+1,file.getName(),size,file.getAbsoluteFile(),hashCode});
 					} 
 					}
 				if(flagLoad==false){
@@ -995,7 +995,7 @@ public class UI  implements Runnable{
 		    try {
 		        md = MessageDigest.getInstance("SHA-512");
 		        FileChannel channel = inputStream.getChannel();
-		        ByteBuffer buff = ByteBuffer.allocate(64*1024);
+		        ByteBuffer buff = ByteBuffer.allocate(1024*1024);
 		        while(channel.read(buff) != -1)
 		        {
 		            buff.flip();
@@ -1031,5 +1031,15 @@ public class UI  implements Runnable{
 		    }
 		    return stringBuffer.toString();
 		}
+	 
+	 public static void showWarningTextBox(String messToShow, String title)
+	 {
+		JFrame frame = new JFrame("JOptionPane showMessageDialog example");
+
+    	JOptionPane.showMessageDialog(frame,
+        messToShow,
+        title,
+        JOptionPane.ERROR_MESSAGE);
+	 }
 }
 
