@@ -13,14 +13,16 @@ public class ClientThread implements Runnable {
 	private long offset;
 	private long lastOffset;
 	final private List<Integer> file_part;
+	final private Object DownloadProgress;
 	
 	public ClientThread(RandomAccessFile _file, DTVParams dtv_params, String address, AtomicInteger peerConnected,
-			List<Integer> file_part) 
+			List<Integer> file_part, Object DownloadProgress) 
 	{
 		file = _file;
 		this.dtv_params = dtv_params;
 		this.peerConnected = peerConnected;
 		this.file_part = file_part;
+		this.DownloadProgress = DownloadProgress;
 		
 		try
 		{	
@@ -107,6 +109,10 @@ public class ClientThread implements Runnable {
 				
 				synchronized (file_part) {
 					file_part.set(partRemain, Integer.valueOf(2));
+				}
+				
+				synchronized (DownloadProgress) {
+					DownloadProgress.notifyAll();
 				}
 			}
 			

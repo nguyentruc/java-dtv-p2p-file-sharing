@@ -113,9 +113,10 @@ public class Peer implements Runnable{
 					
 					clientSocket.close();
 				}
-				catch(UnknownHostException e)
+				catch(UnknownHostException | ConnectException e )
 				{
 					//print textbox cannot find tracker ...
+					UI.showWarningTextBox(String.format("Cannot connect to tracker at %s", tracker),"Unknown Host Error");
 				}
 			}
 			
@@ -165,9 +166,10 @@ public class Peer implements Runnable{
 				
 				clientSocket.close();
 			}
-			catch(UnknownHostException e)
+			catch(UnknownHostException | ConnectException e)
 			{
 				//print textbox cannot find tracker ...
+				UI.showWarningTextBox(String.format("Cannot connect to tracker at %s", tracker),"Unknown Host Error");
 			}
 		}		
 		

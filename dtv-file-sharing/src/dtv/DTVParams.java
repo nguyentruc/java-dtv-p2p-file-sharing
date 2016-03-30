@@ -17,7 +17,6 @@ public class DTVParams {
 	private String pathToFile;
 	private List<String> TrackerList;
 	private int type;
-	private Object[] table;
 	
 	/**
 	 * 
@@ -86,16 +85,6 @@ public class DTVParams {
 	public int getType()
 	{
 		return type;
-	}
-	
-	public void setTable(Object[] table)
-	{
-		this.table = table;
-	}
-	
-	public Object[] getTable()
-	{
-		return this.table;
 	}
 	
 	public void printInfo()

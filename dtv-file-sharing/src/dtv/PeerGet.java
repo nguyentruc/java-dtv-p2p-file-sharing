@@ -5,8 +5,6 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.swing.JProgressBar;
-
 public class PeerGet implements Runnable {
 
 	private DTVParams dtv_params = null;
@@ -16,6 +14,7 @@ public class PeerGet implements Runnable {
 	private AtomicInteger peerConnected;
 	private AtomicInteger tUpdatePeer_control;
 	final private BlockingQueue<DTVParams> DTVFileQ;
+	private Object downloadProgress;
 	
 	public PeerGet(DTVParams dtv_params, BlockingQueue<DTVParams> DTVFileQ) 
 	{
@@ -34,17 +33,14 @@ public class PeerGet implements Runnable {
 		{
 			peerConnected = new AtomicInteger(0);
 			tUpdatePeer_control = new AtomicInteger(1);
+			downloadProgress = new Object();
 			
 			/* Thread update peer list each 2 seconds */
 			Thread tUpdatePeer = new Thread(new UpdatePeerList(availPeer, dtv_params, tUpdatePeer_control));
 			tUpdatePeer.start();
 			
-			Object[] table = dtv_params.getTable();
-			
-			JProgressBar progressBar = new JProgressBar();
-			progressBar.setValue(40);
-			
-			table[3] = progressBar;
+			Thread tDownloadProgress = new Thread(new DownloadProgress(downloadProgress, dtv_params.getName()));
+			tDownloadProgress.start();
 			
 			/* Get access to file */
 			RandomAccessFile file = new RandomAccessFile(dtv_params.getPathToFile(), "rw");
@@ -74,7 +70,7 @@ public class PeerGet implements Runnable {
 					for (int i = 0; i < availPeer.size(); i++)
 					{
 						peerConnected.incrementAndGet();
-						new Thread(new ClientThread(file, dtv_params, availPeer.get(i), peerConnected, file_part)).start();
+						new Thread(new ClientThread(file, dtv_params, availPeer.get(i), peerConnected, file_part, downloadProgress)).start();
 					}
 					availPeer.clear();
 				}
@@ -82,6 +78,10 @@ public class PeerGet implements Runnable {
 			
 			tUpdatePeer_control.set(2); //stop update peer list
 			tUpdatePeer.interrupt();
+			
+			synchronized (downloadProgress) {
+				tDownloadProgress.interrupt();
+			}
 			
 			//close file after finish download
 			file.close();
