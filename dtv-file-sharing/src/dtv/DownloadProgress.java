@@ -44,7 +44,7 @@ public class DownloadProgress implements Runnable{
 		frame = new JFrame();
 	
 		frame.setBounds(100, 100, 449, 90);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		frame.setTitle(title);
 		
@@ -74,6 +74,7 @@ public class DownloadProgress implements Runnable{
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 					progressBar.setValue(100);
+					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 					return;
 				}
 			}

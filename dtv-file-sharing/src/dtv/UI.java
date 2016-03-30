@@ -485,7 +485,7 @@ public class UI  implements Runnable{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				btnDownload.setEnabled(true);
+			
 			}
 		});
 		//Download a File
@@ -964,7 +964,7 @@ public class UI  implements Runnable{
             scrollTableDownload.setVisible(false);
             btnDelete.setEnabled(false);
             btnAddTorrent.setEnabled(false);
-            btnDownload.setEnabled(false);
+            btnDownload.setEnabled(true);
             btnSearch.setEnabled(true);                   
         }
         else  if(tree.getSelectionPath().getLastPathComponent().toString().equals("Download"))
