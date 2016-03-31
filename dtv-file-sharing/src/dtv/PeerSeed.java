@@ -29,10 +29,12 @@ public class PeerSeed implements Runnable {
 			
 			int fileIndex = FileDtvList.posFile(hashCode);
 			
+			/* File not found */
 			if (fileIndex == -1)
 			{
 				outToPeer.writeByte(0);
 				connectionSocket.close();
+				peerConnected.decrementAndGet();
 				System.out.println("Seed: File not found");
 				return;
 			}
@@ -42,6 +44,7 @@ public class PeerSeed implements Runnable {
 			
 			System.out.println("Seed: Start to seed");
 			
+			/* get params, calculate offset and open file */
 			DTVParams dtv_params = FileDtvList.getDtv(fileIndex);
 			offset = dtv_params.getSize() / DTV.numOfPart;
 			long lastOffset = dtv_params.getSize() - (offset*(DTV.numOfPart - 1));
@@ -49,9 +52,9 @@ public class PeerSeed implements Runnable {
 			
 			while (true)
 			{	
-				
 				long filePtr = inFromPeer.readByte();
 				
+				/* if client stop getting */
 				if (filePtr == -1)
 				{
 					System.out.println("ID:" + clientID + "close");
@@ -71,7 +74,6 @@ public class PeerSeed implements Runnable {
 				
 				while ((cnt = file.read(buffer, 0, (int) Long.min(curOffset - amount, DTV.chunkSize))) >= 0)
 				{
-                                        //System.out.println("cnt = " + cnt + "fileptr = " +  filePtr/offset                                        );
 					outToPeer.write(buffer, 0, cnt);
 					outToPeer.flush();
 					amount = amount + cnt;
@@ -81,8 +83,8 @@ public class PeerSeed implements Runnable {
 						break;
 					}
 				}		
-				
 			}
+			
 			peerConnected.decrementAndGet();
 			connectionSocket.close();
 			file.close();
@@ -93,11 +95,9 @@ public class PeerSeed implements Runnable {
 				file.close();
 				peerConnected.decrementAndGet();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				
 			}
 			e.printStackTrace();
 		}
 	}
-
 }

@@ -18,6 +18,7 @@ public class Tracker {
     public static void main(String[] args) throws Exception{
         ServerSocket ss = new ServerSocket(CONSTANT.SERVER_LISTENING_PORT);
         CONSTANT.CONSTRUCT_CONTROL_FILE(CONTROL_FILE);
+        TrackerUI.main(null);
         new Thread(new PeriodicallyResetThread()).start();
         while(true){
             System.out.println("Tracker ready. (Main Thread)");

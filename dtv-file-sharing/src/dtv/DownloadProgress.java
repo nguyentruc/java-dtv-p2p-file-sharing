@@ -4,6 +4,9 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class DownloadProgress implements Runnable{
 
@@ -11,6 +14,7 @@ public class DownloadProgress implements Runnable{
 	private final Object downloadProgress;
 	private JProgressBar progressBar;
 	private final String title;
+	private final Thread tPeerGet;
 
 	/**
 	 * Launch the application.
@@ -19,7 +23,7 @@ public class DownloadProgress implements Runnable{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					DownloadProgress window = new DownloadProgress(null, null);
+					DownloadProgress window = new DownloadProgress(null, null, null);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -31,9 +35,10 @@ public class DownloadProgress implements Runnable{
 	/**
 	 * Create the application.
 	 */
-	public DownloadProgress(Object downloadProgress, String title) {
+	public DownloadProgress(Object downloadProgress, String title, Thread peerGet) {
 		this.downloadProgress = downloadProgress;
 		this.title = title;
+		this.tPeerGet = peerGet;
 		initialize();
 	}
 
@@ -43,7 +48,7 @@ public class DownloadProgress implements Runnable{
 	private void initialize() {
 		frame = new JFrame();
 	
-		frame.setBounds(100, 100, 449, 90);
+		frame.setBounds(100, 100, 449, 119);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		frame.setTitle(title);
@@ -53,10 +58,21 @@ public class DownloadProgress implements Runnable{
 		frame.getContentPane().add(progressBar);
 		progressBar.setStringPainted(true);
 		
+		JButton btnStop = new JButton("STOP");
+		btnStop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				frame.dispose();
+				tPeerGet.interrupt();
+			}
+		});
+		btnStop.setBounds(172, 51, 89, 23);
+		frame.getContentPane().add(btnStop);
+		
 	}
 
 	@Override
-	public void run() {
+	public void run() 
+	{
 		frame.setVisible(true);
 		
 		int progressValue = 0;
@@ -64,15 +80,16 @@ public class DownloadProgress implements Runnable{
 		
 		while (true)
 		{
-			synchronized (downloadProgress) {
-				try {
+			synchronized (downloadProgress) 
+			{
+				try 
+				{
 					downloadProgress.wait();
-				
-					progressValue += 6;
-										
+					progressValue += 6;				
 					progressBar.setValue(progressValue);	
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				} 
+				catch (InterruptedException e) 
+				{
 					progressBar.setValue(100);
 					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 					return;
@@ -80,5 +97,4 @@ public class DownloadProgress implements Runnable{
 			}
 		}
 	}
-
 }

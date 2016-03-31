@@ -15,12 +15,14 @@ public class PeerGet implements Runnable {
 	private AtomicInteger tUpdatePeer_control;
 	final private BlockingQueue<DTVParams> DTVFileQ;
 	private Object downloadProgress;
+	private AtomicInteger stopDownload;
 	
 	public PeerGet(DTVParams dtv_params, BlockingQueue<DTVParams> DTVFileQ) 
 	{
 		this.dtv_params = dtv_params;
 		file_part = new ArrayList<>(DTV.numOfPart);
 		this.DTVFileQ = DTVFileQ;
+		stopDownload = new AtomicInteger(0);
 		
 		for (int i = 0; i < DTV.numOfPart; i++)
 			file_part.add(Integer.valueOf(0));
@@ -39,7 +41,8 @@ public class PeerGet implements Runnable {
 			Thread tUpdatePeer = new Thread(new UpdatePeerList(availPeer, dtv_params, tUpdatePeer_control));
 			tUpdatePeer.start();
 			
-			Thread tDownloadProgress = new Thread(new DownloadProgress(downloadProgress, dtv_params.getName()));
+			Thread tDownloadProgress = 
+					new Thread(new DownloadProgress(downloadProgress, dtv_params.getName(), Thread.currentThread()));
 			tDownloadProgress.start();
 			
 			/* Get access to file */
@@ -48,7 +51,19 @@ public class PeerGet implements Runnable {
 			/* Start to get File */
 			while (true)
 			{
-				synchronized (file_part) {
+				if (Thread.currentThread().isInterrupted())
+				{
+					stopDownload.set(1);
+					tUpdatePeer.interrupt();
+					synchronized (downloadProgress) {
+						tDownloadProgress.interrupt();
+					}
+					file.close();
+					return;
+				}
+				
+				synchronized (file_part) 
+				{
 					if (file_part.indexOf(Integer.valueOf(1)) == -1 
 							&& file_part.indexOf(Integer.valueOf(0)) == -1)
 					{
@@ -66,25 +81,29 @@ public class PeerGet implements Runnable {
 				
 				tUpdatePeer_control.set(1); //want new peer
 				
-				synchronized (availPeer) {
-					for (int i = 0; i < availPeer.size(); i++)
+				synchronized (availPeer) 
+				{
+					if (availPeer.size() > 0)
 					{
-						peerConnected.incrementAndGet();
-						new Thread(new ClientThread(file, dtv_params, availPeer.get(i), peerConnected, file_part, downloadProgress)).start();
+						for (int i = 0; i < availPeer.size(); i++)
+						{
+							peerConnected.incrementAndGet();
+							new Thread(new ClientThread(file, dtv_params, availPeer.get(i), 
+									peerConnected, file_part, downloadProgress, stopDownload)).start();
+						}
+						availPeer.clear();
 					}
-					availPeer.clear();
 				}
 			}
 			
-			tUpdatePeer_control.set(2); //stop update peer list
+			//close file after finish download
+			file.close();
+			
 			tUpdatePeer.interrupt();
 			
 			synchronized (downloadProgress) {
 				tDownloadProgress.interrupt();
 			}
-			
-			//close file after finish download
-			file.close();
 			
 			/* Register to tracker */
 			dtv_params.setType(0);
