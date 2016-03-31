@@ -64,7 +64,8 @@ public class ShareFile implements Serializable{
         
         public String parseFileInfo(){
             String ret = "";
-            ret = ret + fileName + "\n" + hashCode + "\n" + sizeOfFile + "\n" + String.valueOf(ipList.size()) + "\n";
+            ret = ret + fileName + "\n" + hashCode + "\n" + sizeOfFile + "\n";
+            //+ String.valueOf(ipList.size()) + "\n"
             ret = ret + String.valueOf(TrackerList.size()) + "\n";
             for(int i = 0; i<TrackerList.size(); i++){
                 ret = ret + TrackerList.get(i) + "\n";

@@ -7,6 +7,7 @@ package dtv;
 
 
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,6 +15,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 /**
  *
  * @author vuong
@@ -21,60 +29,20 @@ import java.util.ArrayList;
 public class CONSTANT implements Serializable{
 
     public static String STORAGE_PATH = 
-            "d:/abcd/";
-    public static String CONTROL_FILE = 
-            "controlFile.dat";
-    public static int KEEP_ALIVE_TIME = 10;
+            "d://abcd//";
+    public static int KEEP_ALIVE_TIME = 6;
     public static int SERVER_LISTENING_PORT = 1234; 
     public static int IPLIST_SIZE = 16;
     public static int CHECK_TIME_IN_SECS = 1*1000*60; // ms * 1000 * 60 ->1 mins
-    public static String CONTROL_FILE_NAME = "controlFile.dat";
-    public static void CONSTRUCT_CONTROL_FILE(File FILE) throws Exception {
-        if(!FILE.exists()){
-            FILE.createNewFile();
-            ArrayList<String> retArray;
-            retArray = new ArrayList<>();
-            CONSTANT.WRITE_CONTROL_FILE(FILE, retArray);
-            System.out.print(FILE.getName() + " is constructed for the first time...");
-        }else{
-            System.out.print(FILE.getName() + " constructed before. ");
-        }
-        System.out.println(FILE.getName() + " ready!");
-    }
-    public static synchronized void WRITE_CONTROL_FILE(File FILE, ArrayList<String> inArray) throws Exception{
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE));
-        oos.writeObject(inArray);
-        oos.flush();
-        oos.close();
-    }
+   
     
-    public static synchronized ArrayList<String> READ_CONTROL_FILE(File FILE) throws Exception{
-        ArrayList<String> outArray;
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE));
-        outArray = (ArrayList<String>) ois.readObject();
-        ois.close();
-        return outArray;
-    }
-    public static void CONSTRUCT_SHARE_FILE(File FILE, String hashCode, String fileName, String sizeOfFile) throws Exception {
-        if(!FILE.exists()){
-            FILE.createNewFile();
-            ShareFile nsf;
-            nsf = new ShareFile(hashCode, fileName, sizeOfFile);
-            CONSTANT.WRITE_SHARE_FILE(FILE, nsf);
-            System.out.print(FILE.getName() + " is constructed for the first time...");
-        }else{
-            System.out.print(FILE.getName() + " constructed before. ");
-        }
-        System.out.println(FILE.getName() + " ready!");
-    }    
-    
-    public static synchronized void WRITE_SHARE_FILE(File FILE, ShareFile nsf) throws Exception{
+    public static void WRITE_SHARE_FILE(File FILE, ShareFile nsf) throws Exception{
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE));
         oos.writeObject(nsf);
         oos.flush();
         oos.close();
     }
-    public static synchronized ShareFile READ_SHARE_FILE(File FILE) throws Exception{
+    public static ShareFile READ_SHARE_FILE(File FILE) throws Exception{
         ShareFile nsf;
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE));
         nsf = (ShareFile) ois.readObject();
@@ -82,36 +50,4 @@ public class CONSTANT implements Serializable{
         return nsf;
     }
     
-    public static synchronized void WATCH_CONTROL_FILE(File FILE) throws Exception{
-        if(!FILE.exists()){
-            System.out.println(FILE.getName() + "non-exist!");
-            System.out.println("Enquire File non-exist!");
-            return;
-        }
-        String ret;
-        ret = "File Name: " + FILE.getName() + "\n";
-        ArrayList<String> outArray;
-        outArray = CONSTANT.READ_CONTROL_FILE(FILE);
-        if(outArray.isEmpty()) {
-            System.out.println("File exist but empty");
-        }
-        ret = ret + String.valueOf(outArray.size()) + " files" + "\n";
-        for(int i = 0; i<outArray.size(); i++){
-            ret = ret + outArray.get(i) + "\n";
-        }
-        System.out.println(ret);
-    }
-    
-    public static synchronized void WATCH_SHARE_FILE(File FILE) throws Exception{
-        if(!FILE.exists()){
-            System.out.println(FILE.getName() + "non-exist!");
-            return;
-        }
-        String ret;
-        ret = "File Name: " + FILE.getName() + "\n";
-
-        ShareFile sf = CONSTANT.READ_SHARE_FILE(FILE);
-        ret += sf.parseFileInfo();
-        System.out.println(ret);
-    }
 }

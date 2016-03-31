@@ -90,12 +90,13 @@ public class TrackerUI extends javax.swing.JFrame {
         String ret = "";
         try {
             // TODO add your handling code here:
-            ArrayList<String> controlList = CONSTANT.READ_CONTROL_FILE(Tracker.CONTROL_FILE);
-            ret = ret + String.valueOf(controlList.size()) + " files.\n";
-            for(int i = 0; i<controlList.size(); i++){
-                String tmp = controlList.get(i);
-                File f = new File(CONSTANT.STORAGE_PATH + tmp);
-                ShareFile sf = CONSTANT.READ_SHARE_FILE(f);
+            File f = new File(CONSTANT.STORAGE_PATH);
+            String[] listFile = f.list();
+            ret = ret + String.valueOf(listFile.length) + " files.\n";
+            for(int i = 0; i<listFile.length; i++){
+                String tmp = listFile[i];
+                File inf = new File(CONSTANT.STORAGE_PATH + tmp);
+                ShareFile sf = CONSTANT.READ_SHARE_FILE(inf);
                 ret = ret + sf.getFileName() + "\n";
             }
         } catch (Exception ex) {
@@ -109,9 +110,10 @@ public class TrackerUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         String ret = "";
         try{
-            ArrayList<String> controlList = CONSTANT.READ_CONTROL_FILE(Tracker.CONTROL_FILE);
-            for(int i = 0; i<controlList.size(); i++){
-                String tmp = controlList.get(i);
+            File fl = new File(CONSTANT.STORAGE_PATH);
+            String[] listFile = fl.list();
+            for(int i = 0; i<listFile.length; i++){
+                String tmp = listFile[i];
                 File f = new File(CONSTANT.STORAGE_PATH + tmp);
                 ShareFile sf = CONSTANT.READ_SHARE_FILE(f);
                 ret = ret + "File: " + sf.getFileName() + " IP List:\n";
@@ -120,7 +122,7 @@ public class TrackerUI extends javax.swing.JFrame {
                     Seeder tmpS = ipList.get(j);
                     ret = ret + tmpS.getSeederFullInfo();
                 }
-                ret = ret + "--END--\n";
+                ret = ret + "END\n";
             }
         }catch(Exception ex){
             ex.printStackTrace();

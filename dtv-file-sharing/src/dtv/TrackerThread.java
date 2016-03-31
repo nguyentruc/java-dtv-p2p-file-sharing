@@ -64,28 +64,31 @@ public class TrackerThread implements Runnable {
         System.out.println("listening port = " + listeningPort);
         String ipFileAbsolutePath = CONSTANT.STORAGE_PATH + hashCode;
         File f = new File(ipFileAbsolutePath);
-
-        if (f.exists()) {
-            ShareFile sf;
-            sf = CONSTANT.READ_SHARE_FILE(f);
-            // Add new (ip, port, time)
-            sf.addIp(incommingIP, listeningPort);
-            for(int i = 0; i<numberOfTracker; i++){
-                sf.addTracker(br.readLine());
+        if(f.createNewFile()) {
+            LockObject nlo = new LockObject(hashCode);
+            Tracker.lock.add(nlo);
+            int tmp = Tracker.lock.indexOf(nlo);
+            synchronized(Tracker.lock.get(tmp).getLock()){
+                ShareFile sf;
+                sf = new ShareFile(hashCode, fileName, size);
+                // Add new (ip, port, time)
+                sf.addIp(incommingIP, listeningPort);
+                for(int i = 0; i<numberOfTracker; i++){
+                    sf.addTracker(br.readLine());
+                }
+                CONSTANT.WRITE_SHARE_FILE(f, sf);
             }
-            CONSTANT.WRITE_SHARE_FILE(f, sf);
-        }else{
-            ArrayList<String> controlList;
-            {
-                controlList = CONSTANT.READ_CONTROL_FILE(Tracker.CONTROL_FILE);
-               // Add new file into CONTROL_FILE
-                controlList.add(hashCode);
-                CONSTANT.WRITE_CONTROL_FILE(Tracker.CONTROL_FILE, controlList);
+        }
+        else{
+            int tmp = 0;
+            for(int i = 0; i<Tracker.lock.size(); i++){
+                if(Tracker.lock.get(i).getLockName().equals(hashCode)){
+                    tmp = i;
+                    break;
+                }
             }
-            // Make hashCode[file]
-            CONSTANT.CONSTRUCT_SHARE_FILE(f, hashCode, fileName, size);
-            ShareFile sf;
-            {
+            synchronized(Tracker.lock.get(tmp).getLock()){
+                ShareFile sf;
                 sf = CONSTANT.READ_SHARE_FILE(f);
                 // Add new (ip, port, time) into hashCode[file]
                 sf.addIp(incommingIP, listeningPort);
@@ -95,7 +98,6 @@ public class TrackerThread implements Runnable {
                 CONSTANT.WRITE_SHARE_FILE(f, sf);
             }
         }
-        CONSTANT.WATCH_CONTROL_FILE(Tracker.CONTROL_FILE);
     }
 
     private void ExecuteCommandCode1(BufferedReader br) throws Exception {
@@ -109,7 +111,6 @@ public class TrackerThread implements Runnable {
         }else{
             ShareFile sf;
             sf = CONSTANT.READ_SHARE_FILE(f);
-            CONSTANT.WATCH_SHARE_FILE(f);
             // pick at most 5 ip, port send back to enquirer
             dos.write(sf.pickSome().getBytes());
             dos.flush();
@@ -119,12 +120,12 @@ public class TrackerThread implements Runnable {
        
     private void ExecuteCommandCode2() throws Exception {
         DataOutputStream dos = new DataOutputStream(cs.getOutputStream());
-        ArrayList<String> controlList;
-        controlList = CONSTANT.READ_CONTROL_FILE(Tracker.CONTROL_FILE);
-        String numberOfFile = String.valueOf(controlList.size());
+        File f = new File(CONSTANT.STORAGE_PATH);
+        String[] listFile = f.list();
+        String numberOfFile = String.valueOf(listFile.length);
         dos.write((numberOfFile + "\n").getBytes());
-        for(int i = 0; i<controlList.size(); i++){
-            String tmp = controlList.get(i);
+        for(int i = 0; i < listFile.length; i++){
+            String tmp = listFile[i];
             File FILE = new File(CONSTANT.STORAGE_PATH + tmp);
             ShareFile sf = CONSTANT.READ_SHARE_FILE(FILE);
             dos.write(sf.parseFileInfo().getBytes());
@@ -135,14 +136,25 @@ public class TrackerThread implements Runnable {
 
     private void ExecuteCommandCode3(BufferedReader br) throws Exception {
         String listeningPort = br.readLine();
+        File folder = new File(CONSTANT.STORAGE_PATH);
+        String[] listFile = folder.list();
+        int tmp = 0;
         int numOfhashCode = Integer.valueOf(br.readLine());
         for(int i = 0; i<numOfhashCode; i++){
             String hashCode = br.readLine();
             File f = new File(CONSTANT.STORAGE_PATH + hashCode);
             if(f.exists()){
-                ShareFile sf = CONSTANT.READ_SHARE_FILE(f);
-                sf.addIp(incommingIP, listeningPort);
-                CONSTANT.WRITE_SHARE_FILE(f, sf);
+                for(int j = 0; j<listFile.length; j++){
+                    if(Tracker.lock.get(i).getLockName().equals(hashCode)){
+                        tmp = i;
+                        break;
+                    }
+                }
+                synchronized(Tracker.lock.get(tmp).getLock()){
+                    ShareFile sf = CONSTANT.READ_SHARE_FILE(f);
+                    sf.addIp(incommingIP, listeningPort);
+                    CONSTANT.WRITE_SHARE_FILE(f, sf);
+                }
             }
         }
     }
