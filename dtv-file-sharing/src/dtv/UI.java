@@ -56,6 +56,7 @@ import java.awt.SystemColor;
 import javax.swing.UIManager;
 import java.awt.Toolkit;
 import java.awt.Font;
+import javax.swing.JMenuItem;
 public class UI  implements Runnable{
 
 	private JFrame frame;
@@ -79,6 +80,8 @@ public class UI  implements Runnable{
 	private String codeHash;
 	private List<DTVParams> fileL;
 	private JButton btnNewButton;
+	private JMenuItem mntmAboutDtv;
+	private JMenuItem mntmExit;
 	/**
 	 * Launch the application.
 	 */
@@ -137,21 +140,34 @@ public class UI  implements Runnable{
     }
 	private void initialize() {
 		frame = new JFrame();
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("E:\\Hoc tap\\MMT1\\Assignment\\Assignment\\test\\src\\client\\images\\icons\\torrent.png"));
 		frame.setBackground(Color.WHITE);
 		frame.setBounds(100, 100, 884, 482);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SpringLayout springLayout = new SpringLayout();
 		frame.getContentPane().setLayout(springLayout);
-		frame.setTitle("Torrent");
+		frame.setTitle("DTV");
+		//JMenu and MenuBar
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.setForeground(Color.WHITE);
+		menuBar.setBackground(UIManager.getColor("PasswordField.inactiveBackground"));
+		frame.setJMenuBar(menuBar);
 		
-		btnAddTorrent = new JButton("ADD FILE");
-		btnAddTorrent.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		springLayout.putConstraint(SpringLayout.NORTH, btnAddTorrent, 12, SpringLayout.NORTH, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.EAST, btnAddTorrent, -505, SpringLayout.EAST, frame.getContentPane());
-		frame.getContentPane().add(btnAddTorrent);
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//Jtable FileShare ----------------------------
+		JMenu mnFile = new JMenu("File");
+		menuBar.add(mnFile);
+		
+		mntmExit = new JMenuItem("Exit");
+		mnFile.add(mntmExit);
+		
+		JMenu mnOptions = new JMenu("Options");
+		menuBar.add(mnOptions);
+		
+		JMenu mnHelps = new JMenu("Help");
+		menuBar.add(mnHelps);
+		
+		mntmAboutDtv = new JMenuItem("About DTV");
+		mnHelps.add(mntmAboutDtv);
+		//------------------------------------------Define Jtable-------------------------------------------------------- 
+		//Jtable File Share
 		scrollPaneTable1 = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPaneTable1, 70, SpringLayout.NORTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, scrollPaneTable1, 159, SpringLayout.WEST, frame.getContentPane());
@@ -164,10 +180,8 @@ public class UI  implements Runnable{
 		scrollPaneTable1.setViewportView(table);
 		springLayout.putConstraint(SpringLayout.SOUTH, table, -10, SpringLayout.SOUTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, table, 486, SpringLayout.WEST, frame.getContentPane());
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//Jtable FileShare ----------------------------
+		//Jtable Search 
 		scrollTableRequest = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.NORTH, scrollTableRequest, 70, SpringLayout.NORTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, scrollTableRequest, 159, SpringLayout.WEST, frame.getContentPane());
@@ -176,15 +190,14 @@ public class UI  implements Runnable{
 		frame.getContentPane().add(scrollTableRequest);
 		
 		tableRequest = new JTable();
+		tableRequest.setColumnSelectionAllowed(true);
+		tableRequest.setCellSelectionEnabled(true);
 		tableRequest.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		scrollTableRequest.setViewportView(tableRequest);
 		springLayout.putConstraint(SpringLayout.SOUTH, tableRequest, -10, SpringLayout.SOUTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, tableRequest, 486, SpringLayout.WEST, frame.getContentPane());
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//Jtable FileShare ----------------------------
+		//Jtable Download 
 		scrollTableDownload = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.NORTH, scrollTableDownload, 70, SpringLayout.NORTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, scrollTableDownload, 159, SpringLayout.WEST, frame.getContentPane());
@@ -197,7 +210,13 @@ public class UI  implements Runnable{
 		scrollTableDownload.setViewportView(tableDownload);
 		springLayout.putConstraint(SpringLayout.SOUTH, tableDownload, -10, SpringLayout.SOUTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, tableDownload, 486, SpringLayout.WEST, frame.getContentPane());
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		//------------------------------------------Define Button-------------------------------------------------------- 
+		btnAddTorrent = new JButton("UPLOAD");
+		btnAddTorrent.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		springLayout.putConstraint(SpringLayout.NORTH, btnAddTorrent, 12, SpringLayout.NORTH, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.EAST, btnAddTorrent, -505, SpringLayout.EAST, frame.getContentPane());
+		frame.getContentPane().add(btnAddTorrent);
 		
 		btnDelete = new JButton("REMOVE");
 		btnDelete.setFont(new Font("Tahoma", Font.PLAIN, 10));
@@ -208,8 +227,7 @@ public class UI  implements Runnable{
 		frame.getContentPane().add(btnDelete);
 		
 		btnDownload = new JButton("DOWNLOAD");
-		btnDownload.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		
+		btnDownload.setFont(new Font("Tahoma", Font.PLAIN, 10));	
 		springLayout.putConstraint(SpringLayout.NORTH, btnDownload, 12, SpringLayout.NORTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, btnDownload, 6, SpringLayout.EAST, btnDelete);
 		springLayout.putConstraint(SpringLayout.SOUTH, btnDownload, -27, SpringLayout.NORTH, scrollPaneTable1);
@@ -222,82 +240,8 @@ public class UI  implements Runnable{
 		springLayout.putConstraint(SpringLayout.SOUTH, btnSearch, -27, SpringLayout.NORTH, scrollPaneTable1);
 		springLayout.putConstraint(SpringLayout.EAST, btnSearch, -10, SpringLayout.EAST, frame.getContentPane());
 		frame.getContentPane().add(btnSearch);
-		//Create TableModel of Table File Share 
-		table.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"STT", "FILE NAME", "SIZE", "PATH","HASHCODE"
-			}
-		){
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
-            };
-            boolean[] canEdit = new boolean [] {
-                true, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        }			
-		);
-		/////////////////////////////////////////////////////////
-		tableRequest.setModel(new DefaultTableModel(
-				new Object[][] {
-				},
-				new String[] {
-					"STT", "FILE NAME", "SIZE", "IP ADDRESS","PORT"
-				}
-			)
-		{
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
-            };
-            boolean[] canEdit = new boolean [] {
-            		true, false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        }		
-			);
-			//change JTable column width
-			/////////////////////////////////////////////////////////
-			/////////////////////////////////////////////////////////
-			tableDownload.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-			"STT", "FILE NAME", "SIZE", "STATUS","IP ADDRESS","PORT","TIME"
-			})
-			{
-	            Class[] types = new Class [] {
-	                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
-	            };
-	            boolean[] canEdit = new boolean [] {
-	                true, false, false, false,false, false,true
-	            };
-
-	            public Class getColumnClass(int columnIndex) {
-	                return types [columnIndex];
-	            }
-
-	            public boolean isCellEditable(int rowIndex, int columnIndex) {
-	                return canEdit [columnIndex];
-	            }
-	        }			
-					);
-		/////////////////////////////////////////////////////////////////
+	
+		//------------------------------------------Define JTree-------------------------------------------------------- 
 		scrollPaneTree = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.SOUTH, btnAddTorrent, -27, SpringLayout.NORTH, scrollPaneTree);
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPaneTree, 0, SpringLayout.NORTH, scrollPaneTable1);
@@ -311,7 +255,7 @@ public class UI  implements Runnable{
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollPaneTree, 0, SpringLayout.SOUTH, scrollTableRequest);
 		springLayout.putConstraint(SpringLayout.EAST, scrollPaneTree, -6, SpringLayout.WEST, scrollTableRequest);
 		frame.getContentPane().add(scrollPaneTree);
-			/////////////////////////////////////////////////////////
+		
 		tree = new JTree();
 		tree.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		tree.setShowsRootHandles(true);
@@ -320,19 +264,6 @@ public class UI  implements Runnable{
 				treeValueChanged(evt);
 			}
 		});
-		tree.setModel(new DefaultTreeModel(
-				new DefaultMutableTreeNode("Torrent") {
-					{
-						add(new DefaultMutableTreeNode("File Share"));
-						add(new DefaultMutableTreeNode("Search"));
-						add(new DefaultMutableTreeNode("Download"));
-					}
-				}
-			));
-		scrollPaneTree.setViewportView(tree);
-		
-		
-		
 		springLayout.putConstraint(SpringLayout.NORTH, tree, 0, SpringLayout.NORTH, scrollPaneTable1);
 		springLayout.putConstraint(SpringLayout.WEST, tree, 10, SpringLayout.WEST, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, tree, -10, SpringLayout.SOUTH, frame.getContentPane());
@@ -372,12 +303,46 @@ public class UI  implements Runnable{
 		fileAddTorrent.setFileFilter(new Filewinrar());
 		fileAddTorrent.setFileFilter(fileAddTorrent.getAcceptAllFileFilter());
 		fileAddTorrent.setFileView(new ImageFileView());
-		//////////////////////////////////////////////////
+		//Create DataModel for Jtree
+				tree.setModel(new DefaultTreeModel(
+						new DefaultMutableTreeNode("Torrent") {
+							{
+								add(new DefaultMutableTreeNode("File Share"));
+								add(new DefaultMutableTreeNode("Search"));
+								add(new DefaultMutableTreeNode("Download"));
+							}
+						}
+					));
+				scrollPaneTree.setViewportView(tree);
+				//Create TableModel of Table File Share 
+						table.setModel(new DefaultTableModel(
+							new Object[][] {
+							},
+							new String[] {
+								"NO.", "FILE NAME","SIZE","PATH","HASHCODE"
+							}
+						)
+						);
+						//Create TableModel of Table Search
+						tableRequest.setModel(new DefaultTableModel(
+							new Object[][] {
+							},
+							new String[] {
+								"NO.", "FILE NAME", "SIZE"
+							}));
+						//Create TableModel of Table Download
+							tableDownload.setModel(new DefaultTableModel(
+							new Object[][] {
+							},
+							new String[] {
+							"NO.", "FILE NAME", "SIZE","TIME"
+							}));
+				
+		//----------------------------------------Action of Button-------------------------------------------
+		//Button AddFile
 		btnAddTorrent.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e) {
 				DefaultTableModel model=(DefaultTableModel)table.getModel();
-				//hash code
-				//////////
 				int value=fileAddTorrent.showSaveDialog(btnAddTorrent);
 				if(value ==JFileChooser.APPROVE_OPTION){
 				File file = fileAddTorrent.getSelectedFile();
@@ -393,7 +358,7 @@ public class UI  implements Runnable{
 				boolean flag = false;
 				boolean flagLoad = false;
 				if(model.getRowCount()==0){
-					model.addRow(new Object[]{model.getRowCount()+1,file.getName(),size,file.getAbsoluteFile(),hashCode});
+					model.addRow(new Object[]{model.getRowCount()+1,file.getName(),size,file.getAbsolutePath(),hashCode});
 				}
 				else{
 					int count = model.getRowCount();
@@ -442,7 +407,6 @@ public class UI  implements Runnable{
 					}
 				}
 				selectTracker.setModel(modelCombo);
-				/////////////////////////////////////////
 				dtv_params.setType(0);		//Share File
 				try {
 					torMessQ.put(dtv_params);
@@ -456,7 +420,7 @@ public class UI  implements Runnable{
 			}
 		}
 		);
-		//Search 
+		//Button Search 
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				DefaultTableModel modelRequest=(DefaultTableModel)tableRequest.getModel();
@@ -466,15 +430,13 @@ public class UI  implements Runnable{
 					modelRequest.removeRow(0);
 			       }
 				 tree.setSelectionRow(2);
-				///////////////////////////////////
 				DTVParams dtvParams1= new DTVParams();
 				dtvParams1.addTracker((String)selectTracker.getSelectedItem());
 				dtvParams1.setType(2);
 				try {
 					torMessQ.put(dtvParams1);
 					//List<DTVParams>
-					fileL = fileListQ.take();
-					
+					fileL = fileListQ.take();	
 					for (int i = 0; i < fileL.size(); i++)
 					{
 						DTVParams tParams = fileL.get(i);
@@ -488,20 +450,19 @@ public class UI  implements Runnable{
 			
 			}
 		});
-		//Download a File
+		//Button Download
 		btnDownload.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				DefaultTableModel tableDowloadModel=(DefaultTableModel)tableDownload.getModel();
 				DefaultTableModel tableRequestModel = (DefaultTableModel) tableRequest.getModel();
 				DefaultTableModel model=(DefaultTableModel) table.getModel();
-				 JFileChooser fileChooseSave=new JFileChooser();
+				JFileChooser fileChooseSave=new JFileChooser();
 			     
-			     fileChooseSave.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			     
-			     //if(value==JFileChooser.APPROVE_OPTION){
-			    	 File temp = new File("c:/Users/" + (String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1));
-			    	 fileChooseSave.setSelectedFile(temp);//save file 
-			    	fileChooseSave.showSaveDialog(btnDownload);
+			    fileChooseSave.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+			    File temp = new File("c:/Users/" + (String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1));
+			    fileChooseSave.setSelectedFile(temp);
+			    fileChooseSave.showSaveDialog(btnDownload);
 				tree.setSelectionPath(tree.getPathForRow(2));//chon duong dan o Table Searh (JTree 2)
 				for (int i = 0; i < fileL.size(); i++){
 					if(fileL.get(i).getName().equals((String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1))){
@@ -518,29 +479,20 @@ public class UI  implements Runnable{
 						break;
 					}
 				}
-				////////////////////////////////////////////
+				
 				 Date time = new Date();
 		         int index = tableRequest.getSelectedRow();
-		         ///////////////////////////////////////////
-		         model.addRow(new Object[]{model.getRowCount()+1,tableRequestModel.getValueAt(index, 1),tableRequestModel.getValueAt(index, 2),fileChooseSave.getSelectedFile().getAbsolutePath(),codeHash});
+		         //Add Data for Jtable Download and FileShare
+		         model.addRow(new Object[]{model.getRowCount()+1,tableRequestModel.getValueAt(index, 1),tableRequestModel.getValueAt(index, 2),
+		        		 				   fileChooseSave.getSelectedFile().getAbsolutePath(),codeHash});
 				
-			     //////////////////////////////////////////
-			    
-		         Object[] d = new Object[tableDownload.getColumnCount()];
-		         String path = fileChooseSave.getSelectedFile().getAbsolutePath();
-		         d[0] = tableDowloadModel.getRowCount()+1;            
-		         d[1] = tableRequestModel.getValueAt(index, 1);
-		         d[2] = tableRequestModel.getValueAt(index, 2);
-		         d[3] = 0;
-		         d[4] = tableRequestModel.getValueAt(index, 3);
-		         d[5] = tableRequestModel.getValueAt(index, 4);
-		         d[6] = time;        
-		         int count = tableDownload.getRowCount();
-		         tableDowloadModel.insertRow(count,d);
-		         tree.setSelectionRow(3);
+			     
+		         tableDowloadModel.addRow(new Object[]{tableDowloadModel.getRowCount()+1, tableRequestModel.getValueAt(index, 1),
+		        		 								tableRequestModel.getValueAt(index, 2), time });
+		        tree.setSelectionRow(3);
 			}
 		});
-		//Remove a DataRow on Table
+		//Button Remove
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				 DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -561,22 +513,10 @@ public class UI  implements Runnable{
 			        }
 			        for(int i=0;i<table.getRowCount();i++)
 			        	model.setValueAt(i+1, i, 0);
-			        
-				/*}
-				else if(tree.getSelectionPath().equals(tree.getPathForRow(3))){
-					int del = tableDownload.getSelectedRows().length;
-			        for(int i= 0; i<del;i++)
-			        	modelDownload.removeRow(tableDownload.getSelectedRows()[0]);
-			        for(int i=0;i<tableDownload.getRowCount();i++)
-			        	modelDownload.setValueAt(i+1, i, 0);
-				}*/
 		        
 			}
 		});
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		
 		//--------------------------------------------IMAGES TREE-------------------------------------------------------------------------
-		//Change Icon for Jtree
 				tree.setCellRenderer(new DefaultTreeCellRenderer() {
 					private Icon downloadIcon = new ImageIcon(this.getClass().getResource("download-icon.png"));
 			        private Icon searchIcon =  new ImageIcon(this.getClass().getResource("search-icon.png"));
@@ -599,162 +539,56 @@ public class UI  implements Runnable{
 				            return c;
 				        }
 				    });
-	//////--------------------------------------------IMAGES BUTTON--------------------------------------------------
-	/*	btnDelete.setBorder(BorderFactory.createEmptyBorder());
-		btnDelete.setContentAreaFilled(false);
-		btnDelete.setIcon(new ImageIcon(this.getClass().getResource("remove.png")));
-		btnDelete.setText("");
-		btnDownload.setBorder(BorderFactory.createEmptyBorder());
-		btnDownload.setContentAreaFilled(false);
-		btnDownload.setIcon(new ImageIcon(this.getClass().getResource("up-down.png")));
-		btnDownload.setText("");
-		btnSearch.setBorder(BorderFactory.createEmptyBorder());
-		btnSearch.setContentAreaFilled(false);
-		btnSearch.setIcon(new ImageIcon(this.getClass().getResource("search.png")));
-		btnSearch.setText("");
-		btnAddTorrent.setBorder(BorderFactory.createEmptyBorder());
-		btnAddTorrent.setContentAreaFilled(false);
-		btnAddTorrent.setIcon(new ImageIcon(this.getClass().getResource("up-file-share.png")));
-		btnAddTorrent.setText("");*/
-	    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-	       
-	    /////////////////////////////Image for Table////////////////////////////////////////
-	            
-	    //////////////////UDATABLE////////////////////////////////////////////////////
-	            TableColumnModel tcmUpdate = table.getColumnModel();
+	    
+		//----------------------------------------------Get Width for Jtable FileShare--------------------------------------------------
+	         TableColumnModel tcmUpdate = table.getColumnModel();
 	            TableColumn tcUpdate;
 	            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-	            tcUpdate= tcmUpdate.getColumn(1);
-	            tcUpdate.setPreferredWidth(301);
-	            tcUpdate.setHeaderRenderer(new TableCellRenderer(){
-
-	                @Override
-	                public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-	                    JLabel label=new JLabel();
-						label.setBorder(BorderFactory.createEmptyBorder());
-						label.setIcon(new ImageIcon(this.getClass().getResource("file-name.png")));
-						//label.setText("avc");
-						//label.setBackground(Color.red);
-						return label;
-	                }
-	                
-	            });
 	            tcUpdate= tcmUpdate.getColumn(0);
 	            tcUpdate.setPreferredWidth(74);
-	            tcUpdate.setHeaderRenderer(new TableCellRenderer(){
-
-	                @Override
-	                public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-	                    JLabel label=new JLabel();
-						label.setBorder(BorderFactory.createEmptyBorder());
-						label.setIcon(new ImageIcon(this.getClass().getResource("stt.png")));
-						return label;
-	                }
-	                
-	            });
+	            
+	            tcUpdate= tcmUpdate.getColumn(1);
+	            tcUpdate.setPreferredWidth(301);
+	           
 	            tcUpdate= tcmUpdate.getColumn(2);
 	            tcUpdate.setPreferredWidth(79);
-	            tcUpdate.setHeaderRenderer(new TableCellRenderer(){
-
-	                @Override
-	                public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-	                    JLabel label=new JLabel();
-						label.setBorder(BorderFactory.createEmptyBorder());
-						label.setIcon(new ImageIcon(this.getClass().getResource("size.png")));
-						return label;
-	                }
-	                
-	            });
+	           
 	            tcUpdate= tcmUpdate.getColumn(3);
-	            tcUpdate.setPreferredWidth(300);
-	            tcUpdate.setHeaderRenderer(new TableCellRenderer(){
-
-	                @Override
-	                public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-	                    JLabel label=new JLabel();
-						label.setBorder(BorderFactory.createEmptyBorder());
-						label.setIcon(new ImageIcon(this.getClass().getResource("path.png")));
-						return label;	              
-	                }         
-	            });
-				///////////////////////////////////////////////////Request/////////////////////
+	            tcUpdate.setPreferredWidth(400);
+	            
+	            tcUpdate= tcmUpdate.getColumn(4);
+	            tcUpdate.setPreferredWidth(0);
+	     //----------------------------------------------Get Width for Jtable Search--------------------------------------------------
 				TableColumnModel tcmRequest = tableRequest.getColumnModel();
 				TableColumn tcRequest;
 				tableRequest.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 				tcRequest= tcmRequest.getColumn(1);
-				tcRequest.setPreferredWidth(301);
-				tcRequest.setHeaderRenderer(new TableCellRenderer(){
+				tcRequest.setPreferredWidth(475);
 				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("file-name.png")));
-				return label;
-				}
-				
-				});
 				tcRequest= tcmRequest.getColumn(0);
 				tcRequest.setPreferredWidth(74);
-				tcRequest.setHeaderRenderer(new TableCellRenderer(){
 				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("stt.png")));
-				return label;
-				}
-				
-				});
 				tcRequest= tcmRequest.getColumn(2);
-				tcRequest.setPreferredWidth(79);
-				tcRequest.setHeaderRenderer(new TableCellRenderer(){
+				tcRequest.setPreferredWidth(150);
 				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("size.png")));
-				return label;
-				}
-				
-				});
-				tcRequest= tcmRequest.getColumn(3);
-				tcRequest.setPreferredWidth(153);
-				tcRequest.setHeaderRenderer(new TableCellRenderer(){
-				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("ip-address1.png")));
-				return label;
-				
-				}
-				
-				});
-				
-				tcRequest= tcmRequest.getColumn(4);
-				tcRequest.setPreferredWidth(152);
-				tcRequest.setHeaderRenderer(new TableCellRenderer(){
-				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("port1.png")));
-				return label;
-			
-				}
-				});
-				////////////////////////////////////////////////////////////////////////////////
-				
-				////////////////////////Download/////////////////////////////////////////////////
+		//----------------------------------------------Get Width for Jtable FileShare--------------------------------------------------
 				TableColumnModel tcmDownload = tableDownload.getColumnModel();
 				TableColumn tcDownload;
 				tableDownload.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 				
+				tcDownload= tcmDownload.getColumn(1);
+				tcDownload.setPreferredWidth(301);
+				
+				tcDownload= tcmDownload.getColumn(0);
+				tcDownload.setPreferredWidth(74);
+				
+				tcDownload= tcmDownload.getColumn(2);
+				tcDownload.setPreferredWidth(79);
+				
+				tcDownload= tcmDownload.getColumn(3);
+				tcDownload.setPreferredWidth(300);
+				
+				//---------------------------------------Define TextArea and Combobox-------------------------------------------
 				selectTracker = new JComboBox();
 				springLayout.putConstraint(SpringLayout.WEST, btnSearch, 6, SpringLayout.EAST, selectTracker);
 				springLayout.putConstraint(SpringLayout.NORTH, selectTracker, 0, SpringLayout.NORTH, btnAddTorrent);
@@ -763,113 +597,12 @@ public class UI  implements Runnable{
 				springLayout.putConstraint(SpringLayout.EAST, selectTracker, -108, SpringLayout.EAST, frame.getContentPane());
 				frame.getContentPane().add(selectTracker);
 				
-				
-				
 				txtAddressTracker = new JTextArea();
 				springLayout.putConstraint(SpringLayout.NORTH, txtAddressTracker, 12, SpringLayout.NORTH, frame.getContentPane());
 				springLayout.putConstraint(SpringLayout.WEST, txtAddressTracker, 14, SpringLayout.WEST, frame.getContentPane());
 				springLayout.putConstraint(SpringLayout.SOUTH, txtAddressTracker, -6, SpringLayout.NORTH, scrollPaneTable1);
 				springLayout.putConstraint(SpringLayout.EAST, txtAddressTracker, -675, SpringLayout.EAST, frame.getContentPane());
-				frame.getContentPane().add(txtAddressTracker);
-				tcDownload= tcmDownload.getColumn(1);
-				tcDownload.setPreferredWidth(301);
-				tcDownload.setHeaderRenderer(new TableCellRenderer(){
-				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("file-name.png")));
-				return label;
-			
-				}
-				
-				});
-				tcDownload= tcmDownload.getColumn(0);
-				tcDownload.setPreferredWidth(74);
-				tcDownload.setHeaderRenderer(new TableCellRenderer(){
-				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("stt.png")));
-				return label;
-				
-				}
-				
-				});
-				tcDownload= tcmDownload.getColumn(2);
-				tcDownload.setPreferredWidth(79);
-				tcDownload.setHeaderRenderer(new TableCellRenderer(){
-				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("size.png")));
-				return label;
-				
-				}
-				
-				});
-				tcDownload= tcmDownload.getColumn(3);
-				tcDownload.setPreferredWidth(151);
-				tcDownload.setHeaderRenderer(new TableCellRenderer(){
-				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("status.png")));
-				return label;
-				
-				}
-				
-				});
-				tcDownload= tcmDownload.getColumn(4);
-				tcDownload.setPreferredWidth(153);
-				tcDownload.setHeaderRenderer(new TableCellRenderer(){
-				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("ip-address1.png")));
-				return label;
-				
-				}
-				
-				});
-				tcDownload= tcmDownload.getColumn(5);
-				tcDownload.setPreferredWidth(153);
-				tcDownload.setHeaderRenderer(new TableCellRenderer(){
-				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("port1.png")));
-				return label;
-				}
-				
-				});
-				
-				tcDownload= tcmDownload.getColumn(6);
-				tcDownload.setPreferredWidth(120);
-				tcDownload.setHeaderRenderer(new TableCellRenderer(){
-				
-				@Override
-				public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-				JLabel label=new JLabel();
-				label.setBorder(BorderFactory.createEmptyBorder());
-				label.setIcon(new ImageIcon(this.getClass().getResource("time.png")));
-				return label;
-				}
-				
-				});
-				////////////////////////////////////////////////////////////////////////////////
-				//textArea txtAddressTracker
+				frame.getContentPane().add(txtAddressTracker);		
 				txtAddressTracker.setLineWrap(true);//Sets the line-wrapping policy of the text area.
 				
 				btnNewButton = new JButton("OK");
@@ -879,6 +612,8 @@ public class UI  implements Runnable{
 				springLayout.putConstraint(SpringLayout.WEST, btnNewButton, 6, SpringLayout.EAST, txtAddressTracker);
 				springLayout.putConstraint(SpringLayout.SOUTH, btnNewButton, -27, SpringLayout.NORTH, scrollPaneTable1);
 				springLayout.putConstraint(SpringLayout.EAST, btnNewButton, -599, SpringLayout.EAST, frame.getContentPane());
+				frame.getContentPane().add(btnNewButton);
+				//Button OK
 				btnNewButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						String[] lines = txtAddressTracker.getText().split("\n");//read line by line of a text area
@@ -907,40 +642,8 @@ public class UI  implements Runnable{
 						}
 					}
 				);
-				frame.getContentPane().add(btnNewButton);
-				
-				JMenuBar menuBar = new JMenuBar();
-				menuBar.setForeground(Color.WHITE);
-				menuBar.setBackground(UIManager.getColor("PasswordField.inactiveBackground"));
-				frame.setJMenuBar(menuBar);
-				
-				JMenu mnFile = new JMenu("File");
-				menuBar.add(mnFile);
-				
-				JMenu mnEdit = new JMenu("Edit");
-				menuBar.add(mnEdit);
-				
-				JMenu mnOption = new JMenu("Option");
-				menuBar.add(mnOption);
-			
-				txtAddressTracker.append("192.168.43.53:1234");
-
-				
-	            
-	            
-	            
-	            
-	            
-	 
-	            
-	            
-	            
-	            
-	            
-	            
-	            
-	            
-	////////////////////////////////////////////////////////////////////////	
+		
+				txtAddressTracker.append("192.168.43.53:1234");	
 	}
 	//Change value for Jtree
 	private void treeValueChanged(TreeSelectionEvent evt) {//GEN-FIRST:event_treeValueChanged
@@ -965,7 +668,7 @@ public class UI  implements Runnable{
             btnDelete.setEnabled(false);
             btnAddTorrent.setEnabled(false);
             btnDownload.setEnabled(true);
-            btnSearch.setEnabled(true);                   
+            btnSearch.setEnabled(true); 
         }
         else  if(tree.getSelectionPath().getLastPathComponent().toString().equals("Download"))
         {
@@ -978,14 +681,12 @@ public class UI  implements Runnable{
             btnSearch.setEnabled(false);
         }
     }//GEN-LAST:event_treeValueChanged
-	// hash content of fileShare
-	 
 	 @Override
 		public void run() {
 			// TODO Auto-generated method stub
 			frame.setVisible(true);
 		}
-	 
+	 //Hash Code
 	 private static String generateSHA512(FileInputStream inputStream){
 		    if(inputStream==null){
 
@@ -1031,7 +732,7 @@ public class UI  implements Runnable{
 		    }
 		    return stringBuffer.toString();
 		}
-	 
+	 //Message Dialog
 	 public static void showWarningTextBox(String messToShow, String title)
 	 {
 		JFrame frame = new JFrame("JOptionPane showMessageDialog example");
