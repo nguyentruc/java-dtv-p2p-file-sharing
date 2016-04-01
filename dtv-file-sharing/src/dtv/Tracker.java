@@ -16,10 +16,11 @@ import java.util.ArrayList;
  */
 public class Tracker {
     public static final ArrayList<String> lock = new ArrayList<>();
-    public static TrackerUI tui = new TrackerUI();
+    
     public static void main(String[] args) throws Exception{
     ServerSocket ss = new ServerSocket(CONSTANT.SERVER_LISTENING_PORT);
     //Construct new lock array
+    TrackerUI.main(null);
     File f = new File(CONSTANT.STORAGE_PATH);
     String[] tmp = f.list();
     for(int i = 0; i<tmp.length; i++){
