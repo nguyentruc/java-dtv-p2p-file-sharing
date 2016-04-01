@@ -101,6 +101,16 @@ public class PeerGet implements Runnable {
 			
 			tUpdatePeer.interrupt();
 			
+			if (checkHash() == false)
+			{
+				stopDownload.set(2);
+				synchronized (downloadProgress) {
+					tDownloadProgress.interrupt();
+				}
+				DTVFileQ.put(dtv_params);
+				return;
+			}
+			
 			synchronized (downloadProgress) {
 				tDownloadProgress.interrupt();
 			}
@@ -113,5 +123,14 @@ public class PeerGet implements Runnable {
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	private Boolean checkHash() throws FileNotFoundException
+	{
+		File f = new File(dtv_params.getPathToFile());
+		
+		String getHash = UI.generateSHA512(new FileInputStream(f));
+		
+		return (getHash.equals(dtv_params.getHashCode()));
 	}
 }

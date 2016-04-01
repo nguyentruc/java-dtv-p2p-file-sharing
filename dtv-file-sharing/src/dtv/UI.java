@@ -693,7 +693,7 @@ public class UI  implements Runnable{
 			frame.setVisible(true);
 		}
 	 //Hash Code
-	 private static String generateSHA512(FileInputStream inputStream){
+	 public static String generateSHA512(FileInputStream inputStream){
 		    if(inputStream==null){
 
 		        return null;
