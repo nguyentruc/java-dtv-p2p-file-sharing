@@ -213,6 +213,7 @@ public class UI  implements Runnable{
 		
 		//------------------------------------------Define Button-------------------------------------------------------- 
 		btnAddTorrent = new JButton("UPLOAD");
+		btnAddTorrent.setForeground(Color.BLACK);
 		btnAddTorrent.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		springLayout.putConstraint(SpringLayout.NORTH, btnAddTorrent, 12, SpringLayout.NORTH, frame.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, btnAddTorrent, -505, SpringLayout.EAST, frame.getContentPane());
@@ -305,14 +306,14 @@ public class UI  implements Runnable{
 		fileAddTorrent.setFileView(new ImageFileView());
 		//Create DataModel for Jtree
 				tree.setModel(new DefaultTreeModel(
-						new DefaultMutableTreeNode("Torrent") {
-							{
-								add(new DefaultMutableTreeNode("File Share"));
-								add(new DefaultMutableTreeNode("Search"));
-								add(new DefaultMutableTreeNode("Download"));
-							}
+					new DefaultMutableTreeNode("DTV") {
+						{
+							add(new DefaultMutableTreeNode("File Share"));
+							add(new DefaultMutableTreeNode("Search"));
+							add(new DefaultMutableTreeNode("Download"));
 						}
-					));
+					}
+				));
 				scrollPaneTree.setViewportView(tree);
 				//Create TableModel of Table File Share 
 						table.setModel(new DefaultTableModel(
@@ -346,6 +347,7 @@ public class UI  implements Runnable{
 				int value=fileAddTorrent.showSaveDialog(btnAddTorrent);
 				if(value ==JFileChooser.APPROVE_OPTION){
 				File file = fileAddTorrent.getSelectedFile();
+				
 				String size=sizeToString(file.length());
 				String hashCode = "";
 				try {
@@ -429,7 +431,7 @@ public class UI  implements Runnable{
 			       {
 					modelRequest.removeRow(0);
 			       }
-				 tree.setSelectionRow(2);
+				
 				DTVParams dtvParams1= new DTVParams();
 				dtvParams1.addTracker((String)selectTracker.getSelectedItem());
 				dtvParams1.setType(2);
@@ -447,7 +449,9 @@ public class UI  implements Runnable{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			
+				tree.setSelectionRow(2);
+				if(tableRequest.getRowCount()>0)
+		            btnDownload.setEnabled(true);
 			}
 		});
 		//Button Download
@@ -456,13 +460,13 @@ public class UI  implements Runnable{
 				DefaultTableModel tableDowloadModel=(DefaultTableModel)tableDownload.getModel();
 				DefaultTableModel tableRequestModel = (DefaultTableModel) tableRequest.getModel();
 				DefaultTableModel model=(DefaultTableModel) table.getModel();
-				JFileChooser fileChooseSave=new JFileChooser();
-			     
+				JFileChooser fileChooseSave=new JFileChooser();			     
 			    fileChooseSave.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-			    File temp = new File("c:/Users/" + (String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1));
+			    File temp = new File("c:/Users/" + System.getProperty("user.name") + "/Desktop/"
+			    		+ (String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1));
 			    fileChooseSave.setSelectedFile(temp);
 			    fileChooseSave.showSaveDialog(btnDownload);
+			    
 				tree.setSelectionPath(tree.getPathForRow(2));//chon duong dan o Table Searh (JTree 2)
 				for (int i = 0; i < fileL.size(); i++){
 					if(fileL.get(i).getName().equals((String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1))){
@@ -667,7 +671,10 @@ public class UI  implements Runnable{
             scrollTableDownload.setVisible(false);
             btnDelete.setEnabled(false);
             btnAddTorrent.setEnabled(false);
+            DefaultTableModel modelRequest=(DefaultTableModel) tableRequest.getModel();
+           	if(tableRequest.getRowCount()>0)
             btnDownload.setEnabled(true);
+           	else  btnDownload.setEnabled(false);
             btnSearch.setEnabled(true); 
         }
         else  if(tree.getSelectionPath().getLastPathComponent().toString().equals("Download"))
