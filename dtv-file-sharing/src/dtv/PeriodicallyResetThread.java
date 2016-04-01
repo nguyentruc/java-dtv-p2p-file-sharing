@@ -39,8 +39,11 @@ public class PeriodicallyResetThread implements Runnable{
 
     private void RmSeederPeriodically() throws Exception {
         //TODO
-        for(int i = 0; i < Tracker.lock.size(); i++){
-            new Thread(new IndieFileCheck(i)).start();
-        } 
+        synchronized(Tracker.lock)
+        {
+            for(int i = 0; i < Tracker.lock.size(); i++){
+                new Thread(new IndieFileCheck(i)).start();
+            }
+        }
     }
 }

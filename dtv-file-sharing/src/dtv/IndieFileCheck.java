@@ -20,9 +20,8 @@ public class IndieFileCheck implements Runnable{
     
     @Override
     public void run() {
-        LockObject tmpLock = Tracker.lock.get(index);
-        synchronized(tmpLock.getLock()){
-            File f = new File(CONSTANT.STORAGE_PATH + tmpLock.getLockName());
+        synchronized(Tracker.lock.get(index)){
+            File f = new File(CONSTANT.STORAGE_PATH + Tracker.lock.get(index));
             System.out.println("1mins passed. Checking alive time of ip in " + f.getName() + "'s ipList...");
             try{
                 ShareFile tmpSf = CONSTANT.READ_SHARE_FILE(f);
