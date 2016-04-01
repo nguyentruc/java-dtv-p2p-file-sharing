@@ -59,7 +59,14 @@ public class Peer implements Runnable{
 					System.out.println("search");
 					List<DTVParams> fileList = getListFromServer(revDtv);
 					fileListQ.put(fileList);
-
+					
+					if (fileList.isEmpty())
+					{
+						UI.showWarningTextBox(String.format("Could not get file list from tracker %s"
+								, revDtv.getTrackerList().get(0))
+								,"Unknown Host Error");
+					}
+					
 					break;
 					
 				case 3: //remove
@@ -130,49 +137,45 @@ public class Peer implements Runnable{
 		List<DTVParams> fileList = new ArrayList<>();
 		List<String> trackerList = new ArrayList<>(dtv_params.getTrackerList());
 		
-		for (int i = 0; i < trackerList.size(); i++)
+		String tracker = trackerList.get(0);
+			
+		/* Send params to  */
+		try
 		{
-			String tracker = trackerList.get(i);
+			Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
+		
+			PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
+			outToServer.println("2");
+			outToServer.flush();
 			
-			/* Send params to  */
-			try
+			BufferedReader inFromServer= 
+					new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			
+			int numOfFile = Integer.parseInt(inFromServer.readLine());
+			for (int j = 0; j < numOfFile; j++)
 			{
-				Socket clientSocket = new Socket(DTV.getIP(tracker), DTV.getPort(tracker));
-			
-				PrintWriter outToServer = new PrintWriter(clientSocket.getOutputStream());
-				outToServer.println("2");
-				outToServer.flush();
+				DTVParams retDtv = new DTVParams();
 				
-				BufferedReader inFromServer= 
-						new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-				
-				int numOfFile = Integer.parseInt(inFromServer.readLine());
-				for (int j = 0; j < numOfFile; j++)
+				retDtv.setName(inFromServer.readLine());
+				retDtv.setHashCode(inFromServer.readLine());
+				retDtv.setSize(Long.parseLong(inFromServer.readLine()));
+				retDtv.setType(Integer.parseInt(inFromServer.readLine()));
+				int numOfTracker = Integer.parseInt(inFromServer.readLine());
+				for (int k = 0; k < numOfTracker; k++)
 				{
-					DTVParams retDtv = new DTVParams();
-					
-					retDtv.setName(inFromServer.readLine());
-					retDtv.setHashCode(inFromServer.readLine());
-					retDtv.setSize(Long.parseLong(inFromServer.readLine()));
-					retDtv.setType(Integer.parseInt(inFromServer.readLine()));
-					int numOfTracker = Integer.parseInt(inFromServer.readLine());
-					for (int k = 0; k < numOfTracker; k++)
-					{
-						String newTracker = inFromServer.readLine();
-						retDtv.addTracker(newTracker);
-					}
-					
-					fileList.add(retDtv);
+					String newTracker = inFromServer.readLine();
+					retDtv.addTracker(newTracker);
 				}
 				
-				clientSocket.close();
+				fileList.add(retDtv);
 			}
-			catch(UnknownHostException | ConnectException e)
-			{
-				//print textbox cannot find tracker ...
-				UI.showWarningTextBox(String.format("Cannot connect to tracker at %s", tracker),"Unknown Host Error");
-			}
-		}		
+			
+			clientSocket.close();
+		}
+		catch(Exception e)
+		{
+
+		}
 		
 		return fileList;
 	}
