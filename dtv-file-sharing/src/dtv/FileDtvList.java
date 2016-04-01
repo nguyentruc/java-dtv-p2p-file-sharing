@@ -4,12 +4,16 @@ import java.util.*;
 
 public class FileDtvList {
 	
-	static volatile List<DTVParams> listFile = new ArrayList<>();
+	private static volatile List<DTVParams> listFile = new ArrayList<>();
 	
-	public static synchronized List<DTVParams> getFileList()
-	{	
-		return listFile;
-	}
+	/*
+	 * This method is commented due to risk of race condition when 
+	 * directly access to listFile.
+	 */
+//	public static synchronized List<DTVParams> getFileList()
+//	{	
+//		return listFile;
+//	}
 	
 	public static synchronized int posFile(String hashCode)
 	{

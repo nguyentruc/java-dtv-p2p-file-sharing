@@ -15,6 +15,8 @@ public class DownloadProgress implements Runnable{
 	private JProgressBar progressBar;
 	private final String title;
 	private final Thread tPeerGet;
+	private JButton btnStop;
+	private JButton btnClose;
 
 	/**
 	 * Launch the application.
@@ -58,15 +60,25 @@ public class DownloadProgress implements Runnable{
 		frame.getContentPane().add(progressBar);
 		progressBar.setStringPainted(true);
 		
-		JButton btnStop = new JButton("STOP");
+		btnStop = new JButton("STOP");
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				frame.dispose();
 				tPeerGet.interrupt();
 			}
 		});
-		btnStop.setBounds(172, 51, 89, 23);
+		btnStop.setBounds(105, 51, 89, 23);
 		frame.getContentPane().add(btnStop);
+		
+		btnClose = new JButton("CLOSE");
+		btnClose.setEnabled(false);
+		btnClose.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				frame.dispose();
+			}
+		});
+		btnClose.setBounds(238, 51, 89, 23);
+		frame.getContentPane().add(btnClose);
 		
 	}
 
@@ -90,6 +102,8 @@ public class DownloadProgress implements Runnable{
 				} 
 				catch (InterruptedException e) 
 				{
+					btnClose.setEnabled(true);
+					btnStop.setEnabled(false);
 					progressBar.setValue(100);
 					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 					return;

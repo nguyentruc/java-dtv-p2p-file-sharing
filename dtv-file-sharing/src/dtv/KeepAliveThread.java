@@ -15,13 +15,20 @@ public class KeepAliveThread implements Runnable{
 
 	@Override
 	public void run() {
-		try
+
+		while (true)
 		{
-			while (true)
-			{
+			try {
 				Thread.sleep(DTV.keepAliveTimeout);
-				createTrackerList();
-				int size = FileDtvList.getSize();
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			createTrackerList();
+			int size = FileDtvList.getSize();
+			try
+			{
 				for (int i = 0; i < trackerList.size(); i++)
 				{
 					String tracker = trackerList.get(i);
@@ -46,11 +53,12 @@ public class KeepAliveThread implements Runnable{
 					clientSocket.close();					
 				}
 			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		
 		
 	}
 	
