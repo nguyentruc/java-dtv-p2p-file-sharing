@@ -431,7 +431,6 @@ public class UI  implements Runnable{
 			       {
 					modelRequest.removeRow(0);
 			       }
-				
 				DTVParams dtvParams1= new DTVParams();
 				dtvParams1.addTracker((String)selectTracker.getSelectedItem());
 				dtvParams1.setType(2);
@@ -622,6 +621,7 @@ public class UI  implements Runnable{
 				//Button OK
 				btnNewButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
+						 btnSearch.setEnabled(true);
 						String[] lines = txtAddressTracker.getText().split("\n");//read line by line of a text area
 						int row=txtAddressTracker.getLineCount();
 						int rowCombo=selectTracker.getItemCount();
@@ -647,9 +647,9 @@ public class UI  implements Runnable{
 						selectTracker.setModel(modelCombo);
 						}
 					}
-				);
-		
+				);	
 				txtAddressTracker.append("192.168.43.53:1234");	
+				btnSearch.setEnabled(false);
 	}
 	//Change value for Jtree
 	private void treeValueChanged(TreeSelectionEvent evt) {//GEN-FIRST:event_treeValueChanged
