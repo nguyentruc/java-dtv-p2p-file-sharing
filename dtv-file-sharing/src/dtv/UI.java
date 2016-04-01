@@ -329,7 +329,7 @@ public class UI  implements Runnable{
 							new Object[][] {
 							},
 							new String[] {
-								"NO.", "FILE NAME", "SIZE"
+								"NO.", "FILE NAME", "SIZE","SEED"
 							}));
 						//Create TableModel of Table Download
 							tableDownload.setModel(new DefaultTableModel(
@@ -442,7 +442,8 @@ public class UI  implements Runnable{
 					for (int i = 0; i < fileL.size(); i++)
 					{
 						DTVParams tParams = fileL.get(i);
-						modelRequest.addRow(new Object[]{modelRequest.getRowCount()+1,tParams.getName(),sizeToString(tParams.getSize())});
+						modelRequest.addRow(new Object[]{modelRequest.getRowCount()+1,tParams.getName(),
+								sizeToString(tParams.getSize()),tParams.getType()});
 					}
 					
 				} catch (InterruptedException e) {
@@ -450,8 +451,7 @@ public class UI  implements Runnable{
 					e.printStackTrace();
 				}
 				tree.setSelectionRow(2);
-				if(tableRequest.getRowCount()>0)
-		            btnDownload.setEnabled(true);
+				
 			}
 		});
 		//Button Download
@@ -567,13 +567,15 @@ public class UI  implements Runnable{
 				TableColumn tcRequest;
 				tableRequest.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 				tcRequest= tcmRequest.getColumn(1);
-				tcRequest.setPreferredWidth(475);
+				tcRequest.setPreferredWidth(425);
 				
 				tcRequest= tcmRequest.getColumn(0);
 				tcRequest.setPreferredWidth(74);
 				
 				tcRequest= tcmRequest.getColumn(2);
-				tcRequest.setPreferredWidth(150);
+				tcRequest.setPreferredWidth(100);
+				tcRequest= tcmRequest.getColumn(3);
+				tcRequest.setPreferredWidth(100);
 				
 		//----------------------------------------------Get Width for Jtable FileShare--------------------------------------------------
 				TableColumnModel tcmDownload = tableDownload.getColumnModel();
@@ -671,10 +673,7 @@ public class UI  implements Runnable{
             scrollTableDownload.setVisible(false);
             btnDelete.setEnabled(false);
             btnAddTorrent.setEnabled(false);
-            DefaultTableModel modelRequest=(DefaultTableModel) tableRequest.getModel();
-           	if(tableRequest.getRowCount()>0)
-            btnDownload.setEnabled(true);
-           	else  btnDownload.setEnabled(false);
+            btnDownload.setEnabled(true); 	
             btnSearch.setEnabled(true); 
         }
         else  if(tree.getSelectionPath().getLastPathComponent().toString().equals("Download"))
