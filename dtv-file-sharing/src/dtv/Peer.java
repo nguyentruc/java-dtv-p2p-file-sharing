@@ -154,6 +154,7 @@ public class Peer implements Runnable{
 					retDtv.setName(inFromServer.readLine());
 					retDtv.setHashCode(inFromServer.readLine());
 					retDtv.setSize(Long.parseLong(inFromServer.readLine()));
+					retDtv.setType(Integer.parseInt(inFromServer.readLine()));
 					int numOfTracker = Integer.parseInt(inFromServer.readLine());
 					for (int k = 0; k < numOfTracker; k++)
 					{
