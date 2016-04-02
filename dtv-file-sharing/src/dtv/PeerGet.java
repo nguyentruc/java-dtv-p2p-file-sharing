@@ -101,15 +101,18 @@ public class PeerGet implements Runnable {
 			
 			tUpdatePeer.interrupt();
 			
-			if (checkHash() == false)
-			{
-				stopDownload.set(2);
-				synchronized (downloadProgress) {
-					tDownloadProgress.interrupt();
-				}
-				DTVFileQ.put(dtv_params);
-				return;
-			}
+			/**
+			 * Check hash after download
+			 */
+//			if (checkHash() == false)
+//			{
+//				stopDownload.set(2);
+//				synchronized (downloadProgress) {
+//					tDownloadProgress.interrupt();
+//				}
+//				DTVFileQ.put(dtv_params); //Download again
+//				return;
+//			}
 			
 			synchronized (downloadProgress) {
 				tDownloadProgress.interrupt();
@@ -118,6 +121,9 @@ public class PeerGet implements Runnable {
 			/* Register to tracker */
 			dtv_params.setType(0);
 			DTVFileQ.put(dtv_params);
+			
+			/* Show to FileShare */
+			DTV.PeerToUI.put(dtv_params);
 		}
 		catch(Exception e)
 		{
@@ -125,12 +131,12 @@ public class PeerGet implements Runnable {
 		}
 	}
 	
-	private Boolean checkHash() throws FileNotFoundException
-	{
-		File f = new File(dtv_params.getPathToFile());
-		
-		String getHash = UI.generateSHA512(new FileInputStream(f));
-		
-		return (getHash.equals(dtv_params.getHashCode()));
-	}
+//	private Boolean checkHash() throws FileNotFoundException
+//	{
+//		File f = new File(dtv_params.getPathToFile());
+//		
+//		String getHash = UI.generateSHA512(new FileInputStream(f));
+//		
+//		return (getHash.equals(dtv_params.getHashCode()));
+//	}
 }

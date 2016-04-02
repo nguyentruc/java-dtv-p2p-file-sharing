@@ -39,9 +39,8 @@ public class Peer implements Runnable{
 			{
 				/* Sleep until a message appear */
 				DTVParams revDtv = torFileQ.take();
-				System.out.println("Receive from UI");
 				
-				switch (revDtv.getType()) //register new torrent
+				switch (revDtv.getType()) //share new file
 				{
 				case 0:
 					System.out.println("Register new");
@@ -50,8 +49,15 @@ public class Peer implements Runnable{
 					FileDtvList.printListHash();
 					break;
 					
-				case 1: //add torrent
+				case 1: //get file
 					System.out.println("Get DTV");
+					
+					if (FileDtvList.posFile(revDtv.getHashCode()) != -1)
+					{
+						UI.showWarningTextBox("You already have this file", "FILE DUPLICATE");
+						break;
+					}
+					
 					new Thread(new PeerGet(revDtv,torFileQ)).start();
 					break;
 					
@@ -64,7 +70,7 @@ public class Peer implements Runnable{
 					{
 						UI.showWarningTextBox(String.format("Could not get file list from tracker %s"
 								, revDtv.getTrackerList().get(0))
-								,"Unknown Host Error");
+								,"LIST EMPTY");
 					}
 					
 					break;
@@ -123,7 +129,8 @@ public class Peer implements Runnable{
 				catch(UnknownHostException | ConnectException e )
 				{
 					//print textbox cannot find tracker ...
-					UI.showWarningTextBox(String.format("Cannot connect to tracker at %s", tracker),"Unknown Host Error");
+					UI.showWarningTextBox(String.format("Cannot connect to tracker at %s", tracker),
+							"UNKNOWN HOST ERROR");
 				}
 			}
 			

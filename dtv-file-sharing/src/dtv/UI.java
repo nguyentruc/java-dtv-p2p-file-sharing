@@ -458,7 +458,6 @@ public class UI  implements Runnable{
 			public void actionPerformed(ActionEvent arg0) {
 				DefaultTableModel tableDowloadModel=(DefaultTableModel)tableDownload.getModel();
 				DefaultTableModel tableRequestModel = (DefaultTableModel) tableRequest.getModel();
-				DefaultTableModel model=(DefaultTableModel) table.getModel();
 				JFileChooser fileChooseSave=new JFileChooser();			     
 			    fileChooseSave.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			    File temp = new File("c:/Users/" + System.getProperty("user.name") + "/Desktop/"
@@ -471,7 +470,6 @@ public class UI  implements Runnable{
 					if(fileL.get(i).getName().equals((String) tableRequestModel.getValueAt(tableRequest.getSelectedRow(), 1))){
 						DTVParams dtvParamsDownload=fileL.get(i);
 						dtvParamsDownload.setType(1);
-						 codeHash=dtvParamsDownload.getHashCode();
 						dtvParamsDownload.setPathToFile(fileChooseSave.getSelectedFile().getAbsolutePath());
 						try {
 							torMessQ.put(dtvParamsDownload);
@@ -485,11 +483,8 @@ public class UI  implements Runnable{
 				
 				 Date time = new Date();
 		         int index = tableRequest.getSelectedRow();
-		         //Add Data for Jtable Download and FileShare
-		         model.addRow(new Object[]{model.getRowCount()+1,tableRequestModel.getValueAt(index, 1),tableRequestModel.getValueAt(index, 2),
-		        		 				   fileChooseSave.getSelectedFile().getAbsolutePath(),codeHash});
-				
-			     
+		         
+		         //Add Data for Jtable Download			     
 		         tableDowloadModel.addRow(new Object[]{tableDowloadModel.getRowCount()+1, tableRequestModel.getValueAt(index, 1),
 		        		 								tableRequestModel.getValueAt(index, 2), time });
 		        tree.setSelectionRow(3);
@@ -499,8 +494,7 @@ public class UI  implements Runnable{
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				 DefaultTableModel model = (DefaultTableModel) table.getModel();
-				 DefaultTableModel modelDownload = (DefaultTableModel) tableDownload.getModel();
-				//if(tree.getSelectionPath().equals(tree.getPathForRow(1))){
+				 //if(tree.getSelectionPath().equals(tree.getPathForRow(1))){
 					int del = table.getSelectedRows().length;
 			        for(int i= 0; i<del;i++){
 			        	DTVParams params=new DTVParams();
@@ -691,6 +685,22 @@ public class UI  implements Runnable{
 		public void run() {
 			// TODO Auto-generated method stub
 			frame.setVisible(true);
+			
+			DefaultTableModel model = (DefaultTableModel) table.getModel();
+			while (true)
+			{
+				try {
+					DTVParams revDtv = DTV.PeerToUI.take();
+					
+					if (revDtv.getType() == 0)
+					{
+						model.addRow(new Object[]{model.getRowCount()+1,revDtv.getName(),
+								sizeToString(revDtv.getSize()),revDtv.getPathToFile(),revDtv.getHashCode()});
+					}
+				} catch (InterruptedException e) {
+					continue;
+				}	
+			}
 		}
 	 //Hash Code
 	 public static String generateSHA512(FileInputStream inputStream){
