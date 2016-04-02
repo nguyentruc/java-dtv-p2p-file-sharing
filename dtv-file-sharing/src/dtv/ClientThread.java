@@ -105,6 +105,15 @@ public class ClientThread implements Runnable {
 						break;
 					}
 					
+					/* If pause */
+					while (stopDownload.get() == 2)
+					{
+						synchronized (stopDownload) {
+							stopDownload.wait();
+						}
+					}
+					
+					/* If stop */
 					if (stopDownload.get() == 1)
 					{
 						outToServer.writeByte(-1);

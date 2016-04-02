@@ -42,7 +42,7 @@ public class PeerGet implements Runnable {
 			tUpdatePeer.start();
 			
 			Thread tDownloadProgress = 
-					new Thread(new DownloadProgress(downloadProgress, dtv_params.getName(), Thread.currentThread()));
+					new Thread(new DownloadProgress(downloadProgress, dtv_params.getName(), stopDownload));
 			tDownloadProgress.start();
 			
 			/* Get access to file */
@@ -51,15 +51,23 @@ public class PeerGet implements Runnable {
 			/* Start to get File */
 			while (true)
 			{
-				if (Thread.currentThread().isInterrupted())
+				/* If stop */
+				if (stopDownload.get() == 1)
 				{
-					stopDownload.set(1);
 					tUpdatePeer.interrupt();
 					synchronized (downloadProgress) {
 						tDownloadProgress.interrupt();
 					}
 					file.close();
 					return;
+				}
+				
+				/* If pause */
+				while (stopDownload.get() == 2)
+				{
+					synchronized (stopDownload) {
+							stopDownload.wait();
+					}
 				}
 				
 				synchronized (file_part) 

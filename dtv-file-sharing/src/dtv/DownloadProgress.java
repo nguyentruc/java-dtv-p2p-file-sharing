@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.awt.event.ActionEvent;
 
 public class DownloadProgress implements Runnable{
@@ -14,9 +15,10 @@ public class DownloadProgress implements Runnable{
 	private final Object downloadProgress;
 	private JProgressBar progressBar;
 	private final String title;
-	private final Thread tPeerGet;
 	private JButton btnStop;
 	private JButton btnClose;
+	private JButton btnPause;
+	private final AtomicInteger stopDownload;
 
 	/**
 	 * Launch the application.
@@ -37,10 +39,10 @@ public class DownloadProgress implements Runnable{
 	/**
 	 * Create the application.
 	 */
-	public DownloadProgress(Object downloadProgress, String title, Thread peerGet) {
+	public DownloadProgress(Object downloadProgress, String title, AtomicInteger stopDownload) {
 		this.downloadProgress = downloadProgress;
 		this.title = title;
-		this.tPeerGet = peerGet;
+		this.stopDownload = stopDownload;
 		initialize();
 	}
 
@@ -64,10 +66,13 @@ public class DownloadProgress implements Runnable{
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				frame.dispose();
-				tPeerGet.interrupt();
+				stopDownload.set(1);
+				synchronized (stopDownload) {
+					stopDownload.notifyAll();
+				}
 			}
 		});
-		btnStop.setBounds(105, 51, 89, 23);
+		btnStop.setBounds(168, 51, 89, 23);
 		frame.getContentPane().add(btnStop);
 		
 		btnClose = new JButton("CLOSE");
@@ -77,8 +82,29 @@ public class DownloadProgress implements Runnable{
 				frame.dispose();
 			}
 		});
-		btnClose.setBounds(238, 51, 89, 23);
+		btnClose.setBounds(267, 51, 89, 23);
 		frame.getContentPane().add(btnClose);
+		
+		btnPause = new JButton("PAUSE");
+		btnPause.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (stopDownload.get() == 0)
+				{
+					stopDownload.set(2);
+					btnPause.setText("RESUME");
+				}
+				else
+				{
+					stopDownload.set(0);
+					synchronized (stopDownload) {
+						stopDownload.notifyAll();
+					}
+					btnPause.setText("PAUSE");
+				}
+			}
+		});
+		btnPause.setBounds(69, 51, 89, 23);
+		frame.getContentPane().add(btnPause);
 		
 	}
 
@@ -104,6 +130,7 @@ public class DownloadProgress implements Runnable{
 				{
 					btnClose.setEnabled(true);
 					btnStop.setEnabled(false);
+					btnPause.setEnabled(false);
 					progressBar.setValue(100);
 					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 					return;

@@ -695,7 +695,8 @@ public class UI  implements Runnable{
 					if (revDtv.getType() == 0)
 					{
 						model.addRow(new Object[]{model.getRowCount()+1,revDtv.getName(),
-								sizeToString(revDtv.getSize()),revDtv.getPathToFile(),revDtv.getHashCode()});
+								sizeToString(revDtv.getSize()),revDtv.getPathToFile(),
+								revDtv.getHashCode()});
 					}
 				} catch (InterruptedException e) {
 					continue;
@@ -751,7 +752,7 @@ public class UI  implements Runnable{
 	 //Message Dialog
 	 public static void showWarningTextBox(String messToShow, String title)
 	 {
-		JFrame frame = new JFrame("JOptionPane showMessageDialog example");
+		JFrame frame = new JFrame();
 
     	JOptionPane.showMessageDialog(frame,
         messToShow,
