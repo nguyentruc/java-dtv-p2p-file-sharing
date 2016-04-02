@@ -69,7 +69,15 @@ public class KeepAliveThread implements Runnable{
 		int size = FileDtvList.getSize();
 		for (int i = 0; i < size; i++)
 		{
-			trackerList.addAll(FileDtvList.getDtv(i).getTrackerList());
+			List<String> trackerL = FileDtvList.getDtv(i).getTrackerList();
+			
+			for (int j = 0; j < trackerL.size(); j++)
+			{
+				String tracker = trackerL.get(j);
+				
+				if (trackerList.contains(tracker) == false)
+					trackerList.add(tracker);
+			}
 		} 
 	}
 	

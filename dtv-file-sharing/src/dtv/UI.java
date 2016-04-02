@@ -60,8 +60,6 @@ import javax.swing.JMenuItem;
 public class UI  implements Runnable{
 
 	private JFrame frame;
-	protected BlockingQueue<DTVParams> torMessQ = null;
-	BlockingQueue<List<DTVParams>> fileListQ = null;
 	private JTree tree;
 	private JTable table;
 	private JTable tableRequest;
@@ -77,8 +75,8 @@ public class UI  implements Runnable{
 	private JTextArea txtAddressTracker;
 	private JComboBox selectTracker;
 	File fileSave; 
+	List<DTVParams> fileL;
 	private String codeHash;
-	private List<DTVParams> fileL;
 	private JButton btnNewButton;
 	private JMenuItem mntmAboutDtv;
 	private JMenuItem mntmExit;
@@ -89,10 +87,8 @@ public class UI  implements Runnable{
 	/**
 	 * Create the application.
 	 */
-	public UI(BlockingQueue<DTVParams> q, BlockingQueue<List<DTVParams>> fileList) {
+	public UI() {
 		initialize();
-		torMessQ = q;
-		fileListQ = fileList;
 		
 //		try {
 //			List<DTVParams> fileL = fileListQ.take();
@@ -411,7 +407,7 @@ public class UI  implements Runnable{
 				selectTracker.setModel(modelCombo);
 				dtv_params.setType(0);		//Share File
 				try {
-					torMessQ.put(dtv_params);
+					DTV.UIToPeer.put(dtv_params);
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -435,9 +431,9 @@ public class UI  implements Runnable{
 				dtvParams1.addTracker((String)selectTracker.getSelectedItem());
 				dtvParams1.setType(2);
 				try {
-					torMessQ.put(dtvParams1);
+					DTV.UIToPeer.put(dtvParams1);
 					//List<DTVParams>
-					fileL = fileListQ.take();	
+					fileL = DTV.fileList.take();	
 					for (int i = 0; i < fileL.size(); i++)
 					{
 						DTVParams tParams = fileL.get(i);
@@ -472,7 +468,7 @@ public class UI  implements Runnable{
 						dtvParamsDownload.setType(1);
 						dtvParamsDownload.setPathToFile(fileChooseSave.getSelectedFile().getAbsolutePath());
 						try {
-							torMessQ.put(dtvParamsDownload);
+							DTV.UIToPeer.put(dtvParamsDownload);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -501,7 +497,7 @@ public class UI  implements Runnable{
 				        params.setType(3);
 				        params.setHashCode((String)model.getValueAt(table.getSelectedRow(), 4));
 				        try {
-							torMessQ.put(params);
+							DTV.UIToPeer.put(params);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();

@@ -3,7 +3,6 @@ package dtv;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
 import java.net.*;
 
 /**
@@ -13,16 +12,10 @@ import java.net.*;
  *
  */
 public class Peer implements Runnable{
-
-	protected BlockingQueue<DTVParams> torFileQ = null;
-	protected BlockingQueue<List<DTVParams>> fileListQ = null;
 	Thread serverListener = null;
 	public static int ServerPort;
 	
-	public Peer(BlockingQueue<DTVParams> q, BlockingQueue<List<DTVParams>> fileList) {
-		torFileQ = q;
-		this.fileListQ = fileList;
-		
+	public Peer() {
 		serverListener = new Thread(new ServerListener());
 		serverListener.start();
 		
@@ -38,7 +31,7 @@ public class Peer implements Runnable{
 			while (true)
 			{
 				/* Sleep until a message appear */
-				DTVParams revDtv = torFileQ.take();
+				DTVParams revDtv = DTV.UIToPeer.take();
 				
 				switch (revDtv.getType()) //share new file
 				{
@@ -58,13 +51,13 @@ public class Peer implements Runnable{
 						break;
 					}
 					
-					new Thread(new PeerGet(revDtv,torFileQ)).start();
+					new Thread(new PeerGet(revDtv)).start();
 					break;
 					
 				case 2: //search
 					System.out.println("search");
 					List<DTVParams> fileList = getListFromServer(revDtv);
-					fileListQ.put(fileList);
+					DTV.fileList.put(fileList);
 					
 					if (fileList.isEmpty())
 					{

@@ -11,27 +11,26 @@ public class DTV {
 	public static final int numOfPart = 16;
 	public static final int maxPeer = 16;
 	public static final int keepAliveTimeout = 1*90*1000;
+	
+	/**
+	 * Queue to share data between threads
+	 * Note: should have different queues for different purposes
+	 */
 	public static final BlockingQueue<DTVParams> PeerToUI = new LinkedBlockingQueue<DTVParams>();
+	public static final BlockingQueue<DTVParams> UIToPeer = new LinkedBlockingQueue<>();
+	public static final BlockingQueue<List<DTVParams>> fileList = new LinkedBlockingQueue<>();
 	
 	public static void main(String[] args) {
 		/**
-		 * Queue to share data between threads
-		 * Note: should have different queues for different purposes
-		 */
-		BlockingQueue<DTVParams> torFileQ = new LinkedBlockingQueue<>();
-		BlockingQueue<List<DTVParams>> fileList = new LinkedBlockingQueue<>();
-				
-		/**
 		 * create UI thread
 		 */
-		Thread uiHandle = new Thread(new UI(torFileQ, fileList));
+		Thread uiHandle = new Thread(new UI());
 		uiHandle.start();
-		
-			
+					
 		/**
 		 * Create peer thread
 		 */
-		Thread peerHandle = new Thread(new Peer(torFileQ, fileList));
+		Thread peerHandle = new Thread(new Peer());
 		peerHandle.start();				
 	}
 	

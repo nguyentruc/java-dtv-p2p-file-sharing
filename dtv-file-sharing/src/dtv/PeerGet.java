@@ -2,7 +2,6 @@ package dtv;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PeerGet implements Runnable {
@@ -13,15 +12,13 @@ public class PeerGet implements Runnable {
 	private List<Integer> file_part;
 	private AtomicInteger peerConnected;
 	private AtomicInteger tUpdatePeer_control;
-	final private BlockingQueue<DTVParams> DTVFileQ;
 	private Object downloadProgress;
 	private AtomicInteger stopDownload;
 	
-	public PeerGet(DTVParams dtv_params, BlockingQueue<DTVParams> DTVFileQ) 
+	public PeerGet(DTVParams dtv_params) 
 	{
 		this.dtv_params = dtv_params;
 		file_part = new ArrayList<>(DTV.numOfPart);
-		this.DTVFileQ = DTVFileQ;
 		stopDownload = new AtomicInteger(0);
 		
 		for (int i = 0; i < DTV.numOfPart; i++)
@@ -128,7 +125,7 @@ public class PeerGet implements Runnable {
 			
 			/* Register to tracker */
 			dtv_params.setType(0);
-			DTVFileQ.put(dtv_params);
+			DTV.UIToPeer.put(dtv_params);
 			
 			/* Show to FileShare */
 			DTV.PeerToUI.put(dtv_params);
