@@ -375,7 +375,6 @@ public class UI  implements Runnable{
 				if(flagLoad==false){
 				DTVParams dtv_params = new DTVParams();
 				dtv_params.setName(file.getName());
-				
 				dtv_params.setHashCode(hashCode);
 				dtv_params.setSize(file.length());
 				dtv_params.setPathToFile(file.getAbsolutePath());
@@ -490,7 +489,8 @@ public class UI  implements Runnable{
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				 DefaultTableModel model = (DefaultTableModel) table.getModel();
-				 //if(tree.getSelectionPath().equals(tree.getPathForRow(1))){
+				 DefaultTableModel modelDownload=(DefaultTableModel) tableDownload.getModel();
+				 if(tree.getSelectionPath().equals(tree.getPathForRow(1))){
 					int del = table.getSelectedRows().length;
 			        for(int i= 0; i<del;i++){
 			        	DTVParams params=new DTVParams();
@@ -506,8 +506,16 @@ public class UI  implements Runnable{
 			        }
 			        for(int i=0;i<table.getRowCount();i++)
 			        	model.setValueAt(i+1, i, 0);
-		        
+		        }
+				 else if(tree.getSelectionPath().equals(tree.getPathForRow(3))){
+						int del = tableDownload.getSelectedRows().length;
+				        for(int i= 0; i<del;i++)
+				        	modelDownload.removeRow(tableDownload.getSelectedRows()[0]);
+				        for(int i=0;i<tableDownload.getRowCount();i++)
+				        	modelDownload.setValueAt(i+1, i, 0);
+					}
 			}
+			
 		});
 		//--------------------------------------------IMAGES TREE-------------------------------------------------------------------------
 				tree.setCellRenderer(new DefaultTreeCellRenderer() {
@@ -671,7 +679,7 @@ public class UI  implements Runnable{
         	scrollPaneTable1.setVisible(false);
         	scrollTableRequest.setVisible(false);
             scrollTableDownload.setVisible(true);
-            btnDelete.setEnabled(false);
+            btnDelete.setEnabled(true);
             btnAddTorrent.setEnabled(false);
             btnDownload.setEnabled(false);
             btnSearch.setEnabled(false);
