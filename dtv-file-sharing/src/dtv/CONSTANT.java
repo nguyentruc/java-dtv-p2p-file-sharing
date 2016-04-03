@@ -37,7 +37,7 @@ public class CONSTANT implements Serializable{
    
     
     public static void WRITE_SHARE_FILE(File FILE, ShareFile nsf) throws Exception{
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE));
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE));    
         oos.writeObject(nsf);
         oos.flush();
         oos.close();
