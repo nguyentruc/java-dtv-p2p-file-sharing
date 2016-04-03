@@ -10,7 +10,7 @@ public class DTV {
 	public static final int UpdatePeerTimeout = 5*1000;
 	public static final int numOfPart = 16;
 	public static final int maxPeer = 16;
-	public static final int keepAliveTimeout = 1*90*1000;
+	public static final int keepAliveTimeout = 1*75*1000;
 	
 	/**
 	 * Queue to share data between threads
