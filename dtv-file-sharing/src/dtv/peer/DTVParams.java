@@ -1,7 +1,7 @@
 /**
  * 
  */
-package dtv;
+package dtv.peer;
 
 import java.util.*;
 

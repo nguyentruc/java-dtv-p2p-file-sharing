@@ -1,4 +1,4 @@
-package dtv;
+package dtv.peer;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -632,21 +632,21 @@ class Filetxt extends FileFilter  {
 /////////////////////Image Type////////////////////////////////
 
 class ImageFileView extends FileView {
-    ImageIcon jpegIcon = Utils.createImageIcon("jpegType.png");
-    ImageIcon jpgIcon = Utils.createImageIcon("jpgType.png");
-    ImageIcon gifIcon = Utils.createImageIcon("gifType.png");   
-    ImageIcon pngIcon = Utils.createImageIcon("pngType.png");
-    ImageIcon docIcon = Utils.createImageIcon("docType.png");
-    ImageIcon pptIcon = Utils.createImageIcon("pptType.png");
-    ImageIcon xlsIcon = Utils.createImageIcon("xlsType.png");
-    ImageIcon musicIcon = Utils.createImageIcon("musicType.png");
-    ImageIcon mvIcon = Utils.createImageIcon("aviType.png");
-    ImageIcon pdfIcon = Utils.createImageIcon("pdfType.png");
-    ImageIcon psdIcon = Utils.createImageIcon("psdType.png");
-    ImageIcon htmlIcon = Utils.createImageIcon("htmlType.png");
-    ImageIcon binaryIcon = Utils.createImageIcon("binaryType.png");
-    ImageIcon txtIcon = Utils.createImageIcon("txtType.png");
-    ImageIcon winrarIcon = Utils.createImageIcon("winrarType.png");
+    ImageIcon jpegIcon = Utils.createImageIcon("../picture/jpegType.png");
+    ImageIcon jpgIcon = Utils.createImageIcon("../picture/jpgType.png");
+    ImageIcon gifIcon = Utils.createImageIcon("../picture/gifType.png");   
+    ImageIcon pngIcon = Utils.createImageIcon("../picture/pngType.png");
+    ImageIcon docIcon = Utils.createImageIcon("../picture/docType.png");
+    ImageIcon pptIcon = Utils.createImageIcon("../picture/pptType.png");
+    ImageIcon xlsIcon = Utils.createImageIcon("../picture/xlsType.png");
+    ImageIcon musicIcon = Utils.createImageIcon("../picture/musicType.png");
+    ImageIcon mvIcon = Utils.createImageIcon("../picture/aviType.png");
+    ImageIcon pdfIcon = Utils.createImageIcon("../picture/pdfType.png");
+    ImageIcon psdIcon = Utils.createImageIcon("../picture/psdType.png");
+    ImageIcon htmlIcon = Utils.createImageIcon("../picture/htmlType.png");
+    ImageIcon binaryIcon = Utils.createImageIcon("../picture/binaryType.png");
+    ImageIcon txtIcon = Utils.createImageIcon("../picture/txtType.png");
+    ImageIcon winrarIcon = Utils.createImageIcon("../picture/winrarType.png");
 
     public String getName(File f) {
         return null; //let the L&F FileView figure this out

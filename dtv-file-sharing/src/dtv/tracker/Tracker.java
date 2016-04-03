@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package dtv;
+package dtv.tracker;
 
 import java.io.File;
 import java.net.ServerSocket;

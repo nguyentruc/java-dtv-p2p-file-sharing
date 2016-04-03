@@ -1,4 +1,4 @@
-package dtv;
+package dtv.peer;
 
 import java.io.PrintWriter;
 import java.net.Socket;

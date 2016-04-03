@@ -1,4 +1,4 @@
-package dtv;
+package dtv.peer;
 
 import java.awt.EventQueue;
 
@@ -519,10 +519,10 @@ public class UI  implements Runnable{
 		});
 		//--------------------------------------------IMAGES TREE-------------------------------------------------------------------------
 				tree.setCellRenderer(new DefaultTreeCellRenderer() {
-					private Icon downloadIcon = new ImageIcon(this.getClass().getResource("download-icon.png"));
-			        private Icon searchIcon =  new ImageIcon(this.getClass().getResource("search-icon.png"));
-			        private Icon uploadIcon =  new ImageIcon(this.getClass().getResource("upload-icon.png"));
-			        private Icon torrentIcon =  new ImageIcon(this.getClass().getResource("torrent.png"));
+					private Icon downloadIcon = new ImageIcon(this.getClass().getResource("../picture/download-icon.png"));
+			        private Icon searchIcon =  new ImageIcon(this.getClass().getResource("../picture/search-icon.png"));
+			        private Icon uploadIcon =  new ImageIcon(this.getClass().getResource("../picture/upload-icon.png"));
+			        private Icon torrentIcon =  new ImageIcon(this.getClass().getResource("../picture/torrent.png"));
 				        @Override
 				        public Component getTreeCellRendererComponent(JTree tree,
 				                Object value, boolean selected, boolean expanded,
