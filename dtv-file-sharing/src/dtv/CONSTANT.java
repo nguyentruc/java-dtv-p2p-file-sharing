@@ -29,7 +29,7 @@ import java.util.ArrayList;
 public class CONSTANT implements Serializable{
 
     public static String STORAGE_PATH = 
-            "d://abcd//";
+            "C:\\Users\\Public\\Tracker\\";
     public static int KEEP_ALIVE_TIME = 2;
     public static int SERVER_LISTENING_PORT = 1234; 
     public static int IPLIST_SIZE = 16;
