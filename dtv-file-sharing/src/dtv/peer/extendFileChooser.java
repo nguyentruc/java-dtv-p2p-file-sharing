@@ -632,21 +632,21 @@ class Filetxt extends FileFilter  {
 /////////////////////Image Type////////////////////////////////
 
 class ImageFileView extends FileView {
-    ImageIcon jpegIcon = Utils.createImageIcon("../picture/jpegType.png");
-    ImageIcon jpgIcon = Utils.createImageIcon("../picture/jpgType.png");
-    ImageIcon gifIcon = Utils.createImageIcon("../picture/gifType.png");   
-    ImageIcon pngIcon = Utils.createImageIcon("../picture/pngType.png");
-    ImageIcon docIcon = Utils.createImageIcon("../picture/docType.png");
-    ImageIcon pptIcon = Utils.createImageIcon("../picture/pptType.png");
-    ImageIcon xlsIcon = Utils.createImageIcon("../picture/xlsType.png");
-    ImageIcon musicIcon = Utils.createImageIcon("../picture/musicType.png");
-    ImageIcon mvIcon = Utils.createImageIcon("../picture/aviType.png");
-    ImageIcon pdfIcon = Utils.createImageIcon("../picture/pdfType.png");
-    ImageIcon psdIcon = Utils.createImageIcon("../picture/psdType.png");
-    ImageIcon htmlIcon = Utils.createImageIcon("../picture/htmlType.png");
-    ImageIcon binaryIcon = Utils.createImageIcon("../picture/binaryType.png");
-    ImageIcon txtIcon = Utils.createImageIcon("../picture/txtType.png");
-    ImageIcon winrarIcon = Utils.createImageIcon("../picture/winrarType.png");
+    ImageIcon jpegIcon = Utils.createImageIcon("/dtv/picture/jpegType.png");
+    ImageIcon jpgIcon = Utils.createImageIcon("/dtv/picture/jpgType.png");
+    ImageIcon gifIcon = Utils.createImageIcon("/dtv/picture/gifType.png");   
+    ImageIcon pngIcon = Utils.createImageIcon("/dtv/picture/pngType.png");
+    ImageIcon docIcon = Utils.createImageIcon("/dtv/picture/docType.png");
+    ImageIcon pptIcon = Utils.createImageIcon("/dtv/picture/pptType.png");
+    ImageIcon xlsIcon = Utils.createImageIcon("/dtv/picture/xlsType.png");
+    ImageIcon musicIcon = Utils.createImageIcon("/dtv/picture/musicType.png");
+    ImageIcon mvIcon = Utils.createImageIcon("/dtv/picture/aviType.png");
+    ImageIcon pdfIcon = Utils.createImageIcon("/dtv/picture/pdfType.png");
+    ImageIcon psdIcon = Utils.createImageIcon("/dtv/picture/psdType.png");
+    ImageIcon htmlIcon = Utils.createImageIcon("/dtv/picture/htmlType.png");
+    ImageIcon binaryIcon = Utils.createImageIcon("/dtv/picture/binaryType.png");
+    ImageIcon txtIcon = Utils.createImageIcon("/dtv/picture/txtType.png");
+    ImageIcon winrarIcon = Utils.createImageIcon("/dtv/picture/winrarType.png");
 
     public String getName(File f) {
         return null; //let the L&F FileView figure this out

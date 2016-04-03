@@ -1,7 +1,7 @@
 package dtv.peer;
 
 import java.awt.EventQueue;
-
+import dtv.picture.*;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import java.awt.BorderLayout;
@@ -519,10 +519,10 @@ public class UI  implements Runnable{
 		});
 		//--------------------------------------------IMAGES TREE-------------------------------------------------------------------------
 				tree.setCellRenderer(new DefaultTreeCellRenderer() {
-					private Icon downloadIcon = new ImageIcon(this.getClass().getResource("../picture/download-icon.png"));
-			        private Icon searchIcon =  new ImageIcon(this.getClass().getResource("../picture/search-icon.png"));
-			        private Icon uploadIcon =  new ImageIcon(this.getClass().getResource("../picture/upload-icon.png"));
-			        private Icon torrentIcon =  new ImageIcon(this.getClass().getResource("../picture/torrent.png"));
+					private Icon downloadIcon = new ImageIcon(this.getClass().getResource("/dtv/picture/download-icon.png"));
+			        private Icon searchIcon =  new ImageIcon(this.getClass().getResource("/dtv/picture/search-icon.png"));
+			        private Icon uploadIcon =  new ImageIcon(this.getClass().getResource("/dtv/picture/upload-icon.png"));
+			        private Icon torrentIcon =  new ImageIcon(this.getClass().getResource("/dtv/picture/torrent.png"));
 				        @Override
 				        public Component getTreeCellRendererComponent(JTree tree,
 				                Object value, boolean selected, boolean expanded,
