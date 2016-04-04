@@ -2,6 +2,7 @@ package dtv.peer;
 
 import java.io.*;
 import java.net.*;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerListener implements Runnable{
@@ -11,20 +12,23 @@ public class ServerListener implements Runnable{
 	final private int maxConnection;
 	
 	public ServerListener() {
-		int i;
+		int port;
+		Random ranPort = new Random();
 		
-		for (i = 7000; i <= 8000; i++)
+		while (true)
 		{
-			try {
-				welcomeSocket = new ServerSocket(i);
-			} catch (IOException e) {
-				continue;
+			try
+			{
+				port = ranPort.nextInt(1001);
+				port += 7000;
+				welcomeSocket = new ServerSocket(port);
+				break;
 			}
-			break;
+			catch (IOException e){}
 		}
 		
-		Peer.ServerPort = i;
-		System.out.println(String.format("Server port: %d", i));
+		Peer.ServerPort = port;
+		System.out.println(String.format("Server port: %d", port));
 		maxConnection = (DTV.maxPeer + DTV.maxPeer/2);
 	}
 
