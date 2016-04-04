@@ -57,10 +57,9 @@ public class UI  implements Runnable{
 	private JButton btnDownload;
 	private JButton btnSearch;
 	private JTextArea txtAddressTracker;
-	private JComboBox selectTracker;
+	private JComboBox<String> selectTracker;
 	File fileSave; 
 	List<DTVParams> fileL;
-	private String codeHash;
 	private JButton btnNewButton;
 	private JMenuItem mntmAboutDtv;
 	private JMenuItem mntmExit;
@@ -118,6 +117,7 @@ public class UI  implements Runnable{
                 }
         return str_size; 
     }
+	@SuppressWarnings("serial")
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBackground(Color.WHITE);
@@ -262,7 +262,7 @@ public class UI  implements Runnable{
 		
 		//Add data for Table FileShare
 	
-		DefaultComboBoxModel modelCombo=new DefaultComboBoxModel();	
+		DefaultComboBoxModel<String> modelCombo=new DefaultComboBoxModel<String>();	
 		JFileChooser fileAddTorrent = new JFileChooser();
 		fileAddTorrent.setFileFilter(new Filedoc());
 		fileAddTorrent.setFileFilter(new Fileppt());
@@ -566,7 +566,7 @@ public class UI  implements Runnable{
 				tcDownload.setPreferredWidth(300);
 				
 				//---------------------------------------Define TextArea and Combobox-------------------------------------------
-				selectTracker = new JComboBox();
+				selectTracker = new JComboBox<String>();
 				springLayout.putConstraint(SpringLayout.WEST, btnSearch, 6, SpringLayout.EAST, selectTracker);
 				springLayout.putConstraint(SpringLayout.NORTH, selectTracker, 0, SpringLayout.NORTH, btnAddTorrent);
 				springLayout.putConstraint(SpringLayout.WEST, selectTracker, 6, SpringLayout.EAST, btnDownload);
