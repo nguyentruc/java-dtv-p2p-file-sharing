@@ -1,26 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dtv.tracker;
-
 import java.io.File;
 import java.util.ArrayList;
-
 /**
  *
  * @author vuong
  */
 public class TrackerUI extends javax.swing.JFrame {
-
-    /**
-     * Creates new form TrackerUI
-     */
     public TrackerUI() {
         initComponents();
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -85,7 +73,6 @@ public class TrackerUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String ret = "";
         try {
@@ -100,7 +87,6 @@ public class TrackerUI extends javax.swing.JFrame {
                 ret = ret + sf.getFileName() + "\n";
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             ret = ret + ex.getMessage();
         }
         jTextArea1.setText(ret);
@@ -125,12 +111,10 @@ public class TrackerUI extends javax.swing.JFrame {
                 ret = ret + "END\n";
             }
         }catch(Exception ex){
-            ex.printStackTrace();
             ret = ret + ex.getMessage();
         }
         jTextArea1.setText(ret);
     }//GEN-LAST:event_jButton2ActionPerformed
-
     /**
      * @param args the command line arguments
      */

@@ -1,40 +1,28 @@
 package dtv.peer;
 
-import java.awt.EventQueue;
-import dtv.picture.*;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.SpringLayout;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JTextField;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.BlockingQueue;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -49,12 +37,8 @@ import javax.swing.JTextArea;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JMenu;
-import java.awt.SystemColor;
 import javax.swing.UIManager;
-import java.awt.Toolkit;
 import java.awt.Font;
 import javax.swing.JMenuItem;
 public class UI  implements Runnable{
@@ -349,8 +333,6 @@ public class UI  implements Runnable{
 				try {
 					hashCode = generateSHA512(new FileInputStream(file));
 				} catch (FileNotFoundException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
 				}
 				int numberRow=0;
 				boolean flag = false;
@@ -408,8 +390,6 @@ public class UI  implements Runnable{
 				try {
 					DTV.UIToPeer.put(dtv_params);
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
 				}
 				}
@@ -441,8 +421,6 @@ public class UI  implements Runnable{
 					}
 					
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 				tree.setSelectionRow(2);
 				
@@ -469,8 +447,6 @@ public class UI  implements Runnable{
 						try {
 							DTV.UIToPeer.put(dtvParamsDownload);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 						break;
 					}
@@ -499,8 +475,6 @@ public class UI  implements Runnable{
 				        try {
 							DTV.UIToPeer.put(params);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 			        	model.removeRow(table.getSelectedRows()[0]);
 			        }
@@ -519,10 +493,10 @@ public class UI  implements Runnable{
 		});
 		//--------------------------------------------IMAGES TREE-------------------------------------------------------------------------
 				tree.setCellRenderer(new DefaultTreeCellRenderer() {
-					private Icon downloadIcon = new ImageIcon(this.getClass().getResource("/dtv/picture/download-icon.png"));
-			        private Icon searchIcon =  new ImageIcon(this.getClass().getResource("/dtv/picture/search-icon.png"));
-			        private Icon uploadIcon =  new ImageIcon(this.getClass().getResource("/dtv/picture/upload-icon.png"));
-			        private Icon torrentIcon =  new ImageIcon(this.getClass().getResource("/dtv/picture/torrent.png"));
+					private final Icon downloadIcon = new ImageIcon(this.getClass().getResource("/dtv/picture/download-icon.png"));
+			        private final Icon searchIcon =  new ImageIcon(this.getClass().getResource("/dtv/picture/search-icon.png"));
+			        private final Icon uploadIcon =  new ImageIcon(this.getClass().getResource("/dtv/picture/upload-icon.png"));
+			        private final Icon torrentIcon =  new ImageIcon(this.getClass().getResource("/dtv/picture/torrent.png"));
 				        @Override
 				        public Component getTreeCellRendererComponent(JTree tree,
 				                Object value, boolean selected, boolean expanded,
@@ -650,40 +624,39 @@ public class UI  implements Runnable{
 				btnSearch.setEnabled(false);
 	}
 	//Change value for Jtree
-	private void treeValueChanged(TreeSelectionEvent evt) {//GEN-FIRST:event_treeValueChanged
-        // TODO add your handling code here:
-       
-        if(tree.getSelectionPath().getLastPathComponent().toString().equals("File Share"))
-        {
-        	scrollPaneTable1.setVisible(true);
-        	scrollTableRequest.setVisible(false);
-            scrollTableDownload.setVisible(false);
-            btnDelete.setEnabled(true);
-            btnAddTorrent.setEnabled(true);
-            btnDownload.setEnabled(false);
-            btnSearch.setEnabled(true);
-               
-        }
-        else if(tree.getSelectionPath().getLastPathComponent().toString().equals("Search"))
-        {
-        	scrollPaneTable1.setVisible(false);
-        	scrollTableRequest.setVisible(true);
-            scrollTableDownload.setVisible(false);
-            btnDelete.setEnabled(false);
-            btnAddTorrent.setEnabled(false);
-            btnDownload.setEnabled(true); 	
-            btnSearch.setEnabled(true); 
-        }
-        else  if(tree.getSelectionPath().getLastPathComponent().toString().equals("Download"))
-        {
-        	scrollPaneTable1.setVisible(false);
-        	scrollTableRequest.setVisible(false);
-            scrollTableDownload.setVisible(true);
-            btnDelete.setEnabled(true);
-            btnAddTorrent.setEnabled(false);
-            btnDownload.setEnabled(false);
-            btnSearch.setEnabled(false);
-        }
+	private void treeValueChanged(TreeSelectionEvent evt) { //GEN-FIRST:event_treeValueChanged
+            // TODO add your handling code here:
+            switch (tree.getSelectionPath().getLastPathComponent().toString()) {
+                case "File Share":
+                    scrollPaneTable1.setVisible(true);
+                    scrollTableRequest.setVisible(false);
+                    scrollTableDownload.setVisible(false);
+                    btnDelete.setEnabled(true);
+                    btnAddTorrent.setEnabled(true);
+                    btnDownload.setEnabled(false);
+                    btnSearch.setEnabled(true);
+                    break;
+                case "Search":
+                    scrollPaneTable1.setVisible(false);
+                    scrollTableRequest.setVisible(true);
+                    scrollTableDownload.setVisible(false);
+                    btnDelete.setEnabled(false);
+                    btnAddTorrent.setEnabled(false);
+                    btnDownload.setEnabled(true);
+                    btnSearch.setEnabled(true);
+                    break;
+                case "Download":
+                    scrollPaneTable1.setVisible(false);
+                    scrollTableRequest.setVisible(false);
+                    scrollTableDownload.setVisible(true);
+                    btnDelete.setEnabled(true);
+                    btnAddTorrent.setEnabled(false);
+                    btnDownload.setEnabled(false);
+                    btnSearch.setEnabled(false);
+                    break;
+                default:
+                    break;
+            }
     }//GEN-LAST:event_treeValueChanged
 	 @Override
 		public void run() {
@@ -703,7 +676,6 @@ public class UI  implements Runnable{
 								revDtv.getHashCode()});
 					}
 				} catch (InterruptedException e) {
-					continue;
 				}	
 			}
 		}
@@ -727,11 +699,7 @@ public class UI  implements Runnable{
 		        byte[] hashValue = md.digest();
 		        return convertByteArrayToHexString(hashValue);
 		    }
-		    catch (NoSuchAlgorithmException e)
-		    {
-		        return null;
-		    } 
-		    catch (IOException e) 
+		    catch (NoSuchAlgorithmException | IOException e) 
 		    {
 		        return null;
 		    }

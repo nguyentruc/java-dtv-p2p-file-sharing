@@ -1,25 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dtv.tracker;
-
 import java.io.Serializable;
 import java.util.*;
-
 /**
  * @author vuong
  *
  */
 public class ShareFile implements Serializable{
-
 	private final ArrayList<String> TrackerList;
 	private final ArrayList<Seeder> ipList;
         private final String sizeOfFile;
         private final String fileName;
         private final String hashCode;
-        
 	ShareFile(String hashCode, String fileName, String sizeOfFile) {
             TrackerList = new ArrayList<>();
             ipList = new ArrayList<>();
@@ -27,17 +18,14 @@ public class ShareFile implements Serializable{
             this.fileName = fileName;
             this.sizeOfFile = sizeOfFile;
         }
-
 	public void addTracker(String tracker)
 	{
             if(!TrackerList.contains(tracker))TrackerList.add(tracker);
 	}
-
         public void addIp(String ipaddr, String port){
             Seeder ns = new Seeder(ipaddr, port);
             ipList.add(ns);
         }
-        
         public String pickSome(){
             String ret = "";
             if(ipList.size() <= CONSTANT.IPLIST_SIZE){
@@ -61,18 +49,22 @@ public class ShareFile implements Serializable{
             }
             return ret;
         }
-        
         public String parseFileInfo(){
             String ret = "";
+            ArrayList<String> _ipList = new ArrayList<>();
+            for(int j = 0; j < ipList.size(); j++){
+                Seeder tmpSeeder = ipList.get(j);
+                String tmpInfo = tmpSeeder.getIp() + ":" + tmpSeeder.getPort();
+                if(!_ipList.contains(tmpInfo)) _ipList.add(tmpInfo);
+            }
             ret = ret + fileName + "\n" + hashCode + "\n" + sizeOfFile + "\n"
-            + String.valueOf(ipList.size()) + "\n";
+            + String.valueOf(_ipList.size()) + "\n";
             ret = ret + String.valueOf(TrackerList.size()) + "\n";
             for(int i = 0; i<TrackerList.size(); i++){
                 ret = ret + TrackerList.get(i) + "\n";
             }
             return ret;
         }
-        
         public void checkSeederAliveTime(){
             int loopTimes = ipList.size();
             for(int i = loopTimes - 1; i >= 0; i--){
@@ -82,11 +74,9 @@ public class ShareFile implements Serializable{
                 else ipList.set(i, retSeeder);
             }
         }
-        
         public String getFileName(){
             return fileName;
         }
-        
         public ArrayList<Seeder> getIPList(){
             return ipList;
         }

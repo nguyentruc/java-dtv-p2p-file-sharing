@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dtv.tracker;
 /**
  * @author: vuong
@@ -12,10 +7,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.ArrayList;
-
 public class TrackerThread implements Runnable {
-
     Socket cs;
     String incommingIP;
     String incommingPort;
@@ -30,11 +22,8 @@ public class TrackerThread implements Runnable {
             // Create a buffer to store bytes got from InputStream
             BufferedReader br = new BufferedReader(new InputStreamReader(cs.getInputStream()));
             String ServiceCode = br.readLine();
-            // Code for debug
             System.out.println("Received ServiceCode = " + ServiceCode);
             System.out.println("Incomming port = " + incommingPort);
-            // cs.getInetAddress().toString() give us: "/ip"
-            // "/ip" -- substring(1)--> "ip"
             switch (ServiceCode) {
                 case "0":
                     ExecuteCommandCode0(br);
@@ -51,18 +40,17 @@ public class TrackerThread implements Runnable {
                     break;
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
     private Boolean addToList(String hashCode)
     {        
-       if (Tracker.lock.contains(hashCode))
+       if (Tracker.LOCK.contains(hashCode))
        {
            return false;
        }
        else
        {
-           Tracker.lock.add(new String(hashCode));
+           Tracker.LOCK.add(new String(hashCode));
            return true;
        }
     }
@@ -75,13 +63,12 @@ public class TrackerThread implements Runnable {
         Boolean newHash;
         System.out.println("listening port = " + listeningPort);
         String ipFileAbsolutePath = CONSTANT.STORAGE_PATH + hashCode;
-        File f = new File(ipFileAbsolutePath);
-        
-        synchronized (Tracker.lock)
+        File f = new File(ipFileAbsolutePath);        
+        synchronized (Tracker.LOCK)
         {
             newHash = addToList(hashCode);
         }
-        String thisHash = Tracker.lock.get(Tracker.lock.indexOf(hashCode));
+        String thisHash = Tracker.LOCK.get(Tracker.LOCK.indexOf(hashCode));
         synchronized (thisHash)
         {
             if (newHash)
@@ -108,7 +95,6 @@ public class TrackerThread implements Runnable {
             }
         }
     }
-
     private void ExecuteCommandCode1(BufferedReader br) throws Exception {
         String hashCode = br.readLine();
         DataOutputStream dos = new DataOutputStream(cs.getOutputStream());
@@ -125,24 +111,22 @@ public class TrackerThread implements Runnable {
             dos.flush();
             dos.close();
         }
-    }
-       
+    }  
     private void ExecuteCommandCode2() throws Exception {
-        DataOutputStream dos = new DataOutputStream(cs.getOutputStream());
-        File f = new File(CONSTANT.STORAGE_PATH);
-        String[] listFile = f.list();
-        String numberOfFile = String.valueOf(listFile.length);
-        dos.write((numberOfFile + "\n").getBytes());
-        for(int i = 0; i < listFile.length; i++){
-            String tmp = listFile[i];
-            File FILE = new File(CONSTANT.STORAGE_PATH + tmp);
-            ShareFile sf = CONSTANT.READ_SHARE_FILE(FILE);
-            dos.write(sf.parseFileInfo().getBytes());
+        try (DataOutputStream dos = new DataOutputStream(cs.getOutputStream())) {
+            File f = new File(CONSTANT.STORAGE_PATH);
+            String[] listFile = f.list();
+            String numberOfFile = String.valueOf(listFile.length);
+            dos.write((numberOfFile + "\n").getBytes());
+            for(int i = 0; i < listFile.length; i++){
+                String tmp = listFile[i];
+                File FILE = new File(CONSTANT.STORAGE_PATH + tmp);
+                ShareFile sf = CONSTANT.READ_SHARE_FILE(FILE);
+                dos.write(sf.parseFileInfo().getBytes());
+            }
+            dos.flush();
         }
-        dos.flush();
-        dos.close();
     }
-
     private void ExecuteCommandCode3(BufferedReader br) throws Exception {
         String listeningPort = br.readLine();
         File folder = new File(CONSTANT.STORAGE_PATH);
@@ -152,8 +136,8 @@ public class TrackerThread implements Runnable {
             String hashCode = br.readLine();
             File f = new File(CONSTANT.STORAGE_PATH + hashCode);
             if(f.exists()){
-                int tmp = Tracker.lock.indexOf(hashCode);
-                synchronized(Tracker.lock.get(tmp)){
+                int tmp = Tracker.LOCK.indexOf(hashCode);
+                synchronized(Tracker.LOCK.get(tmp)){
                     ShareFile sf = CONSTANT.READ_SHARE_FILE(f);
                     sf.addIp(incommingIP, listeningPort);
                     CONSTANT.WRITE_SHARE_FILE(f, sf);
