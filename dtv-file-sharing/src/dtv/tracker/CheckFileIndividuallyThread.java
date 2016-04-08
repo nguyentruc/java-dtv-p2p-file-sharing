@@ -4,9 +4,9 @@ import java.io.File;
  *
  * @author vuong
  */
-public class IndieFileCheck implements Runnable{
+public class CheckFileIndividuallyThread implements Runnable{
     private final int index;
-    public IndieFileCheck(int index) {
+    public CheckFileIndividuallyThread(int index) {
         this.index = index;
     }
     @Override

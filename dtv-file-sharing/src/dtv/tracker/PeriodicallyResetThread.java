@@ -19,7 +19,7 @@ public class PeriodicallyResetThread implements Runnable{
         synchronized(Tracker.LOCK)
         {
             for(int i = 0; i < Tracker.LOCK.size(); i++){
-                new Thread(new IndieFileCheck(i)).start();
+                new Thread(new CheckFileIndividuallyThread(i)).start();
             }
         }
     }
