@@ -192,7 +192,7 @@ public class UI  implements Runnable{
 		springLayout.putConstraint(SpringLayout.EAST, tableDownload, 486, SpringLayout.WEST, frame.getContentPane());
 		
 		//------------------------------------------Define Button-------------------------------------------------------- 
-		btnAddTorrent = new JButton("UPLOAD");
+		btnAddTorrent = new JButton("SHARE");
 		btnAddTorrent.setForeground(Color.BLACK);
 		btnAddTorrent.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		springLayout.putConstraint(SpringLayout.NORTH, btnAddTorrent, 12, SpringLayout.NORTH, frame.getContentPane());
