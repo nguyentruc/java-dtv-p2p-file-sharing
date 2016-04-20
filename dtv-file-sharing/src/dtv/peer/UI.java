@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -34,12 +35,16 @@ import javax.swing.JTree;
 import java.util.*;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
 import javax.swing.UIManager;
 import java.awt.Font;
+import java.awt.TextField;
+
 import javax.swing.JMenuItem;
 public class UI  implements Runnable{
 
@@ -58,6 +63,12 @@ public class UI  implements Runnable{
 	private JButton btnSearch;
 	private JTextArea txtAddressTracker;
 	private JComboBox<String> selectTracker;
+	private JPopupMenu   popupMenu ;
+	private JMenuItem  menuItemAdd ;
+	private JTextField textField;
+	private JButton btnFrameSearch;
+	private JFrame frameSearch;
+
 	File fileSave; 
 	List<DTVParams> fileL;
 	private JButton btnNewButton;
@@ -622,6 +633,82 @@ public class UI  implements Runnable{
 				);	
 				txtAddressTracker.append("192.168.43.53:1234");	
 				btnSearch.setEnabled(false);
+				////////////////
+				
+		        // constructs the popup menu
+				popupMenu = new JPopupMenu();
+				menuItemAdd = new JMenuItem("Advance Search");  
+		        popupMenu.add(menuItemAdd);
+
+		        // sets the popup menu for the table
+		        btnSearch.setComponentPopupMenu(popupMenu);
+		         
+		        btnSearch.addMouseListener(new TableMouseListener(btnSearch));
+		        
+		        ActionListener menuListener = new ActionListener() {
+		            public void actionPerformed(ActionEvent event) {
+		            frameSearch = new JFrame();
+		            frameSearch.setBounds(100, 100, 318, 86);
+		            frameSearch.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		      		SpringLayout springLayoutSearch = new SpringLayout();
+		      		frameSearch.getContentPane().setLayout(springLayoutSearch);
+		      		frameSearch.setTitle("Avdance Search");
+		      		textField = new JTextField();
+		      		springLayoutSearch.putConstraint(SpringLayout.NORTH, textField, 6, SpringLayout.NORTH, frameSearch.getContentPane());
+		      		springLayoutSearch.putConstraint(SpringLayout.WEST, textField, 10, SpringLayout.WEST, frameSearch.getContentPane());
+		      		springLayoutSearch.putConstraint(SpringLayout.SOUTH, textField, -12, SpringLayout.SOUTH, frameSearch.getContentPane());
+		      		springLayoutSearch.putConstraint(SpringLayout.EAST, textField, 200, SpringLayout.WEST, frameSearch.getContentPane());
+		      		frameSearch.getContentPane().add(textField);
+		      		textField.setColumns(10);
+		      		
+		      		btnFrameSearch = new JButton("SEARCH");
+		      		springLayoutSearch.putConstraint(SpringLayout.NORTH, btnFrameSearch, 0, SpringLayout.NORTH, textField);
+		      		springLayoutSearch.putConstraint(SpringLayout.WEST, btnFrameSearch, 6, SpringLayout.EAST, textField);
+		      		springLayoutSearch.putConstraint(SpringLayout.SOUTH, btnFrameSearch, 0, SpringLayout.SOUTH, textField);
+		      		springLayoutSearch.putConstraint(SpringLayout.EAST, btnFrameSearch, -10, SpringLayout.EAST, frameSearch.getContentPane());
+		      		frameSearch.getContentPane().add(btnFrameSearch);
+		      		btnFrameSearch.addActionListener(new ActionListener() {
+		    			public void actionPerformed(ActionEvent arg0) {		    				
+		    					DefaultTableModel modelRequest=(DefaultTableModel)tableRequest.getModel();
+		    					//delete data for tableSearch
+		    					while(modelRequest.getRowCount()!=0)
+		    				       {
+		    						modelRequest.removeRow(0);
+		    				       }
+		    					
+		    					String textSearch=textField.getText();
+		    					DTVParams dtvParams1= new DTVParams();
+		    					dtvParams1.setName(textSearch);
+		    					dtvParams1.addTracker((String)selectTracker.getSelectedItem());
+		    					dtvParams1.setType(2);
+		    					try {
+		    						DTV.UIToPeer.put(dtvParams1);
+		    						//List<DTVParams>
+		    						fileL = DTV.fileList.take();	
+		    						for (int i = 0; i < fileL.size(); i++)
+		    						{
+		    							DTVParams tParams = fileL.get(i);
+		    							modelRequest.addRow(new Object[]{modelRequest.getRowCount()+1,tParams.getName(),
+		    									sizeToString(tParams.getSize()),tParams.getType()});
+		    						}
+		    						
+		    					} catch (InterruptedException e) {
+		    					}
+		    					frameSearch.setVisible(false);
+		    					tree.setSelectionRow(2);
+		    				}	
+		    		});
+		      		//frame.setType(javax.swing.JFrame.Type.UTILITY);
+		      		frameSearch.setDefaultCloseOperation(frameSearch.DISPOSE_ON_CLOSE);
+		      		frameSearch.setLocation(400, 300);
+		      		frameSearch.setVisible(true);
+		            
+		          
+		            }
+		          };
+		          menuItemAdd.addActionListener( menuListener);
+		          
+				////////////////
 	}
 	//Change value for Jtree
 	private void treeValueChanged(TreeSelectionEvent evt) { //GEN-FIRST:event_treeValueChanged
