@@ -634,7 +634,7 @@ public class UI  implements Runnable{
 				
 		        // constructs the popup menu
 				popupMenu = new JPopupMenu();
-				menuItemAdd = new JMenuItem("Advance Search");  
+				menuItemAdd = new JMenuItem("Advanced Search");  
 		        popupMenu.add(menuItemAdd);
 
 		        // sets the popup menu for the table
@@ -649,7 +649,7 @@ public class UI  implements Runnable{
 		            frameSearch.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		      		SpringLayout springLayoutSearch = new SpringLayout();
 		      		frameSearch.getContentPane().setLayout(springLayoutSearch);
-		      		frameSearch.setTitle("Avdance Search");
+		      		frameSearch.setTitle("Advanced Search");
 		      		textField = new JTextField();
 		      		springLayoutSearch.putConstraint(SpringLayout.NORTH, textField, 6, SpringLayout.NORTH, frameSearch.getContentPane());
 		      		springLayoutSearch.putConstraint(SpringLayout.WEST, textField, 10, SpringLayout.WEST, frameSearch.getContentPane());
