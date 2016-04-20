@@ -20,7 +20,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -43,8 +42,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
 import javax.swing.UIManager;
 import java.awt.Font;
-import java.awt.TextField;
-
 import javax.swing.JMenuItem;
 public class UI  implements Runnable{
 
@@ -699,7 +696,7 @@ public class UI  implements Runnable{
 		    				}	
 		    		});
 		      		//frame.setType(javax.swing.JFrame.Type.UTILITY);
-		      		frameSearch.setDefaultCloseOperation(frameSearch.DISPOSE_ON_CLOSE);
+		      		frameSearch.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		      		frameSearch.setLocation(400, 300);
 		      		frameSearch.setVisible(true);
 		            

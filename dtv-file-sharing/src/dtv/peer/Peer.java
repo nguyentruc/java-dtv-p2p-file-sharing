@@ -2,6 +2,7 @@ package dtv.peer;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.net.*;
 
@@ -57,12 +58,27 @@ public class Peer implements Runnable{
 				case 2: //search
 					System.out.println("search");
 					List<DTVParams> fileList = getListFromServer(revDtv);
+					
+					if (revDtv.getName().equals("") == false)
+					{
+						List<DTVParams> _fileList = new LinkedList<DTVParams>();
+						for (int i = 0; i < fileList.size(); i++)
+						{
+							if (fileList.get(i).getName().contains(revDtv.getName()) == true)
+							{
+								_fileList.add(fileList.get(i));
+							}
+						}
+						
+						fileList.clear();
+						fileList.addAll(_fileList);
+					}
+					
 					DTV.fileList.put(fileList);
 					
 					if (fileList.isEmpty())
 					{
-						UI.showWarningTextBox(String.format("Could not get file list from tracker %s"
-								, revDtv.getTrackerList().get(0))
+						UI.showWarningTextBox("File not found"
 								,"LIST EMPTY");
 					}
 					
