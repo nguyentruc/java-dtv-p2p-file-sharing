@@ -32,7 +32,7 @@ public class TrackerThread implements Runnable {
                     ExecuteCommandCode1(br);
                     break;
                 case "2":
-                    ExecuteCommandCode2();
+                    ExecuteCommandCode2(br);
                     break;
                 case "3":
                     ExecuteCommandCode3(br);
@@ -112,25 +112,49 @@ public class TrackerThread implements Runnable {
             dos.close();
         }
     }  
-    private void ExecuteCommandCode2() throws Exception {
+    private void ExecuteCommandCode2(BufferedReader br) throws Exception {
         try (DataOutputStream dos = new DataOutputStream(cs.getOutputStream())) {
+        	String search_param = br.readLine();
             File f = new File(CONSTANT.STORAGE_PATH);
             String[] listFile = f.list();
             String numberOfFile = String.valueOf(listFile.length);
-            dos.write((numberOfFile + "\n").getBytes());
-            for(int i = 0; i < listFile.length; i++){
-                String tmp = listFile[i];
-                File FILE = new File(CONSTANT.STORAGE_PATH + tmp);
-                ShareFile sf = CONSTANT.READ_SHARE_FILE(FILE);
-                dos.write(sf.parseFileInfo().getBytes());
+            
+            
+            if (search_param.equals("") != true)
+            {
+            	int cnt = 0;
+            	for(int i = 0; i < listFile.length; i++){
+	                String tmp = listFile[i];
+	                File FILE = new File(CONSTANT.STORAGE_PATH + tmp);
+	                ShareFile sf = CONSTANT.READ_SHARE_FILE(FILE);
+	                if (sf.getFileName().contains(search_param) == true)
+	                	cnt++;
+	            }
+            	
+            	dos.write((String.valueOf(cnt) + "\n").getBytes());
+            	for(int i = 0; i < listFile.length; i++){
+	                String tmp = listFile[i];
+	                File FILE = new File(CONSTANT.STORAGE_PATH + tmp);
+	                ShareFile sf = CONSTANT.READ_SHARE_FILE(FILE);
+	                if (sf.getFileName().contains(search_param) == true)
+	                	dos.write(sf.parseFileInfo().getBytes());
+	            }
+            }
+            else
+            {
+            	dos.write((numberOfFile + "\n").getBytes());
+	            for(int i = 0; i < listFile.length; i++){
+	                String tmp = listFile[i];
+	                File FILE = new File(CONSTANT.STORAGE_PATH + tmp);
+	                ShareFile sf = CONSTANT.READ_SHARE_FILE(FILE);
+	                dos.write(sf.parseFileInfo().getBytes());
+	            }
             }
             dos.flush();
         }
     }
     private void ExecuteCommandCode3(BufferedReader br) throws Exception {
         String listeningPort = br.readLine();
-        File folder = new File(CONSTANT.STORAGE_PATH);
-        String[] listFile = folder.list();
         int numOfhashCode = Integer.valueOf(br.readLine());
         for(int i = 0; i<numOfhashCode; i++){
             String hashCode = br.readLine();
